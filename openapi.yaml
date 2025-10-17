@@ -1,0 +1,1197 @@
+openapi: 3.1.0
+info:
+  title: API Credicarro
+  description: API para gerenciamento de cobranças e pagamentos usando o Credicarro.
+  version: 1.0.0
+servers:
+  - url: https://api.staging.credicarro.com.br/api
+    description: Servidor para o ambiente de staging.
+  - url: https://api.credicarro.com.br/api
+    description: Servidor para o ambiente de produção.
+paths:
+  /v1/proposal:
+    get:
+      tags:
+        - Proposta
+      summary: Paginação de propostas
+      description: Traz a paginação de todas as propostas associadas ao parceiro autenticado.
+      parameters:
+        - name: offset
+          in: query
+          description: "Offset/página inicial (mínimo 1). Padrão: 1."
+          schema:
+            type: integer
+            format: int32
+            example: 1
+          example: 1
+        - name: limit
+          in: query
+          description: "Quantidade de itens por página (1–100). Padrão: 10."
+          schema:
+            type: integer
+            format: int32
+            example: 10
+          example: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Core.Domain.Primitives.IPagedResult`1[Integration.S\
+                  hared.Response.IntegrationProposalResponse]"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Core.Domain.Primitives.IPagedResult`1[Integration.S\
+                  hared.Response.IntegrationProposalResponse]"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Core.Domain.Primitives.IPagedResult`1[Integration.S\
+                  hared.Response.IntegrationProposalResponse]"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+    post:
+      tags:
+        - Proposta
+      summary: Criar uma nova proposta.
+      description: "- Cria uma nova proposta a partir de uma simulação existente."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Proposal.Requests.AddPropo\
+                salContent"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Proposal.Requests.AddPropo\
+                salContent"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Proposal.Requests.AddPropo\
+                salContent"
+      responses:
+        "201":
+          description: Created
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationIdentifierRe\
+                  sponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationIdentifierRe\
+                  sponse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationIdentifierRe\
+                  sponse"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+  /v1/proposal/{propostaId}:
+    get:
+      tags:
+        - Proposta
+      summary: Consultar proposta pelo ID.
+      description: "- Consulta os detalhes de uma proposta específica utilizando o seu ID."
+      parameters:
+        - name: propostaId
+          in: path
+          description: Identificador único da proposta (UUID) retornado na criação da
+            proposta.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationProposalResp\
+                  onse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationProposalResp\
+                  onse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationProposalResp\
+                  onse"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+  /v1/proposal/simulation:
+    get:
+      tags:
+        - Proposta
+      summary: Paginação de simulações do parceiro.
+      description: "- Traz a paginação de todas as simulações associadas ao parceiro
+        autenticado."
+      parameters:
+        - name: offset
+          in: query
+          description: "Offset/página inicial (mínimo 1). Padrão: 1."
+          schema:
+            type: integer
+            format: int32
+            example: 1
+          example: 1
+        - name: limit
+          in: query
+          description: "Quantidade de itens por página (1–100). Padrão: 10."
+          schema:
+            type: integer
+            format: int32
+            example: 10
+          example: 10
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Core.Domain.Primitives.IPagedResult`1[Integration.S\
+                  hared.Response.IntegrationSimulationResponse]"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Core.Domain.Primitives.IPagedResult`1[Integration.S\
+                  hared.Response.IntegrationSimulationResponse]"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Core.Domain.Primitives.IPagedResult`1[Integration.S\
+                  hared.Response.IntegrationSimulationResponse]"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+  /v1/proposal/simulation/{simulacaoId}:
+    get:
+      tags:
+        - Proposta
+      summary: Consultar simulação pelo ID.
+      description: "- Consulta os detalhes de uma simulação específica utilizando o seu ID."
+      parameters:
+        - name: simulacaoId
+          in: path
+          description: Identificador único da simulação (UUID) retornado na criação da
+            simulação.
+          required: true
+          schema:
+            type: string
+            format: uuid
+            example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationSimulationRe\
+                  sponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationSimulationRe\
+                  sponse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationSimulationRe\
+                  sponse"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+  /v1/authentication/accessToken:
+    post:
+      tags:
+        - Autenticação
+      summary: Gerar token de acesso.
+      description: "- Gera um token de acesso (access_token) para o parceiro
+        utilizando as credenciais do cliente (client_id e client_secret)."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Authentication.Requests.Ge\
+                nerateAccessTokenRequest"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Authentication.Requests.Ge\
+                nerateAccessTokenRequest"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Authentication.Requests.Ge\
+                nerateAccessTokenRequest"
+      responses:
+        "200":
+          description: OK
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Common.Services.Cognito.AccessTokenResult"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Common.Services.Cognito.AccessTokenResult"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Common.Services.Cognito.AccessTokenResult"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+        "500":
+          description: Internal Server Error
+  /v1/customer:
+    post:
+      tags:
+        - Cliente
+      summary: Cria um novo cliente.
+      description: "- Cria um novo cliente com base nos dados fornecidos."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.CreateCu\
+                stomerRequestContent"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.CreateCu\
+                stomerRequestContent"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.CreateCu\
+                stomerRequestContent"
+      responses:
+        "201":
+          description: Created
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Partner.Shared.Response.IdentifierResponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Partner.Shared.Response.IdentifierResponse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Partner.Shared.Response.IdentifierResponse"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+  /v1/customer/address:
+    post:
+      tags:
+        - Cliente
+      summary: Cria ou atualiza o endereço de um cliente.
+      description: "- Cria ou atualiza um endereço de cliente com base nos dados
+        fornecidos."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.UpsertAd\
+                dressRequestContent"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.UpsertAd\
+                dressRequestContent"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.UpsertAd\
+                dressRequestContent"
+      responses:
+        "202":
+          description: Accepted
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Core.Shared.Results.Result"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Core.Shared.Results.Result"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Core.Shared.Results.Result"
+  /v1/customer/professional:
+    post:
+      tags:
+        - Cliente
+      summary: Cria ou atualiza as informações profissionais de um cliente.
+      description: "- Cria ou atualiza as informações profissionais de um cliente com
+        base nos dados fornecidos."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.UpsertPr\
+                ofileRequestContent"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.UpsertPr\
+                ofileRequestContent"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.UpsertPr\
+                ofileRequestContent"
+      responses:
+        "202":
+          description: Accepted
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Core.Shared.Results.Result"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Core.Shared.Results.Result"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Core.Shared.Results.Result"
+  /v1/customer/unified:
+    post:
+      tags:
+        - Cliente
+      summary: Cria ou atualiza um cliente com dados completos.
+      description: "- Cria ou atualiza um cliente incluindo informações pessoais,
+        endereço e renda."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.CreateFu\
+                llCustomerRequestContent"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.CreateFu\
+                llCustomerRequestContent"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.CreateFu\
+                llCustomerRequestContent"
+      responses:
+        "201":
+          description: Created
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Account.Shared.Responses.IdentifierResponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Account.Shared.Responses.IdentifierResponse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Account.Shared.Responses.IdentifierResponse"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+  /v1/proposal/simulation/refinancing:
+    post:
+      tags:
+        - Proposta
+      summary: Criar uma nova simulação de refinanciamento.
+      description: "- Cria uma nova simulação de refinanciamento com base nos dados
+        fornecidos."
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Proposal.Requests.Refinanc\
+                ingSimulationRequestContent"
+          text/json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Proposal.Requests.Refinanc\
+                ingSimulationRequestContent"
+          application/*+json:
+            schema:
+              $ref: "#/components/schemas/WebIntegration.Endpoints.Proposal.Requests.Refinanc\
+                ingSimulationRequestContent"
+      responses:
+        "201":
+          description: Created
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationListSimplify\
+                  SimulationsResponse"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationListSimplify\
+                  SimulationsResponse"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Integration.Shared.Response.IntegrationListSimplify\
+                  SimulationsResponse"
+        "400":
+          description: Bad Request
+          content:
+            text/plain:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+            text/json:
+              schema:
+                $ref: "#/components/schemas/Microsoft.AspNetCore.Mvc.ProblemDetails"
+components:
+  schemas:
+    Account.Shared.Responses.IdentifierResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+      additionalProperties: false
+    Common.Services.Cognito.AccessTokenResult:
+      type: object
+      properties:
+        accessToken:
+          type: string
+        expiresIn:
+          type: integer
+          format: int32
+        expiresAt:
+          type: string
+          format: date-time
+          readOnly: true
+          example: 2025-10-17T19:05:09.010Z
+        tokenType:
+          type: string
+        scope:
+          type: string
+      additionalProperties: false
+    Core.Domain.Primitives.IPagedResult`1[Integration.Shared.Response.IntegrationProposalResponse]:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Integration.Shared.Response.IntegrationProposalResp\
+              onse"
+          nullable: true
+          readOnly: true
+        page:
+          $ref: "#/components/schemas/Core.Domain.Primitives.Page"
+      additionalProperties: false
+    Core.Domain.Primitives.IPagedResult`1[Integration.Shared.Response.IntegrationSimulationResponse]:
+      type: object
+      properties:
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/Integration.Shared.Response.IntegrationSimulationRe\
+              sponse"
+          nullable: true
+          readOnly: true
+        page:
+          $ref: "#/components/schemas/Core.Domain.Primitives.Page"
+      additionalProperties: false
+    Core.Domain.Primitives.Page:
+      type: object
+      properties:
+        hasNext:
+          type: boolean
+        hasPrevious:
+          type: boolean
+        number:
+          type: integer
+          format: int32
+        size:
+          type: integer
+          format: int32
+        total:
+          type: integer
+          format: int64
+      additionalProperties: false
+    Core.Shared.Errors.Error:
+      type: object
+      properties:
+        code:
+          type: string
+        message:
+          type: string
+      additionalProperties: false
+    Core.Shared.Results.Result:
+      type: object
+      properties:
+        isSuccess:
+          type: boolean
+          readOnly: true
+        isFailure:
+          type: boolean
+          readOnly: true
+        error:
+          $ref: "#/components/schemas/Core.Shared.Errors.Error"
+      additionalProperties: false
+    Integration.Shared.Response.Buyer:
+      type: object
+      properties:
+        cpf:
+          type: string
+      additionalProperties: false
+    Integration.Shared.Response.Cet:
+      type: object
+      properties:
+        percentual_mensal:
+          type: number
+          format: double
+        percentual_anual:
+          type: number
+          format: double
+      additionalProperties: false
+    Integration.Shared.Response.Customer:
+      type: object
+      properties:
+        cpf:
+          type: string
+      additionalProperties: false
+    Integration.Shared.Response.IntegrationIdentifierResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+      additionalProperties: false
+    Integration.Shared.Response.IntegrationListSimplifySimulationsResponse:
+      type: object
+      properties:
+        simulacoes:
+          type: array
+          items:
+            $ref: "#/components/schemas/Integration.Shared.Response.IntegrationSimplifySimu\
+              lationResponse"
+          nullable: true
+      additionalProperties: false
+    Integration.Shared.Response.IntegrationProposalResponse:
+      type: object
+      properties:
+        id_proposta:
+          type: string
+          format: uuid
+        numero:
+          type: integer
+          format: int64
+        id_simulacao:
+          type: string
+          format: uuid
+        tipo:
+          type: string
+        status:
+          type: string
+        comprador:
+          $ref: "#/components/schemas/Integration.Shared.Response.Buyer"
+        vendedor:
+          $ref: "#/components/schemas/Integration.Shared.Response.Seller"
+        data_criacao:
+          type: string
+          format: date-time
+          example: 2025-10-17T19:05:08.984Z
+      additionalProperties: false
+    Integration.Shared.Response.IntegrationSimplifySimulationResponse:
+      type: object
+      properties:
+        id_simulacao:
+          type: string
+          format: uuid
+        valor_solicitado:
+          type: number
+          format: double
+        prazo:
+          type: integer
+          format: int32
+        valor_parcela:
+          type: number
+          format: double
+        valor_tac:
+          type: number
+          format: double
+        valor_boleto:
+          type: number
+          format: double
+        valor_seguro:
+          type: number
+          format: double
+        valor_iof:
+          type: number
+          format: double
+        percentual_iof:
+          type: number
+          format: double
+        valor_credito_total:
+          type: number
+          format: double
+        valor_divida_total:
+          type: number
+          format: double
+        percentual_cet_mensal:
+          type: number
+          format: double
+        percentual_cet_anual:
+          type: number
+          format: double
+        percentual_juros_mensal:
+          type: number
+          format: double
+        percentual_juros_anual:
+          type: number
+          format: double
+        valor_retencao_diaria_aproximado:
+          type: number
+          format: double
+          nullable: true
+      additionalProperties: false
+    Integration.Shared.Response.IntegrationSimulationResponse:
+      type: object
+      properties:
+        id_simulacao:
+          type: string
+          format: uuid
+        prazo:
+          type: integer
+          format: int32
+        valor_parcela:
+          type: number
+          format: double
+        valor_solicitado:
+          type: number
+          format: double
+        valor_entrada:
+          type: number
+          format: double
+        valor_bem:
+          type: number
+          format: double
+        valor_tac:
+          type: number
+          format: double
+        taxa_juros_negociada:
+          type: number
+          format: double
+        valor_registro:
+          type: number
+          format: double
+        uf:
+          type: string
+        tipo:
+          type: string
+        transacao:
+          $ref: "#/components/schemas/Integration.Shared.Response.Transaction"
+        juros:
+          $ref: "#/components/schemas/Integration.Shared.Response.Interest"
+        cet:
+          $ref: "#/components/schemas/Integration.Shared.Response.Cet"
+        iof:
+          $ref: "#/components/schemas/Integration.Shared.Response.Iof"
+        veiculo:
+          $ref: "#/components/schemas/Integration.Shared.Response.Vehicle"
+        cliente:
+          $ref: "#/components/schemas/Integration.Shared.Response.Customer"
+        data_criacao:
+          type: string
+          format: date-time
+          example: 2025-10-17T19:05:09.006Z
+      additionalProperties: false
+    Integration.Shared.Response.Interest:
+      type: object
+      properties:
+        percentual_juros_mensal:
+          type: number
+          format: double
+        percentual_juros_anual:
+          type: number
+          format: double
+      additionalProperties: false
+    Integration.Shared.Response.Iof:
+      type: object
+      properties:
+        valor:
+          type: number
+          format: double
+        percentual:
+          type: number
+          format: double
+      additionalProperties: false
+    Integration.Shared.Response.Seller:
+      type: object
+      properties:
+        cpf:
+          type: string
+      additionalProperties: false
+    Integration.Shared.Response.Transaction:
+      type: object
+      properties:
+        valor_total_credito:
+          type: number
+          format: double
+        valor_total_debito:
+          type: number
+          format: double
+      additionalProperties: false
+    Integration.Shared.Response.Vehicle:
+      type: object
+      properties:
+        marca:
+          type: string
+        modelo:
+          type: string
+        versao:
+          type: string
+        ano:
+          type: integer
+          format: int32
+          nullable: true
+        valor:
+          type: number
+          format: double
+          nullable: true
+        placa:
+          type: string
+        veiculo_zero_km:
+          type: boolean
+          nullable: true
+        chassi:
+          type: string
+        renavam:
+          type: string
+        cor:
+          type: string
+      additionalProperties: false
+    Microsoft.AspNetCore.Mvc.ProblemDetails:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+          format: int32
+          nullable: true
+        detail:
+          type: string
+        instance:
+          type: string
+      additionalProperties: {}
+    Partner.Shared.Response.IdentifierResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+      additionalProperties: false
+    WebIntegration.Endpoints.Authentication.Requests.GenerateAccessTokenRequest:
+      required:
+        - clientId
+        - clientSecret
+      type: object
+      properties:
+        clientId:
+          minLength: 1
+          type: string
+          description: Identificador do cliente de integração fornecido pelo Credicarro.
+        clientSecret:
+          minLength: 1
+          type: string
+          description: Segredo do cliente de integração. Mantenha-o confidencial.
+      additionalProperties: false
+    WebIntegration.Endpoints.Customer.Requests.Address:
+      required:
+        - bairro
+        - cep
+        - cidade
+        - estado
+        - pais
+        - rua
+      type: object
+      properties:
+        rua:
+          minLength: 1
+          type: string
+          description: Nome da rua/avenida/logradouro.
+          example: Av. Paulista
+        cidade:
+          minLength: 1
+          type: string
+          description: Nome da cidade.
+          example: São Paulo
+        estado:
+          minLength: 1
+          type: string
+          description: UF do estado (Sigla).
+          example: SP
+        bairro:
+          minLength: 1
+          type: string
+          description: Nome do bairro.
+          example: Bela Vista
+        cep:
+          minLength: 1
+          type: string
+          description: CEP **somente números** (8 dígitos).
+          example: "01311000"
+        pais:
+          minLength: 1
+          type: string
+          description: Nome do país.
+          example: Brasil
+        numero:
+          type: string
+          description: Número do endereço. Campo opcional.
+          example: "1578"
+        complemento:
+          type: string
+          description: Complemento do endereço (bloco, apartamento, etc.). Campo opcional.
+          example: Bloco B, Apto 1203
+      additionalProperties: false
+    WebIntegration.Endpoints.Customer.Requests.CreateCustomerRequestContent:
+      required:
+        - celular
+        - cpf
+        - dataDeNascimento
+        - email
+        - nome
+        - sobrenome
+      type: object
+      properties:
+        nome:
+          minLength: 1
+          type: string
+          description: Primeiro nome do cliente.
+          example: Maria
+        sobrenome:
+          minLength: 1
+          type: string
+          description: Sobrenome do cliente.
+          example: Souza
+        cpf:
+          minLength: 1
+          type: string
+          description: CPF do cliente **somente números** (11 dígitos).
+          example: "12345678901"
+        email:
+          minLength: 1
+          type: string
+          description: Endereço de e-mail do cliente.
+          example: maria.souza@exemplo.com.br
+        dataDeNascimento:
+          type: string
+          description: Data de nascimento em formato ISO-8601.
+          format: date-time
+          example: 1990-05-20T00:00:00-03:00
+        celular:
+          minLength: 1
+          type: string
+          description: Telefone celular no formato E.164 (código do país + DDD + número).
+          example: +55 (11) 99876-5432
+      additionalProperties: false
+    WebIntegration.Endpoints.Customer.Requests.CreateFullCustomerRequestContent:
+      required:
+        - celular
+        - cpf
+        - dadosProfissionais
+        - dataDeNascimento
+        - email
+        - endereco
+        - nome
+        - sobrenome
+      type: object
+      properties:
+        nome:
+          minLength: 1
+          type: string
+          description: Primeiro nome do cliente.
+          example: Maria
+        sobrenome:
+          minLength: 1
+          type: string
+          description: Sobrenome do cliente.
+          example: Souza
+        email:
+          minLength: 1
+          type: string
+          description: Endereço de e-mail do cliente.
+          example: maria.souza@exemplo.com.br
+        celular:
+          minLength: 1
+          type: string
+          description: Telefone celular no formato E.164 (código do país + DDD + número).
+          example: +55 (11) 99876-5432
+        cpf:
+          minLength: 1
+          type: string
+          description: CPF do cliente **somente números** (11 dígitos).
+          example: "12345678901"
+        dataDeNascimento:
+          type: string
+          description: Data de nascimento em formato ISO-8601.
+          format: date-time
+          example: 1990-05-20T00:00:00-03:00
+        endereco:
+          $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.Customer\
+            Address"
+        dadosProfissionais:
+          $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.Customer\
+            ProfessionalData"
+      additionalProperties: false
+    WebIntegration.Endpoints.Customer.Requests.CustomerAddress:
+      required:
+        - bairro
+        - cep
+        - cidade
+        - estado
+        - pais
+        - rua
+      type: object
+      properties:
+        rua:
+          minLength: 1
+          type: string
+          description: Nome da rua/avenida/logradouro.
+          example: Av. Paulista
+        cidade:
+          minLength: 1
+          type: string
+          description: Nome da cidade.
+          example: São Paulo
+        estado:
+          minLength: 1
+          type: string
+          description: UF do estado (Sigla).
+          example: SP
+        bairro:
+          minLength: 1
+          type: string
+          description: Nome do bairro.
+          example: Bela Vista
+        cep:
+          minLength: 1
+          type: string
+          description: CEP **somente números** (8 dígitos).
+          example: "01311000"
+        pais:
+          minLength: 1
+          type: string
+          description: Nome do país.
+          example: Brasil
+        numero:
+          type: string
+          description: Número do endereço. Campo opcional.
+          example: "1578"
+        complemento:
+          type: string
+          description: Complemento do endereço (bloco, apartamento, etc.). Campo opcional.
+          example: Bloco B, Apto 1203
+      additionalProperties: false
+    WebIntegration.Endpoints.Customer.Requests.CustomerProfessionalData:
+      required:
+        - renda
+        - tipoOcupacao
+      type: object
+      properties:
+        tipoOcupacao:
+          type: integer
+          description: >-
+            Valor aceito (inteiro):
+
+            - `1` = aposentado
+
+            - `2` = pensionista
+
+            - `3` = assalariado
+
+            - `4` = autônomo
+
+            - `6` = freelancer
+
+            - `7` = proprietário
+
+
+            Tipo de ocupação do cliente (enum). Consulte os valores aceitos na
+            descrição deste campo.
+          format: int32
+          example: "1"
+        renda:
+          type: number
+          description: Renda mensal do cliente, em reais. Use ponto como separador decimal.
+          format: double
+          example: 6500
+      additionalProperties: false
+    WebIntegration.Endpoints.Customer.Requests.UpsertAddressRequestContent:
+      required:
+        - cpf
+        - endereco
+      type: object
+      properties:
+        cpf:
+          minLength: 1
+          type: string
+          description: CPF do cliente **somente números** (11 dígitos).
+          example: "12345678901"
+        endereco:
+          $ref: "#/components/schemas/WebIntegration.Endpoints.Customer.Requests.Address"
+      additionalProperties: false
+    WebIntegration.Endpoints.Customer.Requests.UpsertProfileRequestContent:
+      required:
+        - cpf
+        - renda
+        - tipoOcupacao
+      type: object
+      properties:
+        cpf:
+          minLength: 1
+          type: string
+          description: CPF do cliente **somente números** (11 dígitos).
+          example: "12345678901"
+        tipoOcupacao:
+          type: integer
+          description: >-
+            Valor aceito (inteiro):
+
+            - `1` = aposentado
+
+            - `2` = pensionista
+
+            - `3` = assalariado
+
+            - `4` = autônomo
+
+            - `6` = freelancer
+
+            - `7` = proprietário
+
+
+            Tipo de ocupação do cliente (enum). Consulte os valores aceitos na
+            descrição deste campo.
+          format: int32
+          example: "1"
+        renda:
+          type: number
+          description: Renda mensal do cliente, em reais. Use ponto como separador decimal.
+          format: double
+          example: 6500
+      additionalProperties: false
+    WebIntegration.Endpoints.Proposal.Requests.AddProposalContent:
+      required:
+        - cpf
+        - simulacaoId
+      type: object
+      properties:
+        cpf:
+          minLength: 1
+          type: string
+          description: CPF do cliente **somente números** (11 dígitos).
+          example: "12345678901"
+        simulacaoId:
+          type: string
+          description: Identificador único da simulação (UUID) retornado na criação da
+            simulação.
+          format: uuid
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+      additionalProperties: false
+    WebIntegration.Endpoints.Proposal.Requests.RefinancingSimulationRequestContent:
+      required:
+        - placa
+        - valorSolicitado
+      type: object
+      properties:
+        cpf:
+          type: string
+          description: CPF do cliente **somente números** (11 dígitos). Campo opcional.
+          example: "12345678901"
+        placa:
+          minLength: 1
+          type: string
+          description: Placa do veículo no padrão brasileiro (3 letras + 4 números) ou
+            Mercosul.
+          example: ABC1D23
+        valorSolicitado:
+          type: number
+          description: Valor total solicitado para refinanciamento, em reais. Use ponto
+            como separador decimal.
+          format: double
+          example: 45000
+      additionalProperties: false
+  securitySchemes:
+    Bearer:
+      type: apiKey
+      description: JWT Authorization header using the Bearer scheme.
+      name: Authorization
+      in: header
+security:
+  - Bearer: []

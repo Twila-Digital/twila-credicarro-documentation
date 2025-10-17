@@ -1,43 +1,67 @@
-# Mintlify Starter Kit
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset="logo/dark.svg"></source>
+    <source media="(prefers-color-scheme: light)" srcset="logo/light.svg"></source>
+    <img alt="Credicarro Logo" src="logo/light.svg" width="300"></img>
+  </picture>
+</p>
 
-Use the starter kit to get your docs deployed and ready to customize.
+# Credicarro Documentation
 
-Click the green **Use this template** button at the top of this repo to copy the Mintlify starter kit. The starter kit contains examples with
+## 🚀 Quick Start
 
-- Guide pages
-- Navigation
-- Customizations
-- API reference pages
-- Use of popular components
+This documentation is built with [Mintlify](https://mintlify.com)
 
-**[Follow the full quickstart guide](https://starter.mintlify.com/quickstart)**
+1. **Preview locally**
+```bash
+# Install Mintlify CLI
+npm i -g mintlify
 
-## Development
-
-Install the [Mintlify CLI](https://www.npmjs.com/package/mint) to preview your documentation changes locally. To install, use the following command:
-
-```
-npm i -g mint
-```
-
-Run the following command at the root of your documentation, where your `docs.json` is located:
-
-```
-mint dev
+# Start development server
+mintlify dev
 ```
 
-View your local preview at `http://localhost:3000`.
+2. **Visit `http://localhost:3000` to see your documentation**
 
-## Publishing changes
+## 📚 Documentation Structure
 
-Install our GitHub app from your [dashboard](https://dashboard.mintlify.com/settings/organization/github-app) to propagate changes from your repo to your deployment. Changes are deployed to production automatically after pushing to the default branch.
+```
+.
+├── images/         # Store all documentation images and screenshots
+├── logo/           # Brand logos for light and dark themes
+├── pages/          # Main documentation content
+├── docs.json       # Mintlify configuration file for documentation settings
+├── favicon.ico     # Website favicon
+├── openapi.yaml    # OpenAPI/Swagger specification file
+└── README.md       # Project overview and setup instructions
+```
 
-## Need help?
+## 🔧 Local Development
+
+1. **Install dependencies**
+```bash
+mintlify install
+```
+
+2. **Start development server**
+```bash
+mintlify dev
+```
+
+### OR
+
+1. Run using docker
+```bash
+make start
+```
 
 ### Troubleshooting
 
-- If your dev environment isn't running: Run `mint update` to ensure you have the most recent version of the CLI.
-- If a page loads as a 404: Make sure you are running in a folder with a valid `docs.json`.
+- If Mintlify dev isn't running, try `mintlify install` to reinstall dependencies
+- For 404 errors, ensure you're in a directory with `mint.json`
 
-### Resources
-- [Mintlify documentation](https://mintlify.com/docs)
+## 🚀 Deployment
+
+Changes are automatically deployed when merged to the `main` branch, through the Mintlify GitHub integration.
+
+See [Mintlify GitHub App Documentation](https://mintlify.com/docs/settings/github) for more information.
