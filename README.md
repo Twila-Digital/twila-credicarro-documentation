@@ -62,6 +62,6 @@ make start
 
 ## 🚀 Deployment
 
-Changes are automatically deployed when merged to the `main` branch, through the Mintlify GitHub integration.
+Changes are automatically deployed when merged to the `production` branch, through the Mintlify GitHub integration.
 
 See [Mintlify GitHub App Documentation](https://mintlify.com/docs/settings/github) for more information.
