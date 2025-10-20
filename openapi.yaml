@@ -14,15 +14,15 @@ paths:
       summary: Paginação de propostas
       description:  Paginação de todas as propostas associadas ao parceiro
       parameters:
-        - name: offset
+        - name: pagina_inicial
           in: query
-          description: Offset/página inicial (mínimo 1).
+          description: Página inicial (mínimo 1).
           schema:
             type: integer
             format: int32
             example: 1
           example: 1
-        - name: limit
+        - name: limite
           in: query
           description: Quantidade de itens por página (1 a 100).
           schema:
