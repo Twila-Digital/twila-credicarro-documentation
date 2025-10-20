@@ -4,8 +4,8 @@
   "name": "Credicarro",
   "colors": {
     "primary": "#feb916",
-    "light": "#07C983",
-    "dark": "#15803D"
+    "light": "#feb916",
+    "dark": "#feb916"
   },
   "favicon": "/favicon.ico",
   "api": {
@@ -31,8 +31,8 @@
             ]
           },
           {
-            "group": "Cliente",
-            "pages": []
+            "group": "Proposta",
+            "pages": ["pages/proposal/pagination"]
           },
           {
             "group": "Cobrança",

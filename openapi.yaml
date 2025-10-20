@@ -38,12 +38,12 @@ paths:
               schema:
                 type: object
                 properties:
-                  items:
+                  itens:
                     type: array
                     description: Lista de propostas.
                     items:
                       $ref: "#/components/schemas/ProposalResponse"
-                  page:
+                  pagina:
                     $ref: "#/components/schemas/Page"
         '400':
           description: Erro na requisição
@@ -110,20 +110,20 @@ components:
     Page:
       type: object
       properties:
-        hasNext:
+        tem_proximo:
           type: boolean
           description: Identificador se existe uma próxima página
           example: true
-        hasPrevious:
+        tem_anterior:
           type: boolean
           description: Identificador se existe uma página anterior
           example: false
-        number:
+        numero:
           type: integer
           format: int32
           description: Página atual.
           example: 2
-        size:
+        tamanho:
           type: integer
           format: int32
           description: Quantidade de dados por página.
