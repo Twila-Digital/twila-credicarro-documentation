@@ -24,7 +24,11 @@ Webhooks permitem que sua aplicação receba notificações em tempo real sobre 
 
 ## <Icon icon="shield-halved" type="solid"/> Tipos de Autenticação
 
-Aceitamos dois tipos de autenticação para os webhooks:
+Aceitamos três tipos de autenticação para os webhooks:
+
+<Card title="Sem Autenticação (Não recomendado)" icon="triangle-exclamation" color="#ef4444">
+  Se o seu endpoint não requer autenticação, você pode optar por não usar nenhum método de autenticação. Nesse caso, as notificações serão enviadas para o seu endpoint sem nenhum cabeçalho de autenticação.
+</Card>
 
 <Card title="Basic" icon="user-lock" color="#25c2a0">
   A autenticação Basic é um método de autenticação HTTP simples que envolve o envio de um nome de usuário e senha com cada requisição. Para usar a autenticação Basic, você precisará fornecer um nome de usuário e uma senha ao configurar o webhook.
