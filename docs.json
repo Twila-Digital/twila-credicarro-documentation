@@ -40,7 +40,10 @@
           },
           {
             "group": "Proposta",
-            "pages": ["pages/proposal/pagination"]
+            "pages": [
+              "pages/proposal/create",
+              "pages/proposal/pagination"
+            ]
           }
         ]
       },

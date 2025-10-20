@@ -8,11 +8,59 @@ servers:
     description: Servidor para o ambiente de staging
 paths:
   /v1/proposal:
+    post:
+      tags:
+        - Proposta
+      summary: Criar uma nova proposta
+      description: Cria uma nova proposta a partir de uma simulação existente
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Os dados da sua proposta
+              required: ['cpf', 'simulacaoId']
+              additionalProperties: false
+              properties:
+                cpf:
+                  minLength: 11
+                  type: string
+                  description: CPF do cliente **somente números** (11 dígitos).
+                  example: "12345678901"
+                simulacaoId:
+                  type: string
+                  format: uuid
+                  description: Identificador único da simulação
+                  example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
+      responses:
+        '201':
+          description: Proposta criada com sucesso.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_proposta:
+                    type: string
+                    format: uuid
+                    description: Identificador único da proposta
+                    example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     get:
       tags:
         - Proposta
       summary: Paginação de propostas
       description:  Paginação de todas as propostas associadas ao parceiro
+      security:
+        - bearerAuth: []
       parameters:
         - name: pagina_inicial
           in: query
@@ -162,4 +210,4 @@ components:
       type: http
       scheme: bearer
       bearerFormat: JWT
-      description: Cabeçalho de autenticação Bearer no formato `Bearer <credicarro-api-key>` onde `<credicarro-api-key>` é a sua chave de API. 
+      description: Cabeçalho de autenticação Bearer no formato `Bearer <credicarro-token>` onde `<credicarro-token>` é seu TOKEN de autenticação. 
