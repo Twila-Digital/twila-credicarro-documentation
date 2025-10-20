@@ -31,28 +31,16 @@
             ]
           },
           {
+            "group": "Autenticação",
+            "pages": []
+          },
+          {
+            "group": "Cliente",
+            "pages": []
+          },
+          {
             "group": "Proposta",
             "pages": ["pages/proposal/pagination"]
-          },
-          {
-            "group": "Cobrança",
-            "pages": []
-          },
-          {
-            "group": "Pix QRCode",
-            "pages": []
-          },
-          {
-            "group": "Cupom",
-            "pages": []
-          },
-          {
-            "group": "Saque",
-            "pages": []
-          },
-          {
-            "group": "Loja",
-            "pages": []
           }
         ]
       },
@@ -67,12 +55,6 @@
     "dark": "/logo/dark.svg"
   },
   "navbar": {
-    "links": [
-      {
-        "label": "Repositório",
-        "href": "https://github.com/Twila-Digital/documentation-credicarro"
-      }
-    ],
     "primary": {
       "type": "button",
       "label": "Credicarro",
