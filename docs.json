@@ -10,7 +10,7 @@
   "favicon": "/favicon.ico",
   "api": {
     "mdx": {
-      "server": "https://api.staging.credicarro.com/api",
+      "server": "https://api.staging.credicarro.com.br/integration",
       "auth": {
         "method": "bearer"
       }
@@ -23,7 +23,12 @@
         "groups": [
           {
             "group": "Introdução",
-            "pages": []
+            "pages": [
+              "pages/introduction",
+              "pages/development",
+              "pages/authentication",
+              "pages/webhooks"
+            ]
           },
           {
             "group": "Cliente",
@@ -53,7 +58,7 @@
       },
       {
         "tab": "Referência da API",
-        "openapi": "/openapi.yaml"
+        "openapi": "openapi.yaml"
       }
     ]
   },
