@@ -22,7 +22,7 @@ Webhooks permitem que sua aplicação receba notificações em tempo real sobre 
 
 ## <Icon icon="key" type="solid"/> Configurar webhooks
 
-<Card title="Fale com o atendimento" icon="headset" color="#25c2a0">
+<Card title="Fale com o atendimento" icon="headset" horizontal color="#25c2a0">
   Para configurar os seus webhooks, entre em contato com o nosso atendimento pelo e-mail <Icon icon="envelope" type="solid"/> atendimento@credicarro.com.br
 </Card>
 
@@ -30,15 +30,15 @@ Webhooks permitem que sua aplicação receba notificações em tempo real sobre 
 
 Aceitamos três tipos de autenticação para os webhooks:
 
-<Card title="Sem Autenticação (Não recomendado)" icon="triangle-exclamation" color="#ef4444">
+<Card title="Sem Autenticação (Não recomendado)" icon="triangle-exclamation" horizontal color="#ef4444">
   Se o seu endpoint não requer autenticação, você pode optar por não usar nenhum método de autenticação. Nesse caso, as notificações serão enviadas para o seu endpoint sem nenhum cabeçalho de autenticação.
 </Card>
 
-<Card title="Basic" icon="user-lock" color="#25c2a0">
+<Card title="Basic" icon="user-lock" color="#25c2a0" horizontal>
   A autenticação Basic é um método de autenticação HTTP simples que envolve o envio de um nome de usuário e senha com cada requisição. Para usar a autenticação Basic, você precisará fornecer um nome de usuário e uma senha ao configurar o webhook.
 </Card>
 
-<Card title="Bearer JWT" icon="id-card" color="#25c2a0">
+<Card title="Bearer JWT" icon="id-card" color="#25c2a0" horizontal>
   A autenticação Bearer JWT é um método de autenticação que usa um token JSON Web Token (JWT) para autenticar as requisições. Para usar a autenticação Bearer JWT, você precisará fornecer um token JWT válido ao configurar o webhook.
 </Card>
 
@@ -57,35 +57,35 @@ O payload enviado para o endpoint do webhook é um JSON com a seguinte estrutura
 ### Legenda do EnumStatus
 
 <CardGroup>
-  <Card title="0 - Analysing" icon="magnifying-glass-chart" color="#25c2a0">
+  <Card title="0 - Analysing" icon="magnifying-glass-chart" color="#25c2a0" horizontal>
     A proposta está sendo analisada automaticamente.
   </Card>
 
-  <Card title="1 - Approved" icon="check" color="#4caf50">
+  <Card title="1 - Approved" icon="check" color="#4caf50" horizontal>
     A proposta foi aprovada.
   </Card>
 
-  <Card title="2 - Refused" icon="x" color="#f44336">
+  <Card title="2 - Refused" icon="x" color="#f44336" horizontal>
     A proposta foi recusada.
   </Card>
 
-  <Card title="3 - Canceled" icon="ban" color="#9e9e9e">
+  <Card title="3 - Canceled" icon="ban" color="#9e9e9e" horizontal>
     A proposta foi cancelada.
   </Card>
 
-  <Card title="4 - ManualAnalysis" icon="user-check" color="#ff9800">
+  <Card title="4 - ManualAnalysis" icon="user-check" color="#ff9800" horizontal>
     A proposta está aguardando análise manual.
   </Card>
 
-  <Card title="5 - Completed" icon="check-double" color="#2196f3">
+  <Card title="5 - Completed" icon="check-double" color="#2196f3" horizontal>
     A proposta foi concluída com sucesso.
   </Card>
 
-  <Card title="6 - InNegotiation" icon="handshake" color="#673ab7">
+  <Card title="6 - InNegotiation" icon="handshake" color="#673ab7" horizontal>
     A proposta está em negociação.
   </Card>
 
-  <Card title="7 - Expired" icon="clock" color="#795548">
+  <Card title="7 - Expired" icon="clock" color="#795548" horizontal>
     A proposta expirou.
   </Card>
 </CardGroup>
