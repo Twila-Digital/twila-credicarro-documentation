@@ -39,17 +39,24 @@
             "pages": []
           },
           {
+            "group": "Simulação",
+            "pages": [
+              "pages/simulation/range-refinancing",
+              "pages/simulation/create",
+              "pages/simulation/get",
+              "pages/simulation/pagination"
+            ]
+          },
+          {
             "group": "Proposta",
             "pages": [
               "pages/proposal/create",
+              "pages/proposal/get",
               "pages/proposal/pagination"
+              
             ]
           }
         ]
-      },
-      {
-        "tab": "Referência da API",
-        "openapi": "openapi.yaml"
       }
     ]
   },
