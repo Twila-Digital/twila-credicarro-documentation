@@ -6,6 +6,11 @@ icon: 'webhook'
 
 Webhooks permitem que sua aplicação receba notificações em tempo real sobre eventos importantes da Credicarro.
 
+<Card title="Atenção — Webhook disponível" icon="triangle-alert" color="#ef4444">
+  Atualmente, **o único webhook disponível** é o de **atualização de status da Proposta**.<br/>
+  Outros tipos de webhook (como Cliente, Estabelecimento ou Simulação) **ainda não estão disponíveis**.
+</Card>
+
 ## <Icon icon="mobile" type="solid"/> Segmentação de webhooks
 
 <Card title="Ambientes e Webhooks" icon="book" horizontal>
@@ -53,22 +58,35 @@ O payload enviado para o endpoint do webhook é um JSON com a seguinte estrutura
 ### Legenda do EnumStatus
 
 <CardGroup>
-<Card title="0 - Analysing" icon="magnifying-glass-chart" color="#25c2a0">
-  A proposta está sendo analisada.
-</Card>
-<Card title="1 - Approved" icon="check" color="#25c2a0">
-  A proposta foi aprovada.
-</Card>
-<Card title="2 - Refused" icon="x" color="#25c2a0">
-  A proposta foi recusada.
-</Card>
-<Card title="3 - Canceled" icon="ban" color="#25c2a0">
-  A proposta foi cancelada.
-</Card>
-<Card title="5 - Completed" icon="check-double" color="#25c2a0">
-  A proposta foi concluída.
-</Card>
-<Card title="6 - InNegotiation" icon="handshake" color="#25c2a0">
-  A proposta está em negociação.
-</Card>
+  <Card title="0 - Analysing" icon="magnifying-glass-chart" color="#25c2a0">
+    A proposta está sendo analisada automaticamente.
+  </Card>
+
+  <Card title="1 - Approved" icon="check" color="#4caf50">
+    A proposta foi aprovada.
+  </Card>
+
+  <Card title="2 - Refused" icon="x" color="#f44336">
+    A proposta foi recusada.
+  </Card>
+
+  <Card title="3 - Canceled" icon="ban" color="#9e9e9e">
+    A proposta foi cancelada.
+  </Card>
+
+  <Card title="4 - ManualAnalysis" icon="user-check" color="#ff9800">
+    A proposta está aguardando análise manual.
+  </Card>
+
+  <Card title="5 - Completed" icon="check-double" color="#2196f3">
+    A proposta foi concluída com sucesso.
+  </Card>
+
+  <Card title="6 - InNegotiation" icon="handshake" color="#673ab7">
+    A proposta está em negociação.
+  </Card>
+
+  <Card title="7 - Expired" icon="clock" color="#795548">
+    A proposta expirou.
+  </Card>
 </CardGroup>
