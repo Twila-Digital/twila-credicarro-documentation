@@ -385,6 +385,111 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+  /v1/authentication/accessToken:
+    post:
+      tags:
+        - autenticação
+      summary: Gerar token de acesso.
+      description: Gera um token de acesso para o parceiro utilizando as credenciais do cliente.
+      parameters:
+        - name: clientId
+          in: path
+          description: Identificador do cliente de integração fornecido pelo credicarro
+          required: true
+          schema:
+            type: string
+            format: uuid
+            description: Identificador do cliente de integração fornecido pelo credicarro
+            example: 8pqh3k1y0zmtg4u9xenrcvlsw2
+        - name: clientSecret
+          in: path
+          description: Segredo do cliente de integração fornecido pelo credicarro
+          required: true
+          schema:
+            type: string
+            description: Segredo do cliente de integração fornecido pelo credicarro
+            example: 8qzn2v0w5lgyh3cmt9a7jrk1f4bepsdu6xovifn3t5hlgq7r9kc
+      responses:
+        '200':
+          description: autenticação retornada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/authenticationResponse"
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/customer:
+    post:
+      tags:
+        - cliente
+      summary: Criar um novo cliente
+      description: Cria um novo cliente com base nos dados fornecidos
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Dados do novo cliente
+              required: ['celular', 'cpf', 'dataDeNascimento', 'email', 'nome', 'sobrenome']
+              additionalProperties: false
+              properties:
+                celular:
+                  type: string
+                  minLength: 1
+                  description: Telefone celular no formato E.164 (código do país + DDD + número).
+                  example: "+55 (11) 99876-5432"
+                cpf:
+                  type: string
+                  minLength: 1
+                  maxLength: 11
+                  description: CPF do cliente **somente números** (11 dígitos).
+                  example: "12345678901"
+                dataDeNascimento:
+                  type: string
+                  format: date-time
+                  description: Data de nascimento em formato ISO-8601.
+                  example: "1990-05-20T00:00:00-03:00"
+                email:
+                  type: string
+                  minLength: 1
+                  description: Endereço de e-mail do cliente.
+                  example: "maria.souza@exemplo.com.br"
+                nome:
+                  type: string
+                  minLength: 1
+                  description: Primeiro nome do cliente.
+                  example: "Maria"
+                sobrenome:
+                  type: string
+                  minLength: 1
+                  description: Sobrenome do cliente.
+                  example: "Souza"
+      responses:
+        '201':
+          description: Cliente criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: Identificador único do cliente
+                    example: 123e4567-e89b-12d3-a456-426614174000
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 components:
   schemas:
     SimulationResponse:
@@ -438,7 +543,7 @@ components:
           example: 487
         uf:
           type: string
-          maxength: 2
+          maxLength: 2
           description: Estado da simulação
           example: "SP"
         tipo:
@@ -577,6 +682,27 @@ components:
           description: Percentual de juros anual
           example: 39.48
       additionalProperties: false
+    authenticationResponse:
+      type: object
+      properties:
+        token_de_acesso:
+          type: string
+          description: Token de acesso para autenticação nas requisições
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+        tipo_de_token:
+          type: string
+          description: Tipo do token de acesso
+          example: Bearer
+        expira_em_segundos:
+          type: integer
+          format: int32
+          description: Tempo em segundos para expiração do token
+          example: 3600
+        escopo:
+          type: string
+          description: Escopo do token de acesso
+          example: credicarro.integration.access/full
+      additionalProperties: false
     ProposalResponse:
       type: object
       description: Os dados da sua proposta
@@ -662,11 +788,11 @@ components:
     ProblemDetails:
       type: object
       properties:
-        type:
+        tipo:
           type: string
           description: Tipo de problema encontrado
           example: Partner.AccountIsIncompleted
-        title:
+        titulo:
           type: string
           description: Título do erro
           example: Bad Request
@@ -675,11 +801,11 @@ components:
           format: int32
           description: Status Code do erro
           example: 400
-        detail:
+        detalhe:
           type: string
           description: Descrição do erro
           example: Cadastro de conta não finalizado
-        error:
+        erro:
           type: 'null'
       additionalProperties: false
   securitySchemes:

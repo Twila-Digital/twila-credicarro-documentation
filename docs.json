@@ -32,11 +32,15 @@
           },
           {
             "group": "Autenticação",
-            "pages": []
+            "pages": [
+              "pages/authentication/accessToken"
+            ]
           },
           {
             "group": "Cliente",
-            "pages": []
+            "pages": [
+              "pages/customer/create"
+            ]
           },
           {
             "group": "Simulação",
