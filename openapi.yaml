@@ -342,7 +342,7 @@ paths:
                     type: number
                     format: double
                     description: Percentual de IOF
-                  example: 1.92
+                    example: 1.92
                   valor_credito_total:
                     type: number
                     format: double
