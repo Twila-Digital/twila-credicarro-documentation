@@ -1041,25 +1041,25 @@ components:
     authenticationResponse:
       type: object
       properties:
-        accessToken:
+        token_de_acesso:
           type: string
           description: Token de acesso para autenticação nas requisições
           example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
-        tokenType:
+        tipo_de_token:
           type: string
           description: Tipo do token de acesso
           example: Bearer
-        expiresIn:
+        expira_em_segundos:
           type: integer
           format: int32
           description: Tempo em segundos para expiração do token
           example: 3600
-        expiresAt:
+        expira_em:
           type: string
           format: date-time
           description: Data e hora de expiração do token
           example: 2025-10-22T12:57:21.948Z
-        scope:
+        escopo:
           type: string
           description: Escopo do token de acesso
           example: credicarro.integration.access/full
