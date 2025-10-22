@@ -39,7 +39,10 @@
           {
             "group": "Cliente",
             "pages": [
-              "pages/customer/create"
+              "pages/customer/create",
+              "pages/customer/address",
+              "pages/customer/professional",
+              "pages/customer/unified"
             ]
           },
           {

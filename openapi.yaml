@@ -388,7 +388,7 @@ paths:
   /v1/authentication/accessToken:
     post:
       tags:
-        - autenticação
+        - Autenticação
       summary: Gerar token de acesso.
       description: Gera um token de acesso para o parceiro utilizando as credenciais do cliente.
       parameters:
@@ -425,7 +425,7 @@ paths:
   /v1/customer:
     post:
       tags:
-        - cliente
+        - Cliente
       summary: Criar um novo cliente
       description: Cria um novo cliente com base nos dados fornecidos
       security:
@@ -471,6 +471,245 @@ paths:
                   minLength: 1
                   description: Sobrenome do cliente.
                   example: "Souza"
+      responses:
+        '201':
+          description: Cliente criado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: string
+                    format: uuid
+                    description: Identificador único do cliente
+                    example: 123e4567-e89b-12d3-a456-426614174000
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/customer/address:
+    post:
+      tags:
+        - Cliente
+      summary: Criar ou atualizar endereço de um cliente
+      description: Cria ou atualiza o endereço de um cliente com base nos dados fornecidos.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Dados para criação ou atualização de endereço
+              required: ['cpf', 'endereco']
+              additionalProperties: false
+              properties:
+                cpf:
+                  type: string
+                  minLength: 11
+                  maxLength: 11
+                  description: CPF do cliente **somente números** (11 dígitos).
+                  example: "12345678901"
+                endereco:
+                  type: object
+                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep', 'pais', 'numero']
+                  additionalProperties: false
+                  properties:
+                    rua:
+                      type: string
+                      description: Nome da rua.
+                      example: "Av. Paulista"
+                    cidade:
+                      type: string
+                      description: Cidade.
+                      example: "São Paulo"
+                    estado:
+                      type: string
+                      description: Estado.
+                      example: "SP"
+                    bairro:
+                      type: string
+                      description: Bairro.
+                      example: "Bela Vista"
+                    cep:
+                      type: string
+                      description: CEP (somente números).
+                      example: "01311000"
+                    pais:
+                      type: string
+                      description: País.
+                      example: "Brasil"
+                    numero:
+                      type: string
+                      description: Número do endereço.
+                      example: "1578"
+                    complemento:
+                      type: string
+                      description: Complemento (opcional).
+                      example: "Bloco B, Apto 1203"
+      responses:
+        '202':
+          description: Endereço aceito para criação ou atualização
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/customer/professional:
+    post:
+      tags:
+        - Cliente
+      summary: Criar ou atualizar dados profissionais de um cliente
+      description: Cria ou atualiza as informações profissionais de um cliente com base nos dados fornecidos.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Dados profissionais do cliente
+              required: ['cpf', 'tipoOcupacao', 'renda']
+              additionalProperties: false
+              properties:
+                cpf:
+                  type: string
+                  minLength: 11
+                  maxLength: 11
+                  description: CPF do cliente **somente números** (11 dígitos).
+                  example: "12345678901"
+                tipoOcupacao:
+                  type: integer
+                  format: int32
+                  description: |
+                    Tipo de ocupação do cliente.
+                    Valores aceitos:
+                      - 1 = aposentado
+                      - 2 = pensionista
+                      - 3 = assalariado
+                      - 4 = autônomo
+                      - 6 = freelancer
+                      - 7 = proprietário
+                  example: 1
+                renda:
+                  type: number
+                  format: double
+                  description: Renda mensal do cliente, em reais (use ponto como separador decimal).
+                  example: 6500.00
+      responses:
+        '202':
+          description: Dados profissionais aceitos para criação ou atualização
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/customer/unified:
+    post:
+      tags:
+        - Cliente
+      summary: Criar ou atualizar cliente com dados completos
+      description: Cria ou atualiza um cliente incluindo informações pessoais, endereço e dados profissionais.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Dados completos do cliente
+              required: ['celular', 'cpf', 'dataDeNascimento', 'email', 'nome', 'sobrenome', 'endereco', 'dadosProfissionais']
+              additionalProperties: false
+              properties:
+                celular:
+                  type: string
+                  minLength: 1
+                  description: Telefone celular no formato E.164 (código do país + DDD + número).
+                  example: "+55 (11) 99876-5432"
+                cpf:
+                  type: string
+                  minLength: 11
+                  maxLength: 11
+                  description: CPF do cliente **somente números** (11 dígitos).
+                  example: "12345678901"
+                dataDeNascimento:
+                  type: string
+                  format: date-time
+                  description: Data de nascimento em formato ISO-8601.
+                  example: "1990-05-20T00:00:00-03:00"
+                email:
+                  type: string
+                  minLength: 1
+                  description: Endereço de e-mail do cliente.
+                  example: "maria.souza@exemplo.com.br"
+                nome:
+                  type: string
+                  minLength: 1
+                  description: Primeiro nome do cliente.
+                  example: "Maria"
+                sobrenome:
+                  type: string
+                  minLength: 1
+                  description: Sobrenome do cliente.
+                  example: "Souza"
+                endereco:
+                  type: object
+                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep', 'pais', 'numero']
+                  properties:
+                    rua:
+                      type: string
+                      example: "Av. Paulista"
+                    cidade:
+                      type: string
+                      example: "São Paulo"
+                    estado:
+                      type: string
+                      example: "SP"
+                    bairro:
+                      type: string
+                      example: "Bela Vista"
+                    cep:
+                      type: string
+                      example: "01311000"
+                    pais:
+                      type: string
+                      example: "Brasil"
+                    numero:
+                      type: string
+                      example: "1578"
+                    complemento:
+                      type: string
+                      example: "Bloco B, Apto 1203"
+                dadosProfissionais:
+                  type: object
+                  required: ['tipoOcupacao', 'renda']
+                  properties:
+                    tipoOcupacao:
+                      type: integer
+                      format: int32
+                      description: |
+                        Tipo de ocupação do cliente.
+                        Valores aceitos:
+                          - 1 = aposentado
+                          - 2 = pensionista
+                          - 3 = assalariado
+                          - 4 = autônomo
+                          - 6 = freelancer
+                          - 7 = proprietário
+                      example: 1
+                    renda:
+                      type: number
+                      format: double
+                      description: Renda mensal do cliente em reais.
+                      example: 6500.00
       responses:
         '201':
           description: Cliente criado com sucesso
