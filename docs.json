@@ -33,7 +33,7 @@
           {
             "group": "Autenticação",
             "pages": [
-              "pages/authentication/accessToken"
+              "pages/authentication/accesstoken"
             ]
           },
           {
