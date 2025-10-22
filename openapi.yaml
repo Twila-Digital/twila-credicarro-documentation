@@ -272,7 +272,7 @@ paths:
             schema:
               type: object
               description: Os dados da sua simulação
-              required: ['cpf', 'veiculoZeroKm', 'placa', 'valorSolicitado', 'uf', 'valorEntrada']
+              required: ['cpf', 'isVeiculoZeroKm', 'placa', 'valorSolicitado', 'uf', 'valorEntrada']
               additionalProperties: false
               properties:
                 cpf:
@@ -280,7 +280,7 @@ paths:
                   type: string
                   description: CPF do cliente **somente números** (11 dígitos)
                   example: "12345678901"
-                veiculoZeroKm:
+                isVeiculoZeroKm:
                   type: boolean
                   description: Indica se o veículo é zero quilômetro. true para novo, false para usado.
                   example: true
@@ -662,7 +662,7 @@ paths:
                       example: "Brasil"
                     numero:
                       type: string
-                      description: Número do endereço.
+                      description: Número do endereço (opcional).
                       example: "1578"
                     complemento:
                       type: string
