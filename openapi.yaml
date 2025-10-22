@@ -502,7 +502,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
-  /v1/authentication/accessToken:
+  /v1/authentication/accesstoken:
     post:
       tags:
         - Autenticação
