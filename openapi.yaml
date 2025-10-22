@@ -479,7 +479,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
+                  id_cliente:
                     type: string
                     format: uuid
                     description: Identificador único do cliente
@@ -718,7 +718,7 @@ paths:
               schema:
                 type: object
                 properties:
-                  id:
+                  id_cliente:
                     type: string
                     format: uuid
                     description: Identificador único do cliente
