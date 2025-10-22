@@ -258,6 +258,134 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+  /v1/proposal/simulation/financing:
+    post:
+      tags:
+        - Proposta
+      summary: Criar uma nova simulação de financiamento
+      description: Cria uma nova simulação de financiamento
+      security:
+        - bearerAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Os dados da sua simulação
+              required: ['cpf', 'veiculoZeroKm', 'placa', 'valorSolicitado', 'uf', 'valorEntrada']
+              additionalProperties: false
+              properties:
+                cpf:
+                  minLength: 11
+                  type: string
+                  description: CPF do cliente **somente números** (11 dígitos)
+                  example: "12345678901"
+                veiculoZeroKm:
+                  type: boolean
+                  description: Indica se o veículo é zero quilômetro. true para novo, false para usado.
+                  example: true
+                placa:
+                  type: string
+                  description: Placa do veículo
+                  example: ABC1D23
+                valorSolicitado:
+                  type: number
+                  description: Valor total solicitado para financiamento
+                  format: double
+                  example: 45000
+                uf:
+                  type: string
+                  description: UF (Unidade Federativa) do registro do veículo, em formato de 2 letras (ex. SP, RJ, MG). Campo opcional
+                  example: "SP"
+                valorEntrada:
+                  type: number
+                  description: Valor de entrada do financiamento, em reais. Utilize ponto como separador decimal. Campo opcional
+                  format: double
+                  example: 45000
+      responses:
+        '201':
+          description: Simulação criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  simulacoes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id_simulacao:
+                          type: string
+                          format: uuid
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        valor_solicitado:
+                          type: number
+                          format: double
+                          example: 1
+                        prazo:
+                          type: integer
+                          format: int32
+                          example: 1
+                        valor_parcela:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_tac:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_boleto:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_seguro:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_iof:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_iof:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_credito_total:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_divida_total:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_cet_mensal:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_cet_anual:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_juros_mensal:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_juros_anual:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_retencao_diaria_aproximado:
+                          type: number
+                          format: double
+                          nullable: true
+                          example: null
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/proposal/simulation/refinancing:
     post:
       tags:
@@ -272,7 +400,7 @@ paths:
             schema:
               type: object
               description: Os dados da sua simulação
-              required: ['placa', 'valor_solicitado', 'cpf']
+              required: ['placa', 'valorSolicitado', 'cpf']
               additionalProperties: false
               properties:
                 cpf:
@@ -298,87 +426,76 @@ paths:
               schema:
                 type: object
                 properties:
-                  id_simulacao:
-                    type: string
-                    format: uuid
-                    description: Identificador único da simulação
-                    example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
-                  valor_solicitado:
-                    type: number
-                    format: double
-                    description: Valor solicitado
-                    example: 37908
-                  prazo:
-                    type: integer
-                    format: int32
-                    description: Prazo da simulação
-                    example: 24
-                  valor_parcela:
-                    type: number
-                    format: double
-                    description: Valor da parcela
-                    example: 2356
-                  valor_tac:
-                    type: number
-                    format: double
-                    description: Valor da taxa de cadastro
-                    example: 1500
-                  valor_boleto:
-                    type: number
-                    format: double
-                    description: Valor do boleto
-                    example: 0
-                  valor_seguro:
-                    type: number
-                    format: double
-                    description: Valor do seguro
-                    example: 0
-                  valor_iof:
-                    type: number
-                    format: double
-                    description: Valor de IOF
-                    example: 872
-                  percentual_iof:
-                    type: number
-                    format: double
-                    description: Percentual de IOF
-                    example: 1.92
-                  valor_credito_total:
-                    type: number
-                    format: double
-                    description: Valor total do credito
-                    example: 78495
-                  valor_divida_total:
-                    type: number
-                    format: double
-                    description: Valor total da divida
-                    example: 98495
-                  percentual_cet_mensal:
-                    type: number
-                    format: double
-                    description: Percentual mensal
-                    example: 3.62
-                  percentual_cet_anual:
-                    type: number
-                    format: double
-                    description: Percentual anual
-                    example: 43.44
-                  percentual_juros_mensal:
-                    type: number
-                    format: double
-                    description: Percentual mensal
-                    example: 3.62
-                  percentual_juros_anual:
-                    type: number
-                    format: double
-                    description: Percentual anual
-                    example: 43.44
-                  valor_retencao_diaria_aproximado:
-                    type: number
-                    format: double
-                    nullable: true
-                    description: Valor de retenção diário
-                    example: 0
+                  simulacoes:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id_simulacao:
+                          type: string
+                          format: uuid
+                          example: 123e4567-e89b-12d3-a456-426614174000
+                        valor_solicitado:
+                          type: number
+                          format: double
+                          example: 1
+                        prazo:
+                          type: integer
+                          format: int32
+                          example: 1
+                        valor_parcela:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_tac:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_boleto:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_seguro:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_iof:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_iof:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_credito_total:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_divida_total:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_cet_mensal:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_cet_anual:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_juros_mensal:
+                          type: number
+                          format: double
+                          example: 1
+                        percentual_juros_anual:
+                          type: number
+                          format: double
+                          example: 1
+                        valor_retencao_diaria_aproximado:
+                          type: number
+                          format: double
+                          nullable: true
+                          example: null
         '400':
           description: Erro na requisição
           content:
@@ -516,7 +633,7 @@ paths:
                   example: "12345678901"
                 endereco:
                   type: object
-                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep', 'pais', 'numero']
+                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep', 'pais']
                   additionalProperties: false
                   properties:
                     rua:
@@ -662,7 +779,7 @@ paths:
                   example: "Souza"
                 endereco:
                   type: object
-                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep', 'pais', 'numero']
+                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep', 'pais']
                   properties:
                     rua:
                       type: string
