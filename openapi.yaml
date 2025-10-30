@@ -633,7 +633,7 @@ paths:
                   example: "12345678901"
                 endereco:
                   type: object
-                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep', 'pais']
+                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep']
                   additionalProperties: false
                   properties:
                     rua:
@@ -656,10 +656,6 @@ paths:
                       type: string
                       description: CEP (somente números).
                       example: "01311000"
-                    pais:
-                      type: string
-                      description: País.
-                      example: "Brasil"
                     numero:
                       type: string
                       description: Número do endereço (opcional).
@@ -779,7 +775,7 @@ paths:
                   example: "Souza"
                 endereco:
                   type: object
-                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep', 'pais']
+                  required: ['rua', 'cidade', 'estado', 'bairro', 'cep']
                   properties:
                     rua:
                       type: string
@@ -796,9 +792,6 @@ paths:
                     cep:
                       type: string
                       example: "01311000"
-                    pais:
-                      type: string
-                      example: "Brasil"
                     numero:
                       type: string
                       example: "1578"
