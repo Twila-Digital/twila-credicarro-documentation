@@ -508,6 +508,7 @@ paths:
         - Autenticação
       summary: Gerar token de acesso.
       description: Gera um token de acesso para o parceiro utilizando as credenciais do cliente.
+      security: []
       requestBody:
         required: true
         content:
