@@ -8,14 +8,7 @@
     "dark": "#feb916"
   },
   "favicon": "/favicon.ico",
-  "api": {
-    "mdx": {
-      "server": "https://api.staging.credicarro.com.br/integration",
-      "auth": {
-        "method": "bearer"
-      }
-    }
-  },
+  "openapi": "openapi.yaml",
   "navigation": {
     "tabs": [
       {
