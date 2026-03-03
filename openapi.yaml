@@ -128,6 +128,62 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+  /simulation/range/financing:
+    get:
+      tags:
+        - Simulação
+      summary: Consultar valor mínimo de entrada por prazo para financiamento
+      description: Consulta o valor mínimo de entrada por prazo pela placa informada
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: placa
+          in: query
+          description: Placa do veículo para busca
+          required: true
+          schema:
+            type: string
+            minLength: 7
+            example: ABC-1234
+            description: Placa do veículo
+      responses:
+        '200':
+          description: Faixa de financiamento retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opcoes_por_prazo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        prazo:
+                          type: integer
+                          format: int32
+                          description: Prazo em meses
+                          example: 12
+                        valor_minimo_entrada:
+                          type: number
+                          format: double
+                          description: Valor mínimo de entrada para o prazo
+                          example: 5000.00
+                      additionalProperties: false
+                    nullable: true
+                additionalProperties: false
+        '400':
+          description: Bad Request — parâmetros inválidos ou ausentes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '401':
+          description: Unauthorized — token ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/proposal/simulation/range/refinancing:
     get:
       tags:
