@@ -42,6 +42,7 @@
             "group": "Simulação",
             "pages": [
               "pages/simulation/range-refinancing",
+              "pages/simulation/range-financing",
               "pages/simulation/create-refinancing",
               "pages/simulation/create-financing",
               "pages/simulation/get",
