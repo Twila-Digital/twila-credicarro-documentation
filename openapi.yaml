@@ -148,7 +148,7 @@ paths:
             description: Placa do veículo
       responses:
         '200':
-          description: Faixa de financiamento retornada com sucesso
+          description: Faixa Financiável retornada com sucesso
           content:
             application/json:
               schema:
