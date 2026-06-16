@@ -128,7 +128,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
-  /simulation/range/financing:
+  /v1/proposal/simulation/range/financing:
     get:
       tags:
         - Simulação
