@@ -328,7 +328,7 @@ paths:
             schema:
               type: object
               description: Os dados da sua simulação
-              required: ['cpf', 'isVeiculoZeroKm', 'placa', 'valorSolicitado', 'uf', 'valorEntrada']
+              required: ['cpf', 'isVeiculoZeroKm', 'placa', 'valorVeiculo', 'uf', 'valorEntrada']
               additionalProperties: false
               properties:
                 cpf:
@@ -344,9 +344,9 @@ paths:
                   type: string
                   description: Placa do veículo
                   example: ABC1D23
-                valorSolicitado:
+                valorVeiculo:
                   type: number
-                  description: Valor total solicitado para financiamento
+                  description: Valor total do veículo
                   format: double
                   example: 45000
                 uf:
