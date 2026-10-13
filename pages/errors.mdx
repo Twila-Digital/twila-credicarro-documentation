@@ -1,0 +1,44 @@
+---
+title: 'Erros'
+description: 'Como a API informa erros e quais status HTTP esperar'
+icon: 'circle-exclamation'
+---
+
+Os erros retornados pela API seguem o formato abaixo, com campos em português:
+
+```json
+{
+  "tipo": "ValidationError",
+  "titulo": "Validation Error",
+  "status": 400,
+  "detalhe": "A validation problem occurred.",
+  "erros": [
+    { "codigo": "Proposal.InvalidCpf", "mensagem": "O CPF informado é inválido." },
+    { "codigo": "Proposal.PlateIsInvalid", "mensagem": "A placa informada é inválida. Use o formato ABC-1234 ou ABC1D23." }
+  ]
+}
+```
+
+| Campo | Descrição |
+| --- | --- |
+| `tipo` | Código estável do erro (por exemplo, `Partner.AccountIsIncompleted`). Use este campo no seu tratamento. |
+| `titulo` | Categoria do erro. |
+| `status` | Status HTTP. |
+| `detalhe` | Mensagem do erro. |
+| `erros` | Lista com `codigo` e `mensagem` de cada campo inválido. Presente apenas em erros de validação. |
+
+## <Icon icon="list" type="solid"/> Status HTTP
+
+| Status | Quando ocorre |
+| --- | --- |
+| `400` | Dados inválidos ou regra de negócio não atendida. |
+| `401` | Token ausente, inválido ou expirado. |
+| `404` | Recurso não encontrado ou de outro parceiro (proposta, simulação, loja ou webhook). |
+| `409` | `Idempotency-Key` reutilizada com outro conteúdo. |
+| `502` | Falha ao comunicar com um serviço interno ou externo. Tente novamente mais tarde. |
+| `503` | Serviço temporariamente indisponível. Tente novamente mais tarde. |
+| `500` | Erro inesperado. |
+
+<Note>
+  Respostas `401` são devolvidas sem corpo. Falhas inesperadas (`500`, e alguns `502`) podem vir no formato padrão Problem Details, com os campos `type`, `title`, `status` e `detail`.
+</Note>

@@ -1,0 +1,75 @@
+---
+title: 'Webhook de proposta v2'
+description: 'Notificações com o retrato completo da proposta a cada mudança'
+icon: 'webhook'
+---
+
+Propostas criadas pela v2 enviam, para cada webhook ativo do tipo **Proposal** (`tipo` = 3), o retrato atual da proposta sempre que muda o status, uma etapa ou um documento. Elas **não** recebem o payload simplificado da v1.
+
+Cadastre e gerencie seus webhooks pela API em [Cadastrar webhook](/pages/webhook/create). Autenticação, assinatura e retentativas funcionam como descrito em [Webhooks](/pages/webhooks).
+
+## <Icon icon="code" type="solid"/> Payload
+
+```json
+{
+  "id_proposta": "bea8d060-f93d-48eb-b6c4-45f64483cdd9",
+  "enum_status": 2,
+  "status": "APROVADA",
+  "motivo_evento": "DOCUMENTOS_ALTERADOS",
+  "motivo_recusa": null,
+  "data_evento": "2026-10-12T17:20:31.512+00:00",
+  "comprador": {
+    "cpf": "12345678901",
+    "enum_biometria": 3,
+    "biometria": "APROVADA",
+    "status_ativo": {
+      "enum_etapa": 7,
+      "etapa": "CORRECAO_DOCUMENTOS",
+      "enum_situacao": 4,
+      "situacao": "PENDENTE_CORRECAO",
+      "enum_responsavel_acao": 2,
+      "responsavel_acao": "INTEGRADOR"
+    },
+    "etapas_concluidas": [
+      { "enum_etapa": 1, "etapa": "PROPOSTA_CRIADA", "data": "2026-10-12T14:05:08-03:00" },
+      { "enum_etapa": 4, "etapa": "ANALISE_BIOMETRIA", "data": "2026-10-12T14:20:00-03:00" }
+    ],
+    "documentos": [
+      { "enum_tipo": 1, "tipo": "CNH", "enum_status": 2, "status": "INVALIDO", "motivo": "Documento ilegível" }
+    ]
+  },
+  "loja": {
+    "cnpj": "11222333000181",
+    "status_ativo": {
+      "enum_etapa": 6,
+      "etapa": "ENVIO_DOCUMENTOS",
+      "enum_situacao": 1,
+      "situacao": "AGUARDANDO_ENVIO",
+      "enum_responsavel_acao": 2,
+      "responsavel_acao": "INTEGRADOR"
+    },
+    "etapas_concluidas": [],
+    "documentos": []
+  }
+}
+```
+
+| Campo | Descrição |
+| --- | --- |
+| `id_proposta` | Identificador da proposta. |
+| `enum_status` / `status` | Status atual da proposta. Veja [Etapas e status](/pages/v2/steps). |
+| `motivo_evento` | O que disparou a notificação: `STATUS_ALTERADO`, `ETAPAS_ALTERADAS` ou `DOCUMENTOS_ALTERADOS`. |
+| `motivo_recusa` | Motivo da recusa, ou `null`. |
+| `data_evento` | Momento em que a notificação foi gerada (UTC). |
+| `comprador` | Biometria, etapa ativa, etapas concluídas e documentos do comprador. |
+| `loja` | Etapa ativa, etapas concluídas e documentos da loja, ou `null`. |
+
+O formato de `status_ativo`, `etapas_concluidas` e `documentos` é o mesmo da [consulta da proposta v2](/pages/v2/proposal/get).
+
+## <Icon icon="clone" type="solid"/> Entregas repetidas
+
+<Card title="Trate o webhook como idempotente" icon="shield-check" horizontal>
+  - Cada notificação traz o header `Idempotency-Key`. Uma retentativa da mesma notificação usa a mesma chave.
+  - A Credicarro não reenvia um retrato idêntico ao último entregue com sucesso para o mesmo webhook, mesmo que o evento se repita.
+  - As notificações podem chegar fora de ordem. Use `data_evento` ou consulte a proposta para obter o estado mais recente.
+</Card>

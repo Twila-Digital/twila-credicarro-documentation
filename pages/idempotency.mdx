@@ -1,0 +1,30 @@
+---
+title: 'Idempotência'
+description: 'Repita requisições com segurança usando o header Idempotency-Key'
+icon: 'fingerprint'
+---
+
+As rotas que criam ou alteram dados aceitam o header `Idempotency-Key`. Com ele, você pode repetir uma requisição (por exemplo, depois de um timeout) sem criar registros duplicados.
+
+```bash
+curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: 6f1c9a2e-3b7d-4e2a-9c51-0d8f3a7b2e10" \
+  -d '{ "cpf": "12345678901", "simulacaoId": "bea8d060-f93d-48eb-b6c4-45f64483cdd9" }'
+```
+
+<Card title="Regras" icon="list-check" horizontal>
+  - A chave deve ter de 1 a 200 caracteres. Recomendamos um UUID novo por operação.
+  - Repetir a mesma chave com o mesmo conteúdo devolve o resultado original.
+  - Reutilizar a chave com conteúdo diferente retorna erro.
+  - Opcional em clientes, simulações e propostas. **Obrigatório** no [envio de documentos v2](/pages/v2/proposal/document).
+</Card>
+
+| Rota | Header |
+| --- | --- |
+| `POST /v1/customer`, `/v1/customer/unified`, `/v1/customer/address`, `/v1/customer/professional` | Opcional |
+| `POST /v1/proposal/simulation/financing`, `/v1/proposal/simulation/refinancing` | Opcional |
+| `POST /v2/proposal/simulation/financing`, `/v2/proposal/simulation/refinancing` | Opcional |
+| `POST /v1/proposal`, `POST /v2/proposal` | Opcional |
+| `POST /v2/proposal/{propostaId}/document` | Obrigatório |

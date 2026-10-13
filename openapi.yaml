@@ -6,6 +6,8 @@ info:
 servers:
   - url: https://api.staging.credicarro.com.br/integration
     description: Servidor para o ambiente de staging
+  - url: https://api.credicarro.com.br/integration
+    description: Servidor para o ambiente de produção
 paths:
   /v1/proposal:
     post:
@@ -15,6 +17,8 @@ paths:
       description: Cria uma nova proposta a partir de uma simulação existente
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -322,6 +326,8 @@ paths:
       description: Cria uma nova simulação de financiamento
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         content:
           application/json:
@@ -351,13 +357,13 @@ paths:
                   example: 45000
                 uf:
                   type: string
-                  description: UF (Unidade Federativa) do registro do veículo, em formato de 2 letras (ex. SP, RJ, MG). Campo opcional
+                  description: UF (Unidade Federativa) do registro do veículo, em formato de 2 letras (ex. SP, RJ, MG).
                   example: "SP"
                 valorEntrada:
                   type: number
-                  description: Valor de entrada do financiamento, em reais. Utilize ponto como separador decimal. Campo opcional
+                  description: Valor de entrada do financiamento, em reais. Utilize ponto como separador decimal. Informe zero quando não houver entrada; deve ser menor que o valor do veículo.
                   format: double
-                  example: 45000
+                  example: 5000
       responses:
         '201':
           description: Simulação criada com sucesso
@@ -450,6 +456,8 @@ paths:
       description: Cria uma nova simulação de refinanciamento
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         content:
           application/json:
@@ -604,6 +612,8 @@ paths:
       description: Cria um novo cliente com base nos dados fornecidos
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -646,7 +656,7 @@ paths:
                   description: Sobrenome do cliente.
                   example: "Souza"
       responses:
-        '201':
+        '200':
           description: Cliente criado com sucesso
           content:
             application/json:
@@ -664,6 +674,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/customer/address:
     post:
       tags:
@@ -672,6 +688,8 @@ paths:
       description: Cria ou atualiza o endereço de um cliente com base nos dados fornecidos.
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -738,6 +756,8 @@ paths:
       description: Cria ou atualiza as informações profissionais de um cliente com base nos dados fornecidos.
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -789,6 +809,8 @@ paths:
       description: Cria ou atualiza um cliente incluindo informações pessoais, endereço e dados profissionais.
       security:
         - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
       requestBody:
         required: true
         content:
@@ -878,7 +900,7 @@ paths:
                       description: Renda mensal do cliente em reais.
                       example: 6500.00
       responses:
-        '201':
+        '200':
           description: Cliente criado com sucesso
           content:
             application/json:
@@ -896,8 +918,915 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+  /v1/webhook:
+    post:
+      tags:
+        - Webhook
+      summary: Cadastrar um webhook
+      description: |
+        Cadastra um webhook ativo para o parceiro autenticado. É permitido mais de um webhook por tipo.
+        A resposta traz o segredo de assinatura (`segredo_assinatura`) em claro, usado para validar o header
+        `X-CrediCarro-Signature` das notificações. Ele não pode ser recuperado depois, então guarde-o nesse momento.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['tipo', 'url', 'tipo_autenticacao']
+              additionalProperties: false
+              properties:
+                tipo:
+                  type: integer
+                  format: int32
+                  description: |
+                    Evento notificado pelo webhook.
+                    Valores aceitos:
+                      - 1 = Customer
+                      - 2 = Simulation
+                      - 3 = Proposal
+                  example: 3
+                url:
+                  type: string
+                  description: URL absoluta (http ou https) que receberá as notificações.
+                  example: https://parceiro.com.br/webhooks/credicarro
+                tipo_autenticacao:
+                  type: integer
+                  format: int32
+                  description: |
+                    Autenticação enviada pela Credicarro ao chamar a URL. Não pode ser alterada depois da criação.
+                    Valores aceitos:
+                      - 1 = None (sem autenticação)
+                      - 2 = Basic
+                      - 3 = Jwt
+                  example: 2
+                credencial:
+                  type: string
+                  description: |
+                    Credencial enviada no header `Authorization`. Obrigatória para Basic (valor em Base64 de `usuario:senha`,
+                    enviado como `Basic {credencial}`) e Jwt (token enviado como `Bearer {credencial}`).
+                  example: dXN1YXJpbzpzZW5oYQ==
+      responses:
+        '201':
+          description: Webhook cadastrado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_webhook:
+                    type: string
+                    format: uuid
+                    description: Identificador único do webhook
+                    example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+                  segredo_assinatura:
+                    type: string
+                    description: Segredo usado para validar a assinatura `X-CrediCarro-Signature`. Retornado somente nesta resposta.
+                    example: "<segredo-de-assinatura>"
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+    get:
+      tags:
+        - Webhook
+      summary: Consultar webhooks do parceiro
+      description: Traz, de forma paginada, os webhooks cadastrados para o parceiro autenticado. A credencial e o segredo de assinatura não são retornados.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: pagina_inicial
+          in: query
+          description: Página inicial (mínimo 1)
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: limite
+          in: query
+          description: Quantidade de itens por página (1 a 100)
+          schema:
+            type: integer
+            format: int32
+            example: 10
+      responses:
+        '200':
+          description: Lista de webhooks retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  itens:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/WebhookResponse"
+                  pagina:
+                    $ref: "#/components/schemas/Page"
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/webhook/{webhookId}:
+    put:
+      tags:
+        - Webhook
+      summary: Editar um webhook
+      description: |
+        Atualiza o tipo, a URL e o status de um webhook do parceiro autenticado. A autenticação (tipo e credencial)
+        não pode ser alterada; para trocá-la, exclua o webhook e cadastre outro.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WebhookId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['tipo', 'url']
+              additionalProperties: false
+              properties:
+                tipo:
+                  type: integer
+                  format: int32
+                  description: |
+                    Evento notificado pelo webhook.
+                    Valores aceitos:
+                      - 1 = Customer
+                      - 2 = Simulation
+                      - 3 = Proposal
+                  example: 3
+                url:
+                  type: string
+                  description: URL absoluta (http ou https) que receberá as notificações.
+                  example: https://parceiro.com.br/webhooks/credicarro
+                status:
+                  type: integer
+                  format: int32
+                  description: |
+                    Status do webhook. Quando omitido, mantém o status atual.
+                    Valores aceitos:
+                      - 1 = Active
+                      - 2 = Inactive
+                  example: 1
+      responses:
+        '204':
+          description: Webhook atualizado com sucesso
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Webhook não encontrado para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+    delete:
+      tags:
+        - Webhook
+      summary: Excluir um webhook
+      description: Remove um webhook do parceiro autenticado; ele deixa de receber notificações.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WebhookId"
+      responses:
+        '204':
+          description: Webhook excluído com sucesso
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Webhook não encontrado para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/simulation/financing:
+    post:
+      tags:
+        - Proposta
+      summary: Criar uma nova simulação de financiamento
+      description: |
+        Cria uma nova simulação de financiamento selecionando a loja de integração pelo CNPJ (`cnpjLoja`).
+        A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de intermediação.
+        O cliente precisa estar cadastrado antes da simulação, pelas rotas de Cliente da v1.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['cpf', 'placa', 'valorVeiculo', 'valorEntrada', 'uf', 'isVeiculoZeroKm', 'cnpjLoja']
+              additionalProperties: false
+              properties:
+                cpf:
+                  type: string
+                  minLength: 11
+                  description: CPF do cliente **somente números** (11 dígitos)
+                  example: "12345678901"
+                placa:
+                  type: string
+                  description: Placa do veículo no padrão antigo (ABC-1234) ou Mercosul (ABC1D23)
+                  example: ABC1D23
+                valorVeiculo:
+                  type: number
+                  format: double
+                  description: Valor total do veículo, em reais. Deve ser maior que zero.
+                  example: 45000
+                valorEntrada:
+                  type: number
+                  format: double
+                  description: Valor de entrada, em reais. Informe zero quando não houver entrada; deve ser menor que o valor do veículo.
+                  example: 5000
+                uf:
+                  type: string
+                  description: UF do registro do veículo, com 2 letras (ex. SP, RJ, MG).
+                  example: SP
+                isVeiculoZeroKm:
+                  type: boolean
+                  description: Indica se o veículo é zero quilômetro. `true` para novo, `false` para usado.
+                  example: false
+                cnpjLoja:
+                  type: string
+                  description: CNPJ da loja de integração vinculada ao parceiro, formatado ou apenas números.
+                  example: 11.222.333/0001-81
+      responses:
+        '201':
+          description: Simulação criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimplifySimulationListResponse"
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Loja não encontrada ou não vinculada a este parceiro (`ESTABLISHMENT_NOT_FOUND`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/simulation/refinancing:
+    post:
+      tags:
+        - Proposta
+      summary: Criar uma nova simulação de refinanciamento
+      description: |
+        Cria uma nova simulação de refinanciamento selecionando a loja de integração pelo CNPJ (`cnpjLoja`).
+        A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de intermediação.
+        O cliente precisa estar cadastrado com endereço, e o `valorSolicitado` precisa estar dentro da faixa refinanciável da placa.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['cpf', 'placa', 'valorSolicitado', 'cnpjLoja']
+              additionalProperties: false
+              properties:
+                cpf:
+                  type: string
+                  minLength: 11
+                  description: CPF do cliente **somente números** (11 dígitos)
+                  example: "12345678901"
+                placa:
+                  type: string
+                  description: Placa do veículo no padrão antigo (ABC-1234) ou Mercosul (ABC1D23)
+                  example: ABC1D23
+                valorSolicitado:
+                  type: number
+                  format: double
+                  description: Valor solicitado para refinanciamento, em reais. Deve estar dentro da faixa refinanciável da placa.
+                  example: 25000
+                cnpjLoja:
+                  type: string
+                  description: CNPJ da loja de integração vinculada ao parceiro, formatado ou apenas números.
+                  example: 11.222.333/0001-81
+      responses:
+        '201':
+          description: Simulação criada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SimplifySimulationListResponse"
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Loja não encontrada ou não vinculada a este parceiro (`ESTABLISHMENT_NOT_FOUND`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal:
+    post:
+      tags:
+        - Proposta
+      summary: Criar uma nova proposta
+      description: |
+        Cria uma proposta a partir de uma simulação criada pela v2. A simulação precisa pertencer ao parceiro e ter
+        sido feita em uma loja de integração vinculada a ele. O cliente precisa estar com o cadastro completo
+        (endereço, tipo de ocupação e renda).
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/IdempotencyKey"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['cpf', 'simulacaoId']
+              additionalProperties: false
+              properties:
+                cpf:
+                  type: string
+                  minLength: 11
+                  description: CPF do cliente **somente números** (11 dígitos).
+                  example: "12345678901"
+                simulacaoId:
+                  type: string
+                  format: uuid
+                  description: Identificador da simulação escolhida (retornado em `id_simulacao`)
+                  example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
+      responses:
+        '201':
+          description: Proposta criada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id_proposta:
+                    type: string
+                    format: uuid
+                    description: Identificador único da proposta
+                    example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Simulação ou loja não encontrada para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}:
+    get:
+      tags:
+        - Proposta
+      summary: Consultar proposta pelo ID.
+      description: |
+        Consulta o retrato atual de uma proposta criada pela v2, com status, link de biometria e as etapas do
+        comprador e da loja. Propostas criadas pela v1 retornam `PROPOSAL_VERSION_NOT_SUPPORTED`;
+        consulte-as por `GET /v1/proposal/{propostaId}`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+      responses:
+        '200':
+          description: Proposta retornada com sucesso
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProposalV2Response"
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Proposta não encontrada para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}/vehicle-detail:
+    post:
+      tags:
+        - Proposta
+      summary: Incluir os dados do veículo
+      description: |
+        Inclui ou atualiza placa, Renavam, chassi e cor do veículo de uma proposta criada pela v2. Aceito somente
+        enquanto a etapa ativa for `DADOS_VEICULO` (8).
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['renavam', 'chassi', 'placa', 'cor']
+              additionalProperties: false
+              properties:
+                renavam:
+                  type: string
+                  description: Renavam do veículo (11 dígitos).
+                  example: "12345678901"
+                chassi:
+                  type: string
+                  description: Chassi do veículo.
+                  example: 9BWZZZ377VT004251
+                placa:
+                  type: string
+                  description: Placa do veículo.
+                  example: ABC1D23
+                cor:
+                  type: string
+                  description: Cor do veículo (não pode conter números).
+                  example: PRATA
+      responses:
+        '202':
+          description: Dados do veículo aceitos
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Proposta não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}/deposit-account:
+    post:
+      tags:
+        - Proposta
+      summary: Incluir a conta de recebimento
+      description: |
+        Inclui ou substitui a conta de recebimento de uma proposta de **refinanciamento** criada pela v2, enquanto a
+        etapa ativa for `CONTA_RECEBIMENTO` (5). O titular deve ser o cliente da proposta. Propostas de financiamento
+        não são aceitas. Enviar novamente substitui a conta anterior.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['cpfTitular', 'codigoBanco', 'agencia', 'digitoAgencia', 'conta', 'digitoConta', 'tipoConta']
+              additionalProperties: false
+              properties:
+                cpfTitular:
+                  type: string
+                  description: CPF do titular da conta, formatado ou apenas números. Deve ser o CPF do cliente da proposta.
+                  example: "12345678901"
+                codigoBanco:
+                  type: string
+                  description: Código do banco (COMPE) com 3 dígitos.
+                  example: "001"
+                agencia:
+                  type: string
+                  description: Número da agência com 4 dígitos, sem o dígito verificador.
+                  example: "1234"
+                digitoAgencia:
+                  type: string
+                  description: Dígito verificador da agência (número ou X).
+                  example: "5"
+                conta:
+                  type: string
+                  description: Número da conta, de 4 a 13 dígitos, sem o dígito verificador.
+                  example: "123456"
+                digitoConta:
+                  type: string
+                  description: Dígito verificador da conta (número ou X).
+                  example: "7"
+                tipoConta:
+                  type: string
+                  description: Tipo da conta.
+                  enum: ['CORRENTE', 'POUPANCA', 'PAGAMENTO']
+                  example: CORRENTE
+      responses:
+        '200':
+          description: Conta de recebimento registrada
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Proposta não encontrada para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}/document:
+    post:
+      tags:
+        - Proposta
+      summary: Enviar documento de participante
+      description: |
+        Envia um documento do comprador ou da loja em Base64 (até 10 MiB decodificado; PDF, JPG/JPEG ou PNG).
+        Aceito quando a etapa ativa do participante for `ENVIO_DOCUMENTOS` (6) com a proposta aprovada, ou
+        `CORRECAO_DOCUMENTOS` (7) para reenviar um tipo atualmente recusado (`INVALIDO`). O header `Idempotency-Key` é obrigatório.
+
+        | Código de erro | Quando ocorre |
+        | --- | --- |
+        | `Document.InvalidParticipant` | `participante` diferente de `COMPRADOR` ou `LOJA`. |
+        | `Document.InvalidType` | Tipo de documento não aceito para o participante. |
+        | `Document.InvalidName` | Nome de arquivo vazio, com caminho, com mais de 255 caracteres ou com extensão não aceita. |
+        | `Document.InvalidBase64` | Conteúdo Base64 inválido. |
+        | `Document.Empty` | Arquivo vazio. |
+        | `Document.TooLarge` | Arquivo maior que 10 MiB depois de decodificado. |
+        | `Document.InvalidContent` | O conteúdo não corresponde à extensão informada. |
+        | `Document.InvalidProposalStage` | A etapa ativa não permite o envio de documentos. |
+        | `Document.NotPendingCorrection` | Em correção, o tipo enviado não está recusado. |
+        | `Idempotency.KeyConflict` | A `Idempotency-Key` já foi usada com outro conteúdo. |
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+        - name: Idempotency-Key
+          in: header
+          required: true
+          description: Chave única por envio (1 a 200 caracteres). Reenviar a mesma chave com o mesmo conteúdo devolve o mesmo resultado; com conteúdo diferente retorna `Idempotency.KeyConflict`.
+          schema:
+            type: string
+            example: doc-7f3c2a10-comprador-cnh
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['participante', 'tipoDocumento', 'nomeArquivo', 'conteudoBase64']
+              additionalProperties: false
+              properties:
+                participante:
+                  type: string
+                  description: Participante dono do documento.
+                  enum: ['COMPRADOR', 'LOJA']
+                  example: COMPRADOR
+                tipoDocumento:
+                  type: integer
+                  format: int32
+                  description: |
+                    Código do tipo de documento. Tipos aceitos por participante:
+                      - COMPRADOR: 1, 4, 5, 6, 7, 9, 57
+                      - LOJA: 6, 8
+
+                    Códigos: 1 = CNH, 4 = Comprovante de renda, 5 = Comprovante de residência,
+                    6 = Documento do veículo, 7 = CNH digital, 8 = Laudo ECV, 9 = Laudo de vistoria, 57 = ATPV.
+                  example: 1
+                nomeArquivo:
+                  type: string
+                  maxLength: 255
+                  description: Nome do arquivo com extensão `.pdf`, `.jpg`, `.jpeg` ou `.png`, sem caminho. A extensão precisa corresponder ao conteúdo real do arquivo.
+                  example: cnh-comprador.pdf
+                conteudoBase64:
+                  type: string
+                  description: Conteúdo do arquivo em Base64 puro (sem prefixo `data:`), até 10 MiB depois de decodificado.
+                  example: JVBERi0xLjcKJcOkw7zDtsOfCjIgMCBvYmoK...
+      responses:
+        '200':
+          description: Documento recebido
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Proposta não encontrada para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 components:
+  parameters:
+    IdempotencyKey:
+      name: Idempotency-Key
+      in: header
+      required: false
+      description: |
+        Chave opcional (1 a 200 caracteres) para repetir a requisição com segurança. Reenviar a mesma chave com o mesmo
+        conteúdo devolve o resultado original sem duplicar o registro; reutilizá-la com outro conteúdo retorna erro.
+      schema:
+        type: string
+        maxLength: 200
+        example: 6f1c9a2e-3b7d-4e2a-9c51-0d8f3a7b2e10
+    ProposalId:
+      name: propostaId
+      in: path
+      required: true
+      description: Identificador único da proposta (UUID) retornado na criação da proposta
+      schema:
+        type: string
+        format: uuid
+        example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
+    WebhookId:
+      name: webhookId
+      in: path
+      required: true
+      description: Identificador único do webhook (UUID) retornado no cadastro
+      schema:
+        type: string
+        format: uuid
+        example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
   schemas:
+    SimplifySimulationListResponse:
+      type: object
+      properties:
+        simulacoes:
+          type: array
+          description: Uma simulação por prazo disponível
+          items:
+            type: object
+            properties:
+              id_simulacao:
+                type: string
+                format: uuid
+                description: Identificador da simulação (use em `simulacaoId` ao criar a proposta)
+                example: 123e4567-e89b-12d3-a456-426614174000
+              valor_solicitado:
+                type: number
+                format: double
+                example: 40000
+              prazo:
+                type: integer
+                format: int32
+                description: Prazo em meses
+                example: 36
+              valor_parcela:
+                type: number
+                format: double
+                example: 1890.55
+              valor_tac:
+                type: number
+                format: double
+                example: 1500
+              valor_boleto:
+                type: number
+                format: double
+                example: 3.5
+              valor_seguro:
+                type: number
+                format: double
+                example: 0
+              valor_iof:
+                type: number
+                format: double
+                example: 872
+              percentual_iof:
+                type: number
+                format: double
+                example: 1.92
+              valor_credito_total:
+                type: number
+                format: double
+                example: 42372
+              valor_divida_total:
+                type: number
+                format: double
+                example: 68059.8
+              percentual_cet_mensal:
+                type: number
+                format: double
+                example: 3.62
+              percentual_cet_anual:
+                type: number
+                format: double
+                example: 53.25
+              percentual_juros_mensal:
+                type: number
+                format: double
+                example: 3.29
+              percentual_juros_anual:
+                type: number
+                format: double
+                example: 47.53
+              valor_retencao_diaria_aproximado:
+                type: number
+                format: double
+                nullable: true
+                example: null
+    ProposalV2Response:
+      type: object
+      description: Retrato atual da proposta v2
+      properties:
+        id_proposta:
+          type: string
+          format: uuid
+          example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
+        numero:
+          type: integer
+          format: int64
+          description: Número único da proposta
+          example: 171020250001
+        id_simulacao:
+          type: string
+          format: uuid
+          example: 123e4567-e89b-12d3-a456-426614174000
+        enum_status:
+          type: integer
+          format: int32
+          description: Código do status da proposta (veja "Etapas e status")
+          example: 2
+        status:
+          type: string
+          description: Nome do status da proposta
+          enum: ['EM_ANALISE', 'APROVADA', 'RECUSADA', 'CANCELADA', 'ANALISE_MANUAL', 'FINALIZADA', 'EM_NEGOCIACAO', 'EXPIRADA', 'PENDENTE']
+          example: APROVADA
+        tipo:
+          type: string
+          description: Modalidade da proposta
+          enum: ['Financing', 'Refinancing']
+          example: Refinancing
+        data_criacao:
+          type: string
+          format: date-time
+          example: 2026-10-12T14:05:08.984-03:00
+        motivo_recusa:
+          type: string
+          nullable: true
+          description: Motivo da recusa, quando houver. Omitido quando vazio.
+          example: Restrição cadastral
+        link_biometria:
+          type: string
+          nullable: true
+          description: Link para o cliente realizar a biometria, quando disponível. Omitido quando vazio.
+          example: https://onboarding.exemplo.com/sessao/abc123
+        comprador:
+          $ref: "#/components/schemas/ProposalV2Participant"
+        loja:
+          $ref: "#/components/schemas/ProposalV2Store"
+    ProposalV2Participant:
+      type: object
+      properties:
+        cpf:
+          type: string
+          example: "12345678901"
+        enum_biometria:
+          type: integer
+          format: int32
+          description: Código da situação da biometria
+          example: 3
+        biometria:
+          type: string
+          enum: ['NAO_INICIADA', 'SESSAO_CRIADA', 'EM_ANALISE', 'APROVADA', 'REPROVADA']
+          example: APROVADA
+        status_ativo:
+          $ref: "#/components/schemas/ProposalV2ActiveStep"
+        etapas_concluidas:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProposalV2CompletedStep"
+        documentos:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProposalV2Document"
+    ProposalV2Store:
+      type: object
+      description: Etapas da loja de integração. Presente quando a proposta foi feita em loja.
+      properties:
+        cnpj:
+          type: string
+          example: "11222333000181"
+        status_ativo:
+          $ref: "#/components/schemas/ProposalV2ActiveStep"
+        etapas_concluidas:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProposalV2CompletedStep"
+        documentos:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProposalV2Document"
+    ProposalV2ActiveStep:
+      type: object
+      description: Etapa em que o participante está agora, a situação dela e quem precisa agir
+      properties:
+        enum_etapa:
+          type: integer
+          format: int32
+          example: 6
+        etapa:
+          type: string
+          enum: ['INDEFINIDO', 'PROPOSTA_CRIADA', 'PROPOSTA_APROVADA', 'NOTIFICACAO_VENDEDOR', 'ANALISE_BIOMETRIA', 'CONTA_RECEBIMENTO', 'ENVIO_DOCUMENTOS', 'CORRECAO_DOCUMENTOS', 'DADOS_VEICULO', 'VISTORIA', 'ASSINATURA', 'PAGAMENTO', 'PROPOSTA_FINALIZADA']
+          example: ENVIO_DOCUMENTOS
+        enum_situacao:
+          type: integer
+          format: int32
+          example: 1
+        situacao:
+          type: string
+          enum: ['AGUARDANDO_ENVIO', 'AGUARDANDO_CLIENTE', 'EM_PROCESSAMENTO', 'PENDENTE_CORRECAO', 'BLOQUEADA', 'CONCLUIDA', 'CANCELADA']
+          example: AGUARDANDO_ENVIO
+        enum_responsavel_acao:
+          type: integer
+          format: int32
+          example: 2
+        responsavel_acao:
+          type: string
+          enum: ['NENHUM', 'CLIENTE', 'INTEGRADOR', 'CREDICARRO']
+          example: INTEGRADOR
+    ProposalV2CompletedStep:
+      type: object
+      properties:
+        enum_etapa:
+          type: integer
+          format: int32
+          example: 4
+        etapa:
+          type: string
+          example: ANALISE_BIOMETRIA
+        data:
+          type: string
+          format: date-time
+          description: Data da última passagem pela etapa
+          example: 2026-10-12T14:20:00-03:00
+    ProposalV2Document:
+      type: object
+      properties:
+        enum_tipo:
+          type: integer
+          format: int32
+          example: 1
+        tipo:
+          type: string
+          example: CNH
+        enum_status:
+          type: integer
+          format: int32
+          example: 2
+        status:
+          type: string
+          enum: ['RECEBIDO', 'VALIDO', 'INVALIDO', 'EM_ANALISE', 'EXCLUIDO']
+          example: INVALIDO
+        motivo:
+          type: string
+          nullable: true
+          description: Motivo da recusa do documento, quando houver
+          example: Documento ilegível
+    WebhookResponse:
+      type: object
+      properties:
+        id_webhook:
+          type: string
+          format: uuid
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        tipo:
+          type: string
+          example: Proposal
+        url:
+          type: string
+          example: https://parceiro.com.br/webhooks/credicarro
+        tipo_autenticacao:
+          type: string
+          example: Basic
+        status:
+          type: string
+          example: Active
     SimulationResponse:
       type: object
       description: Os dados da sua simulação
@@ -1216,8 +2145,20 @@ components:
           type: string
           description: Descrição do erro
           example: Cadastro de conta não finalizado
-        erro:
-          type: 'null'
+        erros:
+          type: array
+          description: Lista de erros de validação. Presente somente em erros de validação (`tipo` igual a `ValidationError`).
+          items:
+            type: object
+            properties:
+              codigo:
+                type: string
+                description: Código estável do erro
+                example: Proposal.InvalidCpf
+              mensagem:
+                type: string
+                description: Mensagem em português
+                example: O CPF informado é inválido.
       additionalProperties: false
   securitySchemes:
     bearerAuth:

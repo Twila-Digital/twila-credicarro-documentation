@@ -20,7 +20,9 @@
               "pages/introduction",
               "pages/development",
               "pages/authentication",
-              "pages/webhooks"
+              "pages/webhooks",
+              "pages/errors",
+              "pages/idempotency"
             ]
           },
           {
@@ -55,7 +57,45 @@
               "pages/proposal/create",
               "pages/proposal/get",
               "pages/proposal/pagination"
-              
+            ]
+          },
+          {
+            "group": "Webhook",
+            "pages": [
+              "pages/webhook/create",
+              "pages/webhook/list",
+              "pages/webhook/update",
+              "pages/webhook/delete"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API v2",
+        "groups": [
+          {
+            "group": "Introdução v2",
+            "pages": [
+              "pages/v2/overview",
+              "pages/v2/steps",
+              "pages/v2/webhooks"
+            ]
+          },
+          {
+            "group": "Simulação v2",
+            "pages": [
+              "pages/v2/simulation/create-financing",
+              "pages/v2/simulation/create-refinancing"
+            ]
+          },
+          {
+            "group": "Proposta v2",
+            "pages": [
+              "pages/v2/proposal/create",
+              "pages/v2/proposal/get",
+              "pages/v2/proposal/document",
+              "pages/v2/proposal/vehicle-detail",
+              "pages/v2/proposal/deposit-account"
             ]
           }
         ]

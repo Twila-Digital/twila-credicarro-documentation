@@ -37,13 +37,15 @@ Resposta (200)
 
 ```json
 {
-  "accesstoken": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...",
-  "expiresIn": 3600,
-  "expiresAt": "2025-08-12T18:07:28.088Z",
-  "tokenType": "Bearer",
-  "scope": "partner.read partner.write"
+  "token_de_acesso": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
+  "expira_em_segundos": 3600,
+  "expira_em": "2025-08-12T18:07:28.088Z",
+  "tipo_de_token": "Bearer",
+  "escopo": "credicarro.integration.access/full"
 }
 ```
+
+Envie o token em todas as demais requisições, no header `Authorization: Bearer {token_de_acesso}`. O mesmo token vale para as rotas `/v1` e `/v2`. Gere um novo token antes de `expira_em`; um token expirado retorna `401`.
 
 <Card title="Nota Importante" icon="info" horizontal>
   O endpoint (`https://api.staging.credicarro.com.br/integration`) é utilizado para o ambiente de desenvolvimento caso queira utilizar em produção utilize (`https://api.credicarro.com.br/integration`).

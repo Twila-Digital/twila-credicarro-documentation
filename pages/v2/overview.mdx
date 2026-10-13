@@ -1,0 +1,73 @@
+---
+title: 'Visão geral da v2'
+description: 'O que muda na API v2 e como é o fluxo completo de uma proposta'
+icon: 'rocket'
+---
+
+A v2 da API de integração leva a proposta até o fim pelo seu sistema: depois de criada, você acompanha as etapas de cada participante, envia documentos, dados do veículo e conta de recebimento sem precisar de outro canal.
+
+<Card title="A v1 continua disponível" icon="circle-info" horizontal>
+  As rotas `/v1` seguem funcionando. Uma proposta criada pela v1 continua sendo consultada pela v1, e uma proposta criada pela v2 só aceita os endpoints `/v2` de acompanhamento e envio.
+</Card>
+
+## <Icon icon="code-compare" type="solid"/> O que muda em relação à v1
+
+<CardGroup cols={2}>
+  <Card title="Loja informada pelo CNPJ" icon="store">
+    As simulações v2 exigem o campo `cnpjLoja`. A loja precisa estar vinculada ao seu cadastro de parceiro e não pode ter contrato de intermediação.
+  </Card>
+  <Card title="Etapas por participante" icon="list-check">
+    A consulta da proposta traz a etapa ativa, a situação e quem precisa agir para o comprador e para a loja.
+  </Card>
+  <Card title="Envio de dados pela API" icon="upload">
+    Documentos, dados do veículo e conta de recebimento são enviados por endpoints próprios.
+  </Card>
+  <Card title="Webhook detalhado" icon="webhook">
+    Propostas v2 recebem um webhook com o retrato completo da proposta a cada mudança de status, etapa ou documento.
+  </Card>
+</CardGroup>
+
+## <Icon icon="route" type="solid"/> Endpoints usados no fluxo v2
+
+Autenticação, cadastro de cliente, faixas e paginações não mudaram e continuam em `/v1`.
+
+| Passo | Endpoint | Versão |
+| --- | --- | --- |
+| Gerar token | `POST /v1/authentication/accesstoken` | v1 |
+| Cadastrar cliente | `POST /v1/customer/unified` (ou `customer`, `customer/address` e `customer/professional`) | v1 |
+| Consultar faixa (opcional) | `GET /v1/proposal/simulation/range/financing` ou `.../range/refinancing` | v1 |
+| Simular | `POST /v2/proposal/simulation/financing` ou `POST /v2/proposal/simulation/refinancing` | v2 |
+| Criar proposta | `POST /v2/proposal` | v2 |
+| Acompanhar | `GET /v2/proposal/{propostaId}` e webhook de proposta | v2 |
+| Enviar documentos | `POST /v2/proposal/{propostaId}/document` | v2 |
+| Dados do veículo | `POST /v2/proposal/{propostaId}/vehicle-detail` | v2 |
+| Conta de recebimento (só refinanciamento) | `POST /v2/proposal/{propostaId}/deposit-account` | v2 |
+| Gerenciar webhooks | `POST/GET /v1/webhook`, `PUT/DELETE /v1/webhook/{webhookId}` | v1 |
+
+## <Icon icon="list-ol" type="solid"/> Passo a passo
+
+<Steps>
+  <Step title="Autentique-se">
+    Gere o Bearer Token com seu `clientId` e `clientSecret`. Veja [Autenticação](/pages/authentication).
+  </Step>
+  <Step title="Cadastre o webhook de proposta">
+    Cadastre uma URL com `tipo` = 3 (Proposal) em [Cadastrar webhook](/pages/webhook/create) e guarde o `segredo_assinatura` retornado.
+  </Step>
+  <Step title="Cadastre o cliente">
+    A proposta só é aceita com o cadastro completo: dados pessoais, endereço, tipo de ocupação e renda.
+  </Step>
+  <Step title="Simule informando a loja">
+    Envie `cnpjLoja` na [simulação de financiamento](/pages/v2/simulation/create-financing) ou de [refinanciamento](/pages/v2/simulation/create-refinancing). A resposta traz uma simulação por prazo.
+  </Step>
+  <Step title="Crie a proposta">
+    Escolha um `id_simulacao` e chame [Criar proposta](/pages/v2/proposal/create).
+  </Step>
+  <Step title="Acompanhe as etapas">
+    Consulte [a proposta](/pages/v2/proposal/get) ou use o [webhook v2](/pages/v2/webhooks). Quando `responsavel_acao` for `INTEGRADOR`, a etapa ativa indica o que enviar. Quando for `CLIENTE`, o cliente precisa agir (por exemplo, fazer a biometria pelo `link_biometria`).
+  </Step>
+  <Step title="Envie o que a etapa pedir">
+    `ENVIO_DOCUMENTOS` e `CORRECAO_DOCUMENTOS` pedem [documentos](/pages/v2/proposal/document), `DADOS_VEICULO` pede os [dados do veículo](/pages/v2/proposal/vehicle-detail) e `CONTA_RECEBIMENTO` pede a [conta de recebimento](/pages/v2/proposal/deposit-account).
+  </Step>
+</Steps>
+
+Os significados de cada etapa, situação e status estão em [Etapas e status](/pages/v2/steps).
