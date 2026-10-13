@@ -7,46 +7,84 @@
     "light": "#feb916",
     "dark": "#feb916"
   },
+  "appearance": {
+    "default": "light"
+  },
+  "openapi": ["/openapi.yaml"],
   "favicon": "/favicon.ico",
-  "openapi": "openapi.yaml",
+  "contextual": {
+    "options": ["copy", "view", "chatgpt", "claude"]
+  },
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/pages/introduction"
+    },
+    {
+      "source": "/pages/idempotency",
+      "destination": "/pages/errors"
+    }
+  ],
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentação",
+        "tab": "Comece aqui",
         "groups": [
           {
-            "group": "Introdução",
+            "group": "Comece aqui",
+            "pages": ["pages/introduction"]
+          }
+        ]
+      },
+      {
+        "tab": "Para Desenvolvedores",
+        "groups": [
+          {
+            "group": "Integração",
             "pages": [
-              "pages/introduction",
+              "pages/for-developers",
               "pages/development",
-              "pages/authentication",
-              "pages/webhooks",
-              "pages/errors",
-              "pages/idempotency"
+              "pages/errors"
             ]
+          }
+        ]
+      },
+      {
+        "tab": "Autenticação",
+        "groups": [
+          {
+            "group": "Visão geral",
+            "pages": ["pages/authentication"]
           },
           {
             "group": "Autenticação",
-            "pages": [
-              "pages/authentication/accesstoken"
-            ]
+            "pages": ["pages/authentication/accesstoken"]
+          }
+        ]
+      },
+      {
+        "tab": "Proposta",
+        "groups": [
+          {
+            "group": "Fluxo",
+            "pages": ["pages/v2/overview", "pages/v2/steps"]
           },
           {
             "group": "Cliente",
             "pages": [
+              "pages/customer/unified",
               "pages/customer/create",
               "pages/customer/address",
-              "pages/customer/professional",
-              "pages/customer/unified"
+              "pages/customer/professional"
             ]
           },
           {
             "group": "Simulação",
             "pages": [
-              "pages/simulation/range-refinancing",
               "pages/simulation/range-financing",
-              "pages/simulation/create-refinancing",
-              "pages/simulation/create-financing",
+              "pages/simulation/range-refinancing",
+              "pages/v2/simulation/create-financing",
+              "pages/v2/simulation/create-refinancing",
               "pages/simulation/get",
               "pages/simulation/pagination"
             ]
@@ -54,48 +92,43 @@
           {
             "group": "Proposta",
             "pages": [
-              "pages/proposal/create",
-              "pages/proposal/get",
+              "pages/v2/proposal/create",
+              "pages/v2/proposal/get",
+              "pages/v2/proposal/document",
+              "pages/v2/proposal/vehicle-detail",
+              "pages/v2/proposal/deposit-account",
               "pages/proposal/pagination"
             ]
           },
           {
-            "group": "Webhook",
+            "group": "v1 (legado)",
             "pages": [
-              "pages/webhook/create",
-              "pages/webhook/list",
-              "pages/webhook/update",
-              "pages/webhook/delete"
+              "pages/simulation/create-financing",
+              "pages/simulation/create-refinancing",
+              "pages/proposal/create",
+              "pages/proposal/get"
             ]
           }
         ]
       },
       {
-        "tab": "API v2",
+        "tab": "Webhooks",
         "groups": [
           {
-            "group": "Introdução v2",
-            "pages": [
-              "pages/v2/overview",
-              "pages/v2/steps",
-              "pages/v2/webhooks"
-            ]
+            "group": "Visão geral",
+            "pages": ["pages/webhooks", "pages/v2/webhooks"]
           },
           {
-            "group": "Simulação v2",
-            "pages": [
-              "pages/v2/simulation/create-financing",
-              "pages/v2/simulation/create-refinancing"
-            ]
+            "group": "Segurança",
+            "pages": ["pages/webhooks/security"]
           },
           {
-            "group": "Proposta v2",
+            "group": "Webhooks",
             "pages": [
-              "pages/v2/proposal/create",
-              "pages/v2/proposal/get",
-              "pages/v2/proposal/document",
-              "pages/v2/proposal/vehicle-detail",
-              "pages/v2/proposal/deposit-account"
+              "pages/webhook/create",
+              "pages/webhook/list",
+              "pages/webhook/update",
+              "pages/webhook/delete"
             ]
           }
         ]
@@ -107,6 +140,12 @@
     "dark": "/logo/dark.svg"
   },
   "navbar": {
+    "links": [
+      {
+        "label": "llms.txt",
+        "href": "/llms.txt"
+      }
+    ],
     "primary": {
       "type": "button",
       "label": "Credicarro",

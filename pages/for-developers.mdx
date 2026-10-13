@@ -1,0 +1,121 @@
+---
+title: 'Para desenvolvedores'
+description: 'Visão técnica da API da Credicarro — ambientes, autenticação, formato de respostas e erros'
+icon: 'code'
+---
+
+<Tip>
+  Esta seção é para quem vai **integrar tecnicamente**. Se você quer ver a ordem das chamadas de uma proposta, vá direto para o [fluxo de integração](/pages/v2/overview).
+</Tip>
+
+## Em uma frase
+
+A API da Credicarro é REST, autenticada por Bearer token, com campos JSON em português e o mesmo formato de resposta em toda a superfície — um cliente HTTP e um token já bastam para integrar.
+
+<Card title="Não é a página de referência de endpoints" icon="circle-info" horizontal>
+  Esta página explica os conceitos que atravessam toda a API. Para o contrato de cada endpoint, use as abas **Proposta** e **Webhooks** ou a [referência OpenAPI](/openapi.yaml).
+</Card>
+
+## Ambientes
+
+| Ambiente | Base URL | Uso |
+| --- | --- | --- |
+| Staging | `https://api.staging.credicarro.com.br/integration` | Testes, sem afetar produção — veja [ambiente de desenvolvimento](/pages/development) |
+| Produção | `https://api.credicarro.com.br/integration` | Propostas reais |
+
+O ambiente é determinado pela URL base que você chama — as credenciais (`ClientId`/`ClientSecret`) são específicas de cada ambiente.
+
+## Versões
+
+Os endpoints ficam em `/v1` e `/v2`. O mesmo token vale para as duas versões.
+
+| Versão | Uso |
+| --- | --- |
+| `/v2` | Simulação por loja, criação e acompanhamento da proposta, envio de documentos, dados do veículo e conta de recebimento. Recomendada para novas integrações. |
+| `/v1` | Autenticação, cliente, faixas, paginações e webhooks — usados também no fluxo v2. Simulação e proposta v1 continuam disponíveis como legado. |
+
+<Note>
+  Uma proposta criada pela v1 é consultada pela v1. Uma proposta criada pela v2 só aceita os endpoints `/v2` de acompanhamento e envio.
+</Note>
+
+## Autenticação
+
+Toda requisição autenticada usa um Bearer token, obtido via `ClientId`/`ClientSecret` solicitados ao nosso suporte.
+
+```bash
+curl -X POST https://api.staging.credicarro.com.br/integration/v1/authentication/accesstoken \
+  -H "Content-Type: application/json" \
+  -d '{ "clientId": "<client-id>", "clientSecret": "<client-secret>" }'
+```
+
+<Card title="Fluxo completo de autenticação" icon="key" href="/pages/authentication" horizontal>
+  Veja a resposta completa e as boas práticas de segurança.
+</Card>
+
+## Formato das respostas
+
+Os campos JSON são em português. Listas paginadas seguem sempre o mesmo formato:
+
+```json
+{
+  "itens": [ ],
+  "pagina": {
+    "numero": 1,
+    "tamanho": 10,
+    "total": 45,
+    "tem_proximo": true,
+    "tem_anterior": false
+  }
+}
+```
+
+## Erros
+
+Toda resposta de erro traz os campos `tipo`, `titulo`, `status` e `detalhe`. Erros de validação trazem também a lista `erros`.
+
+<Card title="Formato completo de erro e Idempotency-Key" icon="triangle-exclamation" href="/pages/errors" horizontal>
+  Veja o formato de erro, os status HTTP e o reenvio seguro de operações.
+</Card>
+
+## Idempotência
+
+Rotas que criam ou alteram dados aceitam o cabeçalho `Idempotency-Key`: reenviar a mesma chave com o mesmo corpo retorna o resultado original em vez de repetir a operação. No [envio de documentos v2](/pages/v2/proposal/document) o cabeçalho é obrigatório.
+
+## Troubleshooting
+
+<AccordionGroup>
+  <Accordion title="401 Unauthorized" icon="lock">
+    O token não foi enviado, é inválido ou expirou. Gere um novo token — veja [Autenticação](/pages/authentication).
+  </Accordion>
+  <Accordion title="404 em uma proposta que existe" icon="magnifying-glass">
+    A proposta pode ser de outra versão. Propostas criadas pela v1 não são encontradas em `/v2/proposal/{propostaId}`, e vice-versa.
+  </Accordion>
+  <Accordion title="409 Conflict em POST" icon="ban">
+    Uma `Idempotency-Key` já usada com um corpo diferente. Gere uma nova chave para uma nova operação — veja [Erros e idempotência](/pages/errors).
+  </Accordion>
+  <Accordion title="Simulação v2 recusada pela loja" icon="store">
+    O `cnpjLoja` precisa estar vinculado ao seu cadastro de parceiro e a loja não pode ter contrato de intermediação.
+  </Accordion>
+</AccordionGroup>
+
+## Boas práticas de segurança
+
+<Card icon="shield-halved" horizontal>
+  * Armazene `ClientId`/`ClientSecret` em variáveis de ambiente ou um gerenciador de segredos — nunca no código-fonte
+  * Nunca exponha o `ClientSecret` em código client-side (app mobile, SPA)
+  * A Credicarro nunca solicita suas credenciais por e-mail ou telefone
+</Card>
+
+## Por onde continuar
+
+<CardGroup cols={3}>
+  <Card title="Fluxo da proposta" icon="arrow-right-arrow-left" href="/pages/v2/overview">
+    A ordem de chamadas do início ao fim.
+  </Card>
+  <Card title="Etapas e status" icon="list-check" href="/pages/v2/steps">
+    O significado de cada código da proposta.
+  </Card>
+  <Card title="Webhooks" icon="bell" href="/pages/webhooks">
+    Notificações em tempo real sobre a proposta.
+  </Card>
+</CardGroup>
