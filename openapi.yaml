@@ -1116,6 +1116,161 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/simulation/range/financing:
+    get:
+      tags:
+        - Simulação
+      summary: Consultar valor mínimo de entrada por prazo para financiamento
+      description: |
+        Consulta o valor mínimo de entrada por prazo pela placa informada, selecionando a loja de integração pelo
+        CNPJ (`cnpjLoja`). A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de
+        intermediação.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: placa
+          in: query
+          description: Placa do veículo para busca
+          required: true
+          schema:
+            type: string
+            minLength: 7
+            example: ABC-1234
+            description: Placa do veículo
+        - name: cnpjLoja
+          in: query
+          description: CNPJ da loja de integração vinculada ao parceiro, formatado ou apenas números
+          required: true
+          schema:
+            type: string
+            example: 11.222.333/0001-81
+      responses:
+        '200':
+          description: Faixa Financiável retornada com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opcoes_por_prazo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        prazo:
+                          type: integer
+                          format: int32
+                          description: Prazo em meses
+                          example: 12
+                        valor_minimo_entrada:
+                          type: number
+                          format: double
+                          description: Valor mínimo de entrada para o prazo
+                          example: 5000.00
+                      additionalProperties: false
+                    nullable: true
+                additionalProperties: false
+        '400':
+          description: Bad Request — parâmetros inválidos ou ausentes
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '401':
+          description: Unauthorized — token ausente ou inválido
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Loja não encontrada ou não vinculada a este parceiro (`ESTABLISHMENT_NOT_FOUND`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja de integração com contrato de intermediação não é permitida (`Store.Integration.Intermediation`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/simulation/range/refinancing:
+    get:
+      tags:
+        - Simulação
+      summary: Consultar valor mínimo e máximo refinanciável
+      description: |
+        Consulta o valor mínimo e máximo refinanciável pela placa informada, selecionando a loja de integração pelo
+        CNPJ (`cnpjLoja`). A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de
+        intermediação.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: placa
+          in: query
+          description: Placa do veículo para busca
+          required: true
+          schema:
+            type: string
+            minLength: 7
+            example: ABC-1234 ou ABC1D23
+            description: Placa do veículo
+        - name: cnpjLoja
+          in: query
+          description: CNPJ da loja de integração vinculada ao parceiro, formatado ou apenas números
+          required: true
+          schema:
+            type: string
+            example: 11.222.333/0001-81
+      responses:
+        '200':
+          description: Faixa de valor refinanciavel
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  opcoes_por_prazo:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        prazo:
+                          type: integer
+                          format: int32
+                          description: Prazo
+                          example: 6
+                        valor_minimo_refinanciavel:
+                          type: number
+                          format: double
+                          description: Mínimo valor refinanciavel
+                          example: 12480
+                        valor_maximo_refinanciavel:
+                          type: number
+                          format: double
+                          description: Máximo valor refinanciavel
+                          example: 35720
+                      additionalProperties: false
+                    nullable: true
+                additionalProperties: false
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Loja não encontrada ou não vinculada a este parceiro (`ESTABLISHMENT_NOT_FOUND`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja de integração com contrato de intermediação não é permitida (`Store.Integration.Intermediation`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal/simulation/financing:
     post:
       tags:

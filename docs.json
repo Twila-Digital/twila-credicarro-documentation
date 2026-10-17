@@ -81,8 +81,8 @@
           {
             "group": "Simulação",
             "pages": [
-              "pages/simulation/range-financing",
-              "pages/simulation/range-refinancing",
+              "pages/v2/simulation/range-financing",
+              "pages/v2/simulation/range-refinancing",
               "pages/v2/simulation/create-financing",
               "pages/v2/simulation/create-refinancing",
               "pages/simulation/get",
@@ -103,6 +103,8 @@
           {
             "group": "v1 (legado)",
             "pages": [
+              "pages/simulation/range-financing",
+              "pages/simulation/range-refinancing",
               "pages/simulation/create-financing",
               "pages/simulation/create-refinancing",
               "pages/proposal/create",
