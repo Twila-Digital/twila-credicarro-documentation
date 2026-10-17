@@ -73,19 +73,18 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
   </Step>
 
   <Step title="Cadastre o cliente com dados completos">
-    A proposta só é aceita com dados pessoais, endereço, ocupação e renda. O endpoint unificado envia tudo de uma vez — e pode ser chamado de novo para atualizar.
+    A proposta só é aceita com dados pessoais, endereço, ocupação e renda. O endpoint unificado envia tudo de uma vez. Sem `Idempotency-Key`, chamar de novo com o mesmo CPF atualiza o cadastro.
 
     ```bash
     curl -X POST $BASE/v1/customer/unified \
       -H "Authorization: Bearer $TOKEN" \
       -H "Content-Type: application/json" \
-      -H "Idempotency-Key: $(uuidgen)" \
       -d '{
         "cpf": "12345678901",
         "nome": "Maria",
         "sobrenome": "Souza",
         "email": "maria.souza@exemplo.com.br",
-        "celular": "+5511998765432",
+        "celular": "+55 (11) 99876-5432",
         "dataDeNascimento": "1990-05-20T00:00:00-03:00",
         "endereco": {
           "rua": "Av. Paulista",

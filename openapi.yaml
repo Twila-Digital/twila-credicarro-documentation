@@ -32,7 +32,7 @@ paths:
                 cpf:
                   minLength: 11
                   type: string
-                  description: CPF do cliente **somente números** (11 dígitos).
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678901"
                 simulacaoId:
                   type: string
@@ -605,7 +605,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '401':
-          description: Credenciais inválidas
+          description: Credenciais inválidas ou integração inativa (`Integration.Authentication.InvalidCredentials`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/customer:
     post:
       tags:
@@ -629,18 +633,18 @@ paths:
                 celular:
                   type: string
                   minLength: 1
-                  description: Telefone celular no formato E.164 (código do país + DDD + número).
+                  description: Telefone celular exatamente no formato `+55 (DD) 99999-9999`.
                   example: "+55 (11) 99876-5432"
                 cpf:
                   type: string
                   minLength: 1
                   maxLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678901"
                 dataDeNascimento:
                   type: string
                   format: date-time
-                  description: Data de nascimento em formato ISO-8601.
+                  description: Data de nascimento em ISO-8601. O cliente precisa ter entre 18 e 75 anos.
                   example: "1990-05-20T00:00:00-03:00"
                 email:
                   type: string
@@ -659,7 +663,7 @@ paths:
                   example: "Souza"
       responses:
         '200':
-          description: Cliente criado com sucesso
+          description: Cliente criado ou atualizado
           content:
             application/json:
               schema:
@@ -676,8 +680,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          description: Integração inativa (`Integration.Access.Inactive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
         '409':
-          description: A Idempotency-Key já foi usada com outro conteúdo
+          description: CPF, e-mail ou celular já cadastrado (`Cpf.CpfAlreadyAdded`, `Email.EmailAlreadyAdded`, `Phone.PhoneAlreadyAdded`), ou Idempotency-Key reutilizada com outro conteúdo
           content:
             application/json:
               schema:
@@ -706,7 +716,7 @@ paths:
                   type: string
                   minLength: 11
                   maxLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678901"
                 endereco:
                   type: object
@@ -731,7 +741,7 @@ paths:
                       example: "Bela Vista"
                     cep:
                       type: string
-                      description: CEP (somente números).
+                      description: CEP com 8 dígitos, com ou sem hífen.
                       example: "01311000"
                     numero:
                       type: string
@@ -746,6 +756,24 @@ paths:
           description: Endereço aceito para criação ou atualização
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          description: Integração inativa (`Integration.Access.Inactive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo
           content:
             application/json:
               schema:
@@ -774,7 +802,7 @@ paths:
                   type: string
                   minLength: 11
                   maxLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678901"
                 tipoOcupacao:
                   type: integer
@@ -803,6 +831,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          description: Integração inativa (`Integration.Access.Inactive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/customer/unified:
     post:
       tags:
@@ -826,18 +872,18 @@ paths:
                 celular:
                   type: string
                   minLength: 1
-                  description: Telefone celular no formato E.164 (código do país + DDD + número).
+                  description: Telefone celular exatamente no formato `+55 (DD) 99999-9999`.
                   example: "+55 (11) 99876-5432"
                 cpf:
                   type: string
                   minLength: 11
                   maxLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678901"
                 dataDeNascimento:
                   type: string
                   format: date-time
-                  description: Data de nascimento em formato ISO-8601.
+                  description: Data de nascimento em ISO-8601. O cliente precisa ter entre 18 e 75 anos.
                   example: "1990-05-20T00:00:00-03:00"
                 email:
                   type: string
@@ -903,7 +949,7 @@ paths:
                       example: 6500.00
       responses:
         '200':
-          description: Cliente criado com sucesso
+          description: Cliente criado ou atualizado
           content:
             application/json:
               schema:
@@ -916,6 +962,18 @@ paths:
                     example: 123e4567-e89b-12d3-a456-426614174000
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          description: Integração inativa (`Integration.Access.Inactive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: CPF, e-mail ou celular já cadastrado na criação com Idempotency-Key, ou Idempotency-Key reutilizada com outro conteúdo
           content:
             application/json:
               schema:
@@ -1429,7 +1487,7 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678901"
                 simulacaoId:
                   type: string
@@ -2198,8 +2256,8 @@ components:
         expira_em:
           type: string
           format: date-time
-          description: Data e hora de expiração do token
-          example: 2025-10-22T12:57:21.948Z
+          description: Data e hora (UTC) até quando reaproveitar o token. Já vem com 60 segundos de margem antes da expiração real.
+          example: 2025-10-22T12:57:21.948+00:00
         escopo:
           type: string
           description: Escopo do token de acesso

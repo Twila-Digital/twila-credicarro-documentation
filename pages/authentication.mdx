@@ -26,7 +26,7 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v1/authentication
 {
   "token_de_acesso": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9...",
   "expira_em_segundos": 3600,
-  "expira_em": "2025-08-12T18:07:28.088Z",
+  "expira_em": "2025-08-12T18:06:28.088+00:00",
   "tipo_de_token": "Bearer",
   "escopo": "credicarro.integration.access/full"
 }
@@ -36,7 +36,7 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v1/authentication
 | --- | --- |
 | `token_de_acesso` | O token a enviar no header `Authorization`. |
 | `expira_em_segundos` | Validade do token, em segundos. |
-| `expira_em` | Data e hora (UTC) em que o token expira. |
+| `expira_em` | Data e hora (UTC) até quando reaproveitar o token. Já vem com 60 segundos de margem antes da expiração real. |
 | `tipo_de_token` | Sempre `Bearer`. |
 | `escopo` | Escopo concedido ao token. |
 
@@ -58,7 +58,7 @@ curl https://api.staging.credicarro.com.br/integration/v2/proposal/{propostaId} 
 Não gere um token por requisição. Guarde o token em cache e gere outro só quando ele estiver perto de expirar:
 
 1. Guarde `token_de_acesso` e `expira_em` em memória (ou em um cache compartilhado, se você tiver várias instâncias)
-2. Antes de cada chamada, use o token guardado se faltar mais de um minuto para `expira_em`
+2. Antes de cada chamada, use o token guardado enquanto `expira_em` não tiver passado
 3. Caso contrário, gere um novo token e substitua o guardado
 
 <Note>
@@ -72,10 +72,17 @@ Não gere um token por requisição. Guarde o token em cache e gere outro só qu
 A API retorna `401 Unauthorized` (sem corpo) quando:
 
 - O header `Authorization` não foi enviado
-- O token é inválido ou foi revogado
+- O token é inválido (assinatura, emissor ou tipo)
 - O token expirou
 
-Em `POST /v1/authentication/accesstoken`, credenciais erradas retornam `401` e campos ausentes retornam `400`.
+Se a integração do parceiro for desativada, as rotas retornam `403` com `tipo` `Integration.Access.Inactive`, mesmo com um token válido.
+
+Em `POST /v1/authentication/accesstoken`:
+
+| Situação | Resposta |
+| --- | --- |
+| `clientId` ou `clientSecret` ausente | `400` com `Validation.Field.Required` |
+| Credenciais inválidas ou integração inativa | `401` com `tipo` `Integration.Authentication.InvalidCredentials` |
 
 ---
 
