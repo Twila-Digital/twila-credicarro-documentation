@@ -80,7 +80,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
       -H "Authorization: Bearer $TOKEN" \
       -H "Content-Type: application/json" \
       -d '{
-        "cpf": "12345678901",
+        "cpf": "12345678909",
         "nome": "Maria",
         "sobrenome": "Souza",
         "email": "maria.souza@exemplo.com.br",
@@ -130,7 +130,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
       -H "Content-Type: application/json" \
       -H "Idempotency-Key: $(uuidgen)" \
       -d '{
-        "cpf": "12345678901",
+        "cpf": "12345678909",
         "placa": "ABC1D23",
         "valorVeiculo": 45000,
         "valorEntrada": 5000,
@@ -174,7 +174,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
       -H "Authorization: Bearer $TOKEN" \
       -H "Content-Type: application/json" \
       -H "Idempotency-Key: $(uuidgen)" \
-      -d '{ "cpf": "12345678901", "simulacaoId": "123e4567-e89b-12d3-a456-426614174000" }'
+      -d '{ "cpf": "12345678909", "simulacaoId": "123e4567-e89b-12d3-a456-426614174000" }'
     ```
 
     ```json Resposta (201)
@@ -220,21 +220,21 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
   </Step>
 
   <Step title="Informe os dados do veículo">
-    Quando a etapa ativa for `DADOS_VEICULO`:
+    Quando a etapa ativa da **loja** for `DADOS_VEICULO`:
 
     ```bash
     curl -X POST $BASE/v2/proposal/bea8d060-f93d-48eb-b6c4-45f64483cdd9/vehicle-detail \
       -H "Authorization: Bearer $TOKEN" \
       -H "Content-Type: application/json" \
       -d '{
-        "renavam": "12345678901",
+        "renavam": "12345678900",
         "chassi": "9BWZZZ377VT004251",
         "placa": "ABC1D23",
         "cor": "PRATA"
       }'
     ```
 
-    Resposta: `202 Accepted`.
+    Resposta: `204 No Content`.
   </Step>
 
   <Step title="Aguarde vistoria, assinatura e pagamento">
@@ -253,7 +253,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
 | `Store.Integration.Intermediation` | Faixa ou simulação | Use outra loja ou fale com o time Credicarro. |
 | `Customer.Account.Incomplete` | Proposta | Complete endereço, ocupação e renda em `/v1/customer/unified`. |
 | `Simulation.Access.NotFromStore` | Proposta | Use um `id_simulacao` de uma simulação feita com `cnpjLoja`. |
-| `Document.InvalidProposalStage` | Documentos | Envie só quando a etapa ativa for `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`. |
+| `Proposal.InvalidStatus` | Dados do veículo | Envie só quando a etapa ativa da loja for `DADOS_VEICULO`. |
 
 <Card title="Todos os códigos" icon="triangle-exclamation" href="/pages/errors" horizontal>
   Veja o formato de erro e a lista completa de códigos.

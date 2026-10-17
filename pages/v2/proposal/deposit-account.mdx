@@ -8,7 +8,7 @@ Inclui ou substitui a conta onde o cliente recebe o crédito. Só para propostas
 **Exemplo:**
 ```json
 {
-  "cpfTitular": "12345678901",
+  "cpfTitular": "12345678909",
   "codigoBanco": "001",
   "agencia": "1234",
   "digitoAgencia": "5",
@@ -22,6 +22,14 @@ Inclui ou substitui a conta onde o cliente recebe o crédito. Só para propostas
   O `cpfTitular` precisa ser o CPF do cliente da proposta. Senão, a API retorna `Proposal.DepositAccount.HolderNotBuyer`.
 </Warning>
 
+<Tip title="Regras" horizontal>
+  `codigoBanco` com 3 dígitos, `agencia` com até 4 dígitos, `conta` de 4 a 13 dígitos. `digitoAgencia` e `digitoConta` são obrigatórios: um único caractere, de 0 a 9 ou `X`. `tipoConta`: `CORRENTE`, `POUPANCA` ou `PAGAMENTO`.
+</Tip>
+
 <Tip title="Corrigir a conta" horizontal>
   Enviar de novo substitui a conta anterior, enquanto a etapa estiver ativa.
 </Tip>
+
+<Note>
+  Retorna `204 No Content`. A etapa `CONTA_RECEBIMENTO` é do comprador. Fora dela, a API retorna `422` com `Proposal.ProposalIsNotInDepositAccountStatus`.
+</Note>

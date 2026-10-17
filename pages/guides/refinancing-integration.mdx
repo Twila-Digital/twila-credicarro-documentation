@@ -55,7 +55,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
       -H "Content-Type: application/json" \
       -H "Idempotency-Key: $(uuidgen)" \
       -d '{
-        "cpf": "12345678901",
+        "cpf": "12345678909",
         "placa": "ABC1D23",
         "valorSolicitado": 25000,
         "cnpjLoja": "11.222.333/0001-81"
@@ -71,7 +71,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
       -H "Authorization: Bearer $TOKEN" \
       -H "Content-Type: application/json" \
       -H "Idempotency-Key: $(uuidgen)" \
-      -d '{ "cpf": "12345678901", "simulacaoId": "<id_simulacao escolhido>" }'
+      -d '{ "cpf": "12345678909", "simulacaoId": "<id_simulacao escolhido>" }'
     ```
   </Step>
 
@@ -81,7 +81,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
     | `etapa` | Endpoint |
     | --- | --- |
     | `ENVIO_DOCUMENTOS` / `CORRECAO_DOCUMENTOS` | [`POST /v2/proposal/{id}/document`](/pages/v2/proposal/document) |
-    | `DADOS_VEICULO` | [`POST /v2/proposal/{id}/vehicle-detail`](/pages/v2/proposal/vehicle-detail) |
+    | `DADOS_VEICULO` (do comprador) | [`POST /v2/proposal/{id}/vehicle-detail`](/pages/v2/proposal/vehicle-detail) |
     | `CONTA_RECEBIMENTO` | [`POST /v2/proposal/{id}/deposit-account`](/pages/v2/proposal/deposit-account) |
   </Step>
 
@@ -93,7 +93,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
       -H "Authorization: Bearer $TOKEN" \
       -H "Content-Type: application/json" \
       -d '{
-        "cpfTitular": "12345678901",
+        "cpfTitular": "12345678909",
         "codigoBanco": "001",
         "agencia": "1234",
         "digitoAgencia": "5",
@@ -103,14 +103,16 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
       }'
     ```
 
-    Resposta: `200 OK`.
+    Resposta: `204 No Content`.
 
     | Regra | Erro |
     | --- | --- |
     | `cpfTitular` precisa ser o CPF do cliente da proposta | `Proposal.DepositAccount.HolderNotBuyer` |
     | Só propostas de refinanciamento | `Proposal.DepositAccount.OnlyRefinancing` |
-    | `codigoBanco` com 3 dígitos, `agencia` com 4, `conta` de 4 a 13 | `400` com a lista `erros` |
-    | `tipoConta`: `CORRENTE`, `POUPANCA` ou `PAGAMENTO` | `400` com a lista `erros` |
+    | `codigoBanco` com 3 dígitos, `agencia` com até 4, `conta` de 4 a 13 | `400` com `Validation.Bank.InvalidCode`, `InvalidAgency` ou `InvalidAccountNumber` |
+    | `digitoAgencia` e `digitoConta`: um caractere, de 0 a 9 ou `X` | `400` com o campo em `campo` |
+    | `tipoConta`: `CORRENTE`, `POUPANCA` ou `PAGAMENTO` | `400` com `Validation.Field.InvalidOption` |
+    | Etapa `CONTA_RECEBIMENTO` ativa no comprador | `Proposal.ProposalIsNotInDepositAccountStatus` |
 
     <Note>
       Enviar de novo **substitui** a conta anterior, enquanto a etapa estiver ativa.

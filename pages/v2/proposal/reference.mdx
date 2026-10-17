@@ -4,7 +4,7 @@ description: 'O objeto proposta, como ler as etapas e qual endpoint chamar em ca
 icon: 'book-open-cover'
 ---
 
-A **proposta** é o pedido de crédito, criado a partir de uma opção de simulação. Ela traz o status geral e, para cada participante (comprador e loja), a etapa ativa e quem precisa agir.
+A **proposta** é o pedido de crédito, criado a partir de uma opção de simulação. Ela traz o status geral e, para cada participante (comprador, loja e, quando houver, vendedor), a etapa ativa e quem precisa agir.
 
 ## Ciclo de vida
 
@@ -46,7 +46,7 @@ O diagrama mostra os caminhos mais comuns. A lista completa de status está em [
   "data_criacao": "2026-10-12T14:05:08.984-03:00",
   "link_biometria": "https://onboarding.exemplo.com/sessao/abc123",
   "comprador": {
-    "cpf": "12345678901",
+    "cpf": "12345678909",
     "enum_biometria": 1,
     "biometria": "SESSAO_CRIADA",
     "status_ativo": {
@@ -90,17 +90,18 @@ O diagrama mostra os caminhos mais comuns. A lista completa de status está em [
 | `motivo_recusa` | Motivo da recusa. Omitido quando vazio. |
 | `link_biometria` | Link para o cliente fazer a biometria. Omitido quando vazio. |
 | `comprador` | Biometria, etapa ativa, etapas concluídas e documentos do comprador. |
-| `loja` | Etapa ativa, etapas concluídas e documentos da loja. Presente quando a proposta foi feita em loja. |
+| `vendedor` | Mesma estrutura de `comprador`. Omitido quando a proposta não tem vendedor. |
+| `loja` | Etapa ativa, etapas concluídas e documentos da loja. Omitido quando a proposta não foi feita em loja. |
 
 ## Como decidir o próximo passo
 
-Para **cada** participante (`comprador` e `loja`), leia `status_ativo`:
+Para **cada** participante (`comprador`, `vendedor` e `loja`), leia `status_ativo`:
 
 | `responsavel_acao` | `etapa` | O que fazer |
 | --- | --- | --- |
 | `INTEGRADOR` (2) | `ENVIO_DOCUMENTOS` (6) ou `CORRECAO_DOCUMENTOS` (7) | [Enviar documento](/pages/v2/proposal/document) |
-| `INTEGRADOR` (2) | `DADOS_VEICULO` (8) | [Incluir dados do veículo](/pages/v2/proposal/vehicle-detail) |
-| `INTEGRADOR` (2) | `CONTA_RECEBIMENTO` (5) | [Incluir conta de recebimento](/pages/v2/proposal/deposit-account) |
+| `INTEGRADOR` (2) | `DADOS_VEICULO` (8) — da loja no financiamento, do comprador no refinanciamento | [Incluir dados do veículo](/pages/v2/proposal/vehicle-detail) |
+| `INTEGRADOR` (2) | `CONTA_RECEBIMENTO` (5) — do comprador | [Incluir conta de recebimento](/pages/v2/proposal/deposit-account) |
 | `CLIENTE` (1) | qualquer | Orientar o cliente (biometria, vistoria ou assinatura) |
 | `CREDICARRO` (3) | qualquer | Aguardar |
 | `NENHUM` (0) | qualquer | Nada — a proposta foi encerrada |

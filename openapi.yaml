@@ -33,7 +33,7 @@ paths:
                   minLength: 11
                   type: string
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
-                  example: "12345678901"
+                  example: "12345678909"
                 simulacaoId:
                   type: string
                   format: uuid
@@ -341,7 +341,7 @@ paths:
                   minLength: 11
                   type: string
                   description: CPF do cliente **somente números** (11 dígitos)
-                  example: "12345678901"
+                  example: "12345678909"
                 isVeiculoZeroKm:
                   type: boolean
                   description: Indica se o veículo é zero quilômetro. true para novo, false para usado.
@@ -471,7 +471,7 @@ paths:
                   minLength: 11
                   type: string
                   description: CPF do cliente **somente números** (11 dígitos)
-                  example: "12345678901"
+                  example: "12345678909"
                 placa:
                   minLength: 1
                   type: string
@@ -640,7 +640,7 @@ paths:
                   minLength: 1
                   maxLength: 11
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
-                  example: "12345678901"
+                  example: "12345678909"
                 dataDeNascimento:
                   type: string
                   format: date-time
@@ -717,7 +717,7 @@ paths:
                   minLength: 11
                   maxLength: 11
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
-                  example: "12345678901"
+                  example: "12345678909"
                 endereco:
                   type: object
                   required: ['rua', 'cidade', 'estado', 'bairro', 'cep']
@@ -803,7 +803,7 @@ paths:
                   minLength: 11
                   maxLength: 11
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
-                  example: "12345678901"
+                  example: "12345678909"
                 tipoOcupacao:
                   type: integer
                   format: int32
@@ -879,7 +879,7 @@ paths:
                   minLength: 11
                   maxLength: 11
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
-                  example: "12345678901"
+                  example: "12345678909"
                 dataDeNascimento:
                   type: string
                   format: date-time
@@ -1357,7 +1357,7 @@ paths:
                   type: string
                   minLength: 11
                   description: CPF do cliente **somente números** (11 dígitos)
-                  example: "12345678901"
+                  example: "12345678909"
                 placa:
                   type: string
                   description: Placa do veículo no padrão antigo (ABC-1234) ou Mercosul (ABC1D23)
@@ -1429,7 +1429,7 @@ paths:
                   type: string
                   minLength: 11
                   description: CPF do cliente **somente números** (11 dígitos)
-                  example: "12345678901"
+                  example: "12345678909"
                 placa:
                   type: string
                   description: Placa do veículo no padrão antigo (ABC-1234) ou Mercosul (ABC1D23)
@@ -1488,7 +1488,7 @@ paths:
                   type: string
                   minLength: 11
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
-                  example: "12345678901"
+                  example: "12345678909"
                 simulacaoId:
                   type: string
                   format: uuid
@@ -1569,7 +1569,7 @@ paths:
       summary: Incluir os dados do veículo
       description: |
         Inclui ou atualiza placa, Renavam, chassi e cor do veículo de uma proposta. Aceito somente
-        enquanto a etapa ativa for `DADOS_VEICULO` (8).
+        enquanto a etapa `DADOS_VEICULO` (8) estiver ativa: na loja, no financiamento; no comprador, no refinanciamento.
       security:
         - bearerAuth: []
       parameters:
@@ -1585,23 +1585,23 @@ paths:
               properties:
                 renavam:
                   type: string
-                  description: Renavam do veículo (11 dígitos).
-                  example: "12345678901"
+                  description: Renavam do veículo, com até 11 dígitos e dígito verificador válido.
+                  example: "12345678900"
                 chassi:
                   type: string
-                  description: Chassi do veículo.
+                  description: Chassi do veículo, com 17 caracteres, sem as letras I, O e Q.
                   example: 9BWZZZ377VT004251
                 placa:
                   type: string
-                  description: Placa do veículo.
+                  description: Placa do veículo (ABC-1234, ABC1234 ou ABC1D23).
                   example: ABC1D23
                 cor:
                   type: string
-                  description: Cor do veículo (não pode conter números).
+                  description: Cor do veículo, sem números, com até 30 caracteres.
                   example: PRATA
       responses:
-        '202':
-          description: Dados do veículo aceitos
+        '204':
+          description: Dados do veículo registrados
         '400':
           description: Erro na requisição
           content:
@@ -1610,6 +1610,12 @@ paths:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
           description: Proposta não encontrada
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Etapa não permite o envio (`Proposal.InvalidStatus`) ou proposta não disponível nesta rota
           content:
             application/json:
               schema:
@@ -1639,14 +1645,14 @@ paths:
                 cpfTitular:
                   type: string
                   description: CPF do titular da conta, formatado ou apenas números. Deve ser o CPF do cliente da proposta.
-                  example: "12345678901"
+                  example: "12345678909"
                 codigoBanco:
                   type: string
                   description: Código do banco (COMPE) com 3 dígitos.
                   example: "001"
                 agencia:
                   type: string
-                  description: Número da agência com 4 dígitos, sem o dígito verificador.
+                  description: Número da agência com até 4 dígitos, sem o dígito verificador.
                   example: "1234"
                 digitoAgencia:
                   type: string
@@ -1666,7 +1672,7 @@ paths:
                   enum: ['CORRENTE', 'POUPANCA', 'PAGAMENTO']
                   example: CORRENTE
       responses:
-        '200':
+        '204':
           description: Conta de recebimento registrada
         '400':
           description: Erro na requisição
@@ -1680,28 +1686,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra não atendida — `Proposal.DepositAccount.OnlyRefinancing`, `Proposal.DepositAccount.HolderNotBuyer` ou `Proposal.ProposalIsNotInDepositAccountStatus`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal/{propostaId}/document:
     post:
       tags:
         - Proposta
       summary: Enviar documento de participante
       description: |
-        Envia um documento do comprador ou da loja em Base64 (até 10 MiB decodificado; PDF, JPG/JPEG ou PNG).
+        Envia um documento do comprador, do vendedor ou da loja em Base64 (até 10 MiB decodificado; PDF, JPG/JPEG ou PNG).
         Aceito quando a etapa ativa do participante for `ENVIO_DOCUMENTOS` (6) com a proposta aprovada, ou
         `CORRECAO_DOCUMENTOS` (7) para reenviar um tipo atualmente recusado (`INVALIDO`). O header `Idempotency-Key` é obrigatório.
 
-        | Código de erro | Quando ocorre |
-        | --- | --- |
-        | `Document.InvalidParticipant` | `participante` diferente de `COMPRADOR` ou `LOJA`. |
-        | `Document.InvalidType` | Tipo de documento não aceito para o participante. |
-        | `Document.InvalidName` | Nome de arquivo vazio, com caminho, com mais de 255 caracteres ou com extensão não aceita. |
-        | `Document.InvalidBase64` | Conteúdo Base64 inválido. |
-        | `Document.Empty` | Arquivo vazio. |
-        | `Document.TooLarge` | Arquivo maior que 10 MiB depois de decodificado. |
-        | `Document.InvalidContent` | O conteúdo não corresponde à extensão informada. |
-        | `Document.InvalidProposalStage` | A etapa ativa não permite o envio de documentos. |
-        | `Document.NotPendingCorrection` | Em correção, o tipo enviado não está recusado. |
-        | `Idempotency.KeyConflict` | A `Idempotency-Key` já foi usada com outro conteúdo. |
       security:
         - bearerAuth: []
       parameters:
@@ -1709,7 +1709,7 @@ paths:
         - name: Idempotency-Key
           in: header
           required: true
-          description: Chave única por envio (1 a 200 caracteres). Reenviar a mesma chave com o mesmo conteúdo devolve o mesmo resultado; com conteúdo diferente retorna `Idempotency.KeyConflict`.
+          description: Chave única por envio (1 a 200 caracteres). Com a mesma chave e o mesmo conteúdo, um envio bem-sucedido nas últimas 24 horas não é processado de novo.
           schema:
             type: string
             example: doc-7f3c2a10-comprador-cnh
@@ -1725,7 +1725,7 @@ paths:
                 participante:
                   type: string
                   description: Participante dono do documento.
-                  enum: ['COMPRADOR', 'LOJA']
+                  enum: ['COMPRADOR', 'VENDEDOR', 'LOJA']
                   example: COMPRADOR
                 tipoDocumento:
                   type: integer
@@ -1733,10 +1733,11 @@ paths:
                   description: |
                     Código do tipo de documento. Tipos aceitos por participante:
                       - COMPRADOR: 1, 4, 5, 6, 7, 9, 57
+                      - VENDEDOR: 1, 2, 3, 5, 6, 7, 8, 9, 11
                       - LOJA: 6, 8
 
-                    Códigos: 1 = CNH, 4 = Comprovante de renda, 5 = Comprovante de residência,
-                    6 = Documento do veículo, 7 = CNH digital, 8 = Laudo ECV, 9 = Laudo de vistoria, 57 = ATPV.
+                    Códigos: 1 = CNH, 2 = CPF, 3 = RG, 4 = Comprovante de renda, 5 = Comprovante de residência,
+                    6 = Documento do veículo, 7 = CNH digital, 8 = Laudo ECV, 9 = Laudo de vistoria, 11 = Cartão CNPJ, 57 = ATPV.
                   example: 1
                 nomeArquivo:
                   type: string
@@ -1748,7 +1749,7 @@ paths:
                   description: Conteúdo do arquivo em Base64 puro (sem prefixo `data:`), até 10 MiB depois de decodificado.
                   example: JVBERi0xLjcKJcOkw7zDtsOfCjIgMCBvYmoK...
       responses:
-        '200':
+        '204':
           description: Documento recebido
         '400':
           description: Erro na requisição
@@ -1758,6 +1759,12 @@ paths:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
           description: Proposta não encontrada para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Etapa não permite o envio, tipo não está recusado na correção, conteúdo não corresponde à extensão ou chave reutilizada com outro conteúdo
           content:
             application/json:
               schema:
@@ -1918,6 +1925,8 @@ components:
           example: https://onboarding.exemplo.com/sessao/abc123
         comprador:
           $ref: "#/components/schemas/ProposalV2Participant"
+        vendedor:
+          $ref: "#/components/schemas/ProposalV2Participant"
         loja:
           $ref: "#/components/schemas/ProposalV2Store"
     ProposalV2Participant:
@@ -1925,7 +1934,7 @@ components:
       properties:
         cpf:
           type: string
-          example: "12345678901"
+          example: "12345678909"
         enum_biometria:
           type: integer
           format: int32
@@ -2026,7 +2035,7 @@ components:
         motivo:
           type: string
           nullable: true
-          description: Motivo da recusa do documento, quando houver
+          description: Motivo da recusa do documento. Omitido quando vazio
           example: Documento ilegível
     WebhookResponse:
       type: object

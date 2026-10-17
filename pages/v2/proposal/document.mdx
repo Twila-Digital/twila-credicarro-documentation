@@ -3,7 +3,7 @@ title: 'Enviar documento'
 openapi: "POST /v2/proposal/{propostaId}/document"
 ---
 
-Envia **um** documento do comprador ou da loja, em Base64. Aceito quando a etapa ativa do participante for `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`.
+Envia **um** documento do comprador, do vendedor ou da loja, em Base64. Aceito quando a etapa ativa do participante for `ENVIO_DOCUMENTOS` (com a proposta aprovada) ou `CORRECAO_DOCUMENTOS` (só para tipos com status `INVALIDO`). Retorna `204 No Content`.
 
 **Exemplo:**
 ```json
