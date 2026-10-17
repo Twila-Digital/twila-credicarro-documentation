@@ -217,17 +217,66 @@
             "tab": "Comece aqui",
             "groups": [
               {
-                "group": "Introdução",
+                "group": "Comece aqui",
                 "pages": [
-                  "pages/v1/introduction",
-                  "pages/v1/overview"
+                  "pages/introduction"
                 ]
               },
               {
+                "group": "Sobre a v1",
+                "pages": [
+                  "pages/v1/introduction"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Para lojistas",
+            "groups": [
+              {
+                "group": "Entenda o produto",
+                "pages": [
+                  "pages/concepts/overview",
+                  "pages/concepts/financing",
+                  "pages/concepts/refinancing",
+                  "pages/concepts/journey",
+                  "pages/concepts/documents",
+                  "pages/concepts/costs"
+                ]
+              },
+              {
+                "group": "Guias rápidos",
+                "pages": [
+                  "pages/guides/first-proposal"
+                ]
+              },
+              {
+                "group": "Ajuda",
+                "pages": [
+                  "pages/faq",
+                  "pages/glossary"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Para desenvolvedores",
+            "groups": [
+              {
                 "group": "Integração",
                 "pages": [
+                  "pages/for-developers",
+                  "pages/reference/introduction",
                   "pages/development",
+                  "pages/production",
                   "pages/errors"
+                ]
+              },
+              {
+                "group": "Ajuda",
+                "pages": [
+                  "pages/faq",
+                  "pages/glossary"
                 ]
               }
             ]
@@ -252,6 +301,12 @@
           {
             "tab": "Proposta",
             "groups": [
+              {
+                "group": "Fluxo",
+                "pages": [
+                  "pages/v1/overview"
+                ]
+              },
               {
                 "group": "Cliente",
                 "pages": [
