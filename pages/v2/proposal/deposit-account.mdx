@@ -2,3 +2,26 @@
 title: 'Incluir conta de recebimento'
 openapi: "POST /v2/proposal/{propostaId}/deposit-account"
 ---
+
+Inclui ou substitui a conta onde o cliente recebe o crédito. Só para propostas de **refinanciamento**, enquanto a etapa ativa for `CONTA_RECEBIMENTO`.
+
+**Exemplo:**
+```json
+{
+  "cpfTitular": "12345678901",
+  "codigoBanco": "001",
+  "agencia": "1234",
+  "digitoAgencia": "5",
+  "conta": "123456",
+  "digitoConta": "7",
+  "tipoConta": "CORRENTE"
+}
+```
+
+<Warning>
+  O `cpfTitular` precisa ser o CPF do cliente da proposta. Senão, a API retorna `Proposal.DepositAccount.HolderNotBuyer`.
+</Warning>
+
+<Tip title="Corrigir a conta" horizontal>
+  Enviar de novo substitui a conta anterior, enquanto a etapa estiver ativa.
+</Tip>

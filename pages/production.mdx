@@ -1,0 +1,63 @@
+---
+title: 'Ir para produção'
+description: 'Checklist para sair do staging e processar propostas reais'
+icon: 'rocket'
+---
+
+Quando o fluxo estiver validado no [ambiente de testes](/pages/development), siga este checklist para começar a processar propostas reais.
+
+---
+
+## Requisitos para produção
+
+<Steps>
+  <Step title="Valide o fluxo completo no staging">
+    Rode pelo menos uma proposta de ponta a ponta na modalidade que você vai oferecer (financiamento, refinanciamento ou as duas).
+  </Step>
+  <Step title="Peça as credenciais de produção">
+    Solicite o `clientId` e o `clientSecret` de produção em atendimento@credicarro.com.br, com a lista de lojas (CNPJ) que vão operar.
+  </Step>
+  <Step title="Aguarde a liberação">
+    O time Credicarro libera a integração e vincula as lojas ao seu cadastro de parceiro.
+  </Step>
+  <Step title="Troque a base URL e as credenciais">
+    Use `https://api.credicarro.com.br/integration` e as credenciais de produção.
+  </Step>
+  <Step title="Cadastre o webhook de produção">
+    Os webhooks do staging não recebem eventos reais. Cadastre de novo a URL de produção e guarde o novo `segredo_assinatura`.
+  </Step>
+</Steps>
+
+---
+
+## Checklist técnico
+
+<Card title="Antes de virar a chave" icon="list-check">
+  - [ ] Base URL e credenciais vêm de configuração, não do código
+  - [ ] `clientSecret` guardado em um gerenciador de segredos
+  - [ ] Token reaproveitado em cache até perto de `expira_em`
+  - [ ] `Idempotency-Key` gerada por operação e reaproveitada nas retentativas
+  - [ ] Retentativa com espera crescente em `500`, `502` e `503`
+  - [ ] Tratamento por `tipo` dos erros de negócio que o seu fluxo usa
+  - [ ] Webhook com assinatura HMAC validada e autenticação Basic ou JWT
+  - [ ] Webhook responde `2xx` rápido e processa de forma assíncrona
+  - [ ] Notificações deduplicadas pelo `Idempotency-Key` e ordenadas por `data_evento`
+  - [ ] Logs sem CPF completo, token, `clientSecret` ou conteúdo de documentos
+</Card>
+
+---
+
+## Depois do go-live
+
+<CardGroup cols={2}>
+  <Card title="Acompanhe as primeiras propostas" icon="magnifying-glass-chart">
+    Confira se as etapas avançam e se os documentos estão sendo aceitos.
+  </Card>
+  <Card title="Monitore os webhooks" icon="bell">
+    Falhas de entrega (`4xx` não são retentados) fazem você perder atualizações. Reconcilie consultando a proposta.
+  </Card>
+</CardGroup>
+
+<Card title="Precisa de ajuda?" icon="headset" horizontal>
+  Fale com o time Credicarro em atendimento@credicarro.com.br.
+</Card>

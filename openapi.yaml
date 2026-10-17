@@ -604,6 +604,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '401':
+          description: Credenciais inválidas
   /v1/customer:
     post:
       tags:
@@ -1183,7 +1185,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
-          description: Loja não encontrada ou não vinculada a este parceiro (`ESTABLISHMENT_NOT_FOUND`)
+          description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
           content:
             application/json:
               schema:
@@ -1260,7 +1262,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
-          description: Loja não encontrada ou não vinculada a este parceiro (`ESTABLISHMENT_NOT_FOUND`)
+          description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
           content:
             application/json:
               schema:
@@ -1338,7 +1340,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
-          description: Loja não encontrada ou não vinculada a este parceiro (`ESTABLISHMENT_NOT_FOUND`)
+          description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
           content:
             application/json:
               schema:
@@ -1397,7 +1399,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
-          description: Loja não encontrada ou não vinculada a este parceiro (`ESTABLISHMENT_NOT_FOUND`)
+          description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
           content:
             application/json:
               schema:
@@ -1472,7 +1474,7 @@ paths:
       summary: Consultar proposta pelo ID.
       description: |
         Consulta o retrato atual de uma proposta criada pela v2, com status, link de biometria e as etapas do
-        comprador e da loja. Propostas criadas pela v1 retornam `PROPOSAL_VERSION_NOT_SUPPORTED`;
+        comprador e da loja. Propostas criadas pela v1 retornam `422` com `Proposal.Access.NotIntegrationV2`;
         consulte-as por `GET /v1/proposal/{propostaId}`.
       security:
         - bearerAuth: []
@@ -1493,6 +1495,12 @@ paths:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
           description: Proposta não encontrada para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Proposta criada pela v1 (`Proposal.Access.NotIntegrationV2`)
           content:
             application/json:
               schema:
@@ -2300,6 +2308,11 @@ components:
           type: string
           description: Descrição do erro
           example: Cadastro de conta não finalizado
+        campo:
+          type: string
+          nullable: true
+          description: Campo da requisição relacionado ao erro, quando houver
+          example: cpf
         erros:
           type: array
           description: Lista de erros de validação. Presente somente em erros de validação (`tipo` igual a `ValidationError`).
@@ -2314,6 +2327,11 @@ components:
                 type: string
                 description: Mensagem em português
                 example: O CPF informado é inválido.
+              campo:
+                type: string
+                nullable: true
+                description: Campo inválido, quando houver
+                example: cpf
       additionalProperties: false
   securitySchemes:
     bearerAuth:

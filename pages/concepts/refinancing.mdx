@@ -1,0 +1,78 @@
+---
+title: 'Refinanciamento'
+description: 'Como o cliente usa o próprio veículo como garantia para conseguir crédito'
+icon: 'money-bill-transfer'
+---
+
+## Em uma frase
+
+No refinanciamento, o cliente **usa um veículo que já é dele como garantia** e recebe o crédito direto na conta bancária, pagando em parcelas mensais.
+
+---
+
+## Quando oferecer
+
+- O cliente precisa de dinheiro e tem um veículo em nome dele
+- O cliente quer uma taxa menor do que a de um crédito sem garantia
+- O cliente quer continuar usando o veículo enquanto paga
+
+<Note>
+  O veículo continua com o cliente. Ele fica como garantia do crédito até a quitação.
+</Note>
+
+---
+
+## O que você precisa para simular
+
+| Informação | Exemplo | Observação |
+| --- | --- | --- |
+| CPF do cliente | `123.456.789-01` | O cliente precisa estar cadastrado **com endereço** |
+| Placa do veículo | `ABC1D23` | Padrão antigo (`ABC-1234`) ou Mercosul (`ABC1D23`) |
+| Valor solicitado | R$ 25.000,00 | Precisa estar dentro da faixa refinanciável do veículo |
+| CNPJ da loja | `11.222.333/0001-81` | A loja precisa estar vinculada ao integrador |
+
+<Tip title="Quanto o cliente pode pedir?" horizontal>
+  O valor depende do veículo. Antes de simular, consulte a **faixa refinanciável**: para cada prazo, ela mostra o valor mínimo e o máximo que o cliente pode pedir com aquela placa.
+</Tip>
+
+---
+
+## Onde o cliente recebe o dinheiro
+
+Depois que a proposta é aprovada, o refinanciamento tem uma etapa a mais: a **conta de recebimento**. É a conta bancária onde o crédito vai ser depositado.
+
+<Warning>
+  A conta precisa estar no **nome e CPF do próprio cliente** da proposta. Contas de terceiros são recusadas.
+</Warning>
+
+São aceitas contas corrente, poupança e de pagamento. Tenha em mãos:
+
+- Código do banco (3 dígitos, por exemplo `001`)
+- Agência (4 dígitos) e dígito
+- Número da conta e dígito
+- Tipo da conta
+
+Se o cliente informar uma conta errada, ela pode ser substituída enquanto a etapa estiver pendente.
+
+---
+
+## Depois da simulação
+
+<Steps>
+  <Step title="O cliente escolhe o prazo">
+    A simulação traz uma opção por prazo, com parcela, juros e Custo Efetivo Total.
+  </Step>
+  <Step title="A proposta vai para análise">
+    Com o cadastro completo (dados pessoais, endereço, ocupação e renda), a proposta é criada e analisada.
+  </Step>
+  <Step title="Formalização">
+    Biometria, documentos, dados do veículo, conta de recebimento, vistoria e assinatura. Veja a [jornada da proposta](/pages/concepts/journey).
+  </Step>
+  <Step title="O dinheiro cai na conta">
+    Com tudo validado, a Credicarro faz o pagamento na conta de recebimento.
+  </Step>
+</Steps>
+
+<Card title="Financiamento ou refinanciamento?" icon="scale-balanced" horizontal>
+  **Financiamento** é para comprar um veículo. **Refinanciamento** é para conseguir crédito usando um veículo que o cliente já tem.
+</Card>

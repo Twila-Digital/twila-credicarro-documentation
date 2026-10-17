@@ -1,0 +1,56 @@
+---
+title: 'Glossário'
+description: 'Termos de crédito e da API explicados em linguagem simples'
+icon: 'book'
+---
+
+## Crédito e veículos
+
+| Termo | Significado |
+| --- | --- |
+| **ATPV** | Autorização para Transferência de Propriedade do Veículo. Documento usado na transferência do veículo. |
+| **Biometria** | Confirmação da identidade do cliente por reconhecimento facial, feita por um link. |
+| **CET** | Custo Efetivo Total. Taxa que reúne juros, tarifas, impostos e seguros da operação. |
+| **Chassi** | Número de identificação único gravado no veículo. |
+| **CNH** | Carteira Nacional de Habilitação. Aceita física ou digital. |
+| **Entrada** | Valor que o cliente paga à vista no financiamento. Pode ser zero. |
+| **Faixa financiável** | Entrada mínima exigida para cada prazo de financiamento de um veículo. |
+| **Faixa refinanciável** | Valor mínimo e máximo que pode ser pedido em cada prazo de refinanciamento de um veículo. |
+| **Financiamento** | Crédito para o cliente comprar um veículo. |
+| **IOF** | Imposto sobre Operações Financeiras, cobrado em operações de crédito. |
+| **Laudo ECV** | Laudo emitido por uma Empresa Credenciada de Vistoria. |
+| **Laudo de vistoria** | Resultado da vistoria do veículo. |
+| **Prazo** | Quantidade de parcelas mensais da operação. |
+| **Refinanciamento** | Crédito em que o cliente usa um veículo próprio como garantia. |
+| **Renavam** | Registro Nacional de Veículos Automotores. Número de 11 dígitos do documento do veículo. |
+| **TAC** | Tarifa de cadastro da operação de crédito. |
+| **UF** | Unidade Federativa — o estado de registro do veículo (ex.: `SP`). |
+| **Vistoria** | Verificação das condições e da identificação do veículo. |
+
+---
+
+## Participantes
+
+| Termo | Significado |
+| --- | --- |
+| **Cliente / comprador** | A pessoa que pede o crédito. Na API, `comprador`. |
+| **Loja** | O estabelecimento que vende o veículo ou atende o cliente, identificado pelo CNPJ (`cnpjLoja`). |
+| **Integrador / parceiro** | Quem consome a API da Credicarro — o sistema da loja ou de um parceiro. |
+
+---
+
+## API
+
+| Termo | Significado |
+| --- | --- |
+| **Bearer token** | Token de acesso enviado no header `Authorization` de cada requisição. |
+| **Client ID / Client Secret** | Credenciais do integrador, usadas para gerar o token. Cada ambiente tem as suas. |
+| **Etapa ativa** | A etapa em que o comprador ou a loja está agora (`status_ativo`). |
+| **Idempotency-Key** | Header que permite repetir uma requisição sem duplicar a operação. |
+| **Proposta** | O pedido de crédito, criado a partir de uma simulação. |
+| **Responsável pela ação** | Quem precisa agir na etapa ativa: cliente, integrador ou Credicarro. |
+| **Segredo de assinatura** | Chave usada para validar a assinatura HMAC dos webhooks. |
+| **Simulação** | Cálculo das condições de crédito. Retorna uma opção por prazo. |
+| **Situação** | O estado da etapa ativa (aguardando envio, em processamento, concluída…). |
+| **Staging** | Ambiente de testes, isolado da produção. |
+| **Webhook** | Notificação HTTP que a Credicarro envia ao seu sistema quando algo muda. |

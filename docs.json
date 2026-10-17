@@ -10,7 +10,6 @@
   "appearance": {
     "default": "light"
   },
-  "openapi": ["/openapi.yaml"],
   "favicon": "/favicon.ico",
   "contextual": {
     "options": ["copy", "view", "chatgpt", "claude"]
@@ -26,111 +25,229 @@
     }
   ],
   "navigation": {
-    "tabs": [
+    "versions": [
       {
-        "tab": "Comece aqui",
-        "groups": [
+        "version": "v2",
+        "tag": "Atual",
+        "tabs": [
           {
-            "group": "Comece aqui",
-            "pages": ["pages/introduction"]
+            "tab": "Comece aqui",
+            "groups": [
+              {
+                "group": "Comece aqui",
+                "pages": ["pages/introduction"]
+              }
+            ]
+          },
+          {
+            "tab": "Para lojistas",
+            "groups": [
+              {
+                "group": "Entenda o produto",
+                "pages": [
+                  "pages/concepts/overview",
+                  "pages/concepts/financing",
+                  "pages/concepts/refinancing",
+                  "pages/concepts/journey",
+                  "pages/concepts/documents",
+                  "pages/concepts/costs"
+                ]
+              },
+              {
+                "group": "Guias rápidos",
+                "pages": ["pages/guides/first-proposal"]
+              },
+              {
+                "group": "Ajuda",
+                "pages": ["pages/faq", "pages/glossary"]
+              }
+            ]
+          },
+          {
+            "tab": "Para desenvolvedores",
+            "groups": [
+              {
+                "group": "Integração",
+                "pages": [
+                  "pages/for-developers",
+                  "pages/authentication",
+                  "pages/development",
+                  "pages/production",
+                  "pages/errors"
+                ]
+              },
+              {
+                "group": "Fluxo da proposta",
+                "pages": ["pages/v2/overview", "pages/v2/steps"]
+              },
+              {
+                "group": "Guias",
+                "pages": [
+                  "pages/guides/financing-integration",
+                  "pages/guides/refinancing-integration",
+                  "pages/guides/document-upload"
+                ]
+              },
+              {
+                "group": "Ajuda",
+                "pages": ["pages/faq", "pages/glossary"]
+              }
+            ]
+          },
+          {
+            "tab": "Webhooks",
+            "groups": [
+              {
+                "group": "Visão geral",
+                "pages": ["pages/webhooks"]
+              },
+              {
+                "group": "Segurança",
+                "pages": ["pages/webhooks/security"]
+              },
+              {
+                "group": "Eventos",
+                "pages": ["pages/v2/webhooks"]
+              }
+            ]
+          },
+          {
+            "tab": "Referência",
+            "groups": [
+              {
+                "group": "Introdução",
+                "pages": ["pages/reference/introduction"]
+              },
+              {
+                "group": "Autenticação",
+                "pages": ["pages/authentication/accesstoken"]
+              },
+              {
+                "group": "Cliente",
+                "pages": [
+                  "pages/customer/reference",
+                  "pages/customer/unified",
+                  "pages/customer/create",
+                  "pages/customer/address",
+                  "pages/customer/professional"
+                ]
+              },
+              {
+                "group": "Simulação",
+                "pages": [
+                  "pages/v2/simulation/reference",
+                  "pages/v2/simulation/range-financing",
+                  "pages/v2/simulation/range-refinancing",
+                  "pages/v2/simulation/create-financing",
+                  "pages/v2/simulation/create-refinancing",
+                  "pages/simulation/get",
+                  "pages/simulation/pagination"
+                ]
+              },
+              {
+                "group": "Proposta",
+                "pages": [
+                  "pages/v2/proposal/reference",
+                  "pages/v2/proposal/create",
+                  "pages/v2/proposal/get",
+                  "pages/v2/proposal/document",
+                  "pages/v2/proposal/vehicle-detail",
+                  "pages/v2/proposal/deposit-account",
+                  "pages/proposal/pagination"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "pages": [
+                  "pages/webhook/reference",
+                  "pages/webhook/create",
+                  "pages/webhook/list",
+                  "pages/webhook/update",
+                  "pages/webhook/delete"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Changelog",
+            "pages": ["pages/changelog"]
           }
         ]
       },
       {
-        "tab": "Para Desenvolvedores",
-        "groups": [
+        "version": "v1",
+        "tag": "Legado",
+        "tabs": [
           {
-            "group": "Integração",
-            "pages": [
-              "pages/for-developers",
-              "pages/development",
-              "pages/errors"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Autenticação",
-        "groups": [
-          {
-            "group": "Visão geral",
-            "pages": ["pages/authentication"]
-          },
-          {
-            "group": "Autenticação",
-            "pages": ["pages/authentication/accesstoken"]
-          }
-        ]
-      },
-      {
-        "tab": "Proposta",
-        "groups": [
-          {
-            "group": "Fluxo",
-            "pages": ["pages/v2/overview", "pages/v2/steps"]
-          },
-          {
-            "group": "Cliente",
-            "pages": [
-              "pages/customer/unified",
-              "pages/customer/create",
-              "pages/customer/address",
-              "pages/customer/professional"
+            "tab": "Comece aqui",
+            "groups": [
+              {
+                "group": "Introdução",
+                "pages": ["pages/v1/introduction", "pages/v1/overview"]
+              },
+              {
+                "group": "Integração",
+                "pages": ["pages/authentication", "pages/development", "pages/errors"]
+              }
             ]
           },
           {
-            "group": "Simulação",
-            "pages": [
-              "pages/v2/simulation/range-financing",
-              "pages/v2/simulation/range-refinancing",
-              "pages/v2/simulation/create-financing",
-              "pages/v2/simulation/create-refinancing",
-              "pages/simulation/get",
-              "pages/simulation/pagination"
+            "tab": "Webhooks",
+            "groups": [
+              {
+                "group": "Visão geral",
+                "pages": ["pages/v1/webhooks"]
+              },
+              {
+                "group": "Segurança",
+                "pages": ["pages/webhooks/security"]
+              }
             ]
           },
           {
-            "group": "Proposta",
-            "pages": [
-              "pages/v2/proposal/create",
-              "pages/v2/proposal/get",
-              "pages/v2/proposal/document",
-              "pages/v2/proposal/vehicle-detail",
-              "pages/v2/proposal/deposit-account",
-              "pages/proposal/pagination"
-            ]
-          },
-          {
-            "group": "v1 (legado)",
-            "pages": [
-              "pages/simulation/range-financing",
-              "pages/simulation/range-refinancing",
-              "pages/simulation/create-financing",
-              "pages/simulation/create-refinancing",
-              "pages/proposal/create",
-              "pages/proposal/get"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "Webhooks",
-        "groups": [
-          {
-            "group": "Visão geral",
-            "pages": ["pages/webhooks", "pages/v2/webhooks"]
-          },
-          {
-            "group": "Segurança",
-            "pages": ["pages/webhooks/security"]
-          },
-          {
-            "group": "Webhooks",
-            "pages": [
-              "pages/webhook/create",
-              "pages/webhook/list",
-              "pages/webhook/update",
-              "pages/webhook/delete"
+            "tab": "Referência",
+            "groups": [
+              {
+                "group": "Autenticação",
+                "pages": ["pages/authentication/accesstoken"]
+              },
+              {
+                "group": "Cliente",
+                "pages": [
+                  "pages/customer/unified",
+                  "pages/customer/create",
+                  "pages/customer/address",
+                  "pages/customer/professional"
+                ]
+              },
+              {
+                "group": "Simulação",
+                "pages": [
+                  "pages/simulation/range-financing",
+                  "pages/simulation/range-refinancing",
+                  "pages/simulation/create-financing",
+                  "pages/simulation/create-refinancing",
+                  "pages/simulation/get",
+                  "pages/simulation/pagination"
+                ]
+              },
+              {
+                "group": "Proposta",
+                "pages": [
+                  "pages/proposal/create",
+                  "pages/proposal/get",
+                  "pages/proposal/pagination"
+                ]
+              },
+              {
+                "group": "Webhooks",
+                "pages": [
+                  "pages/webhook/create",
+                  "pages/webhook/list",
+                  "pages/webhook/update",
+                  "pages/webhook/delete"
+                ]
+              }
             ]
           }
         ]

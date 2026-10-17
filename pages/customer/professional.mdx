@@ -2,3 +2,18 @@
 title: 'Criar ou atualizar dados profissionais do cliente'
 openapi: "POST /v1/customer/professional"
 ---
+
+Cria ou atualiza a ocupação e a renda de um cliente já cadastrado. Esses dados são exigidos na proposta.
+
+| `tipoOcupacao` | Ocupação |
+| --- | --- |
+| 1 | Aposentado |
+| 2 | Pensionista |
+| 3 | Assalariado |
+| 4 | Autônomo |
+| 6 | Freelancer |
+| 7 | Proprietário |
+
+<Note>
+  Retorna `202 Accepted`, sem corpo.
+</Note>

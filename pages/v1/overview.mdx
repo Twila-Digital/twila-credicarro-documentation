@@ -1,0 +1,91 @@
+---
+title: 'Fluxo de integração v1'
+description: 'Ordem de chamadas para criar e acompanhar uma proposta v1'
+icon: 'arrow-right-arrow-left'
+---
+
+<Warning>
+  Fluxo **legado**. Para novas integrações, siga o [fluxo v2](/pages/v2/overview).
+</Warning>
+
+<Steps>
+  <Step title="Gerar token de acesso" icon="key">
+    Autentique-se com seu `clientId` e `clientSecret`.
+
+    <Card title="POST Gerar token de acesso" icon="lock" href="/pages/authentication/accesstoken">
+      Autenticação
+    </Card>
+  </Step>
+
+  <Step title="Cadastrar o webhook de proposta" icon="bell">
+    Cadastre uma URL com `tipo` = 3 (Proposal) e guarde o `segredo_assinatura`. Basta fazer isso uma vez.
+
+    <Card title="POST Cadastrar webhook" icon="plus" href="/pages/webhook/create">
+      Webhooks
+    </Card>
+  </Step>
+
+  <Step title="Cadastrar o cliente" icon="user-check">
+    Envie dados pessoais, endereço, ocupação e renda.
+
+    <Card title="POST Criar ou atualizar cliente com dados completos" icon="id-card" href="/pages/customer/unified">
+      Cliente
+    </Card>
+  </Step>
+
+  <Step title="Consultar a faixa (opcional)" icon="sliders">
+    Consulte a entrada mínima por prazo (financiamento) ou o valor mínimo e máximo (refinanciamento) pela placa.
+
+    <CardGroup cols={2}>
+      <Card title="GET Faixa financiável" icon="car" href="/pages/simulation/range-financing">
+        Simulação · v1
+      </Card>
+      <Card title="GET Faixa refinanciável" icon="car-side" href="/pages/simulation/range-refinancing">
+        Simulação · v1
+      </Card>
+    </CardGroup>
+  </Step>
+
+  <Step title="Simular" icon="calculator">
+    A resposta traz uma simulação por prazo.
+
+    <CardGroup cols={2}>
+      <Card title="POST Simulação de financiamento" icon="calculator" href="/pages/simulation/create-financing">
+        Simulação · v1
+      </Card>
+      <Card title="POST Simulação de refinanciamento" icon="calculator" href="/pages/simulation/create-refinancing">
+        Simulação · v1
+      </Card>
+    </CardGroup>
+  </Step>
+
+  <Step title="Criar a proposta" icon="file-signature">
+    Escolha um `id_simulacao` e crie a proposta.
+
+    <Card title="POST Criar proposta" icon="file-signature" href="/pages/proposal/create">
+      Proposta · v1
+    </Card>
+  </Step>
+
+  <Step title="Acompanhar o status" icon="magnifying-glass">
+    Receba o [webhook v1](/pages/v1/webhooks) ou consulte a proposta.
+
+    <Card title="GET Buscar proposta" icon="magnifying-glass" href="/pages/proposal/get">
+      Proposta · v1
+    </Card>
+  </Step>
+</Steps>
+
+## Status da proposta v1
+
+| `status` | Significado |
+| --- | --- |
+| `Analysing` | Em análise automática. |
+| `Approved` | Aprovada. |
+| `Refused` | Recusada. |
+| `Canceled` | Cancelada. |
+| `ManualAnalysis` | Aguardando análise manual. |
+| `Completed` | Concluída. |
+| `InNegotiation` | Em negociação. |
+| `Expired` | Expirada. |
+| `Pending` | Pendente. |

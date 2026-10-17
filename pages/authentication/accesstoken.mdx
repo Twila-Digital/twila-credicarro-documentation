@@ -2,3 +2,13 @@
 title: 'Gerar token de acesso'
 openapi: "POST /v1/authentication/accesstoken"
 ---
+
+Troca o `clientId` e o `clientSecret` por um token de acesso, válido para as rotas `/v1` e `/v2`.
+
+<Tip title="Reaproveite o token" horizontal>
+  Guarde o token em cache e gere outro só perto de `expira_em`. Veja [Autenticação](/pages/authentication#reaproveite-o-token).
+</Tip>
+
+<Note>
+  Esta é a única rota sem o header `Authorization`. Credenciais inválidas retornam `401`.
+</Note>

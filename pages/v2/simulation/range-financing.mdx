@@ -2,3 +2,14 @@
 title: 'Faixa financiável'
 openapi: "GET /v2/proposal/simulation/range/financing"
 ---
+
+Retorna a **entrada mínima** para cada prazo de financiamento de uma placa, na loja informada. Consulte antes de simular para orientar o valor de entrada.
+
+```json Resposta
+{
+  "opcoes_por_prazo": [
+    { "prazo": 24, "valor_minimo_entrada": 4500.00 },
+    { "prazo": 36, "valor_minimo_entrada": 5000.00 }
+  ]
+}
+```

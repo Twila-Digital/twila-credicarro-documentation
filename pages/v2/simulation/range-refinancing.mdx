@@ -2,3 +2,9 @@
 title: 'Faixa refinanciável'
 openapi: "GET /v2/proposal/simulation/range/refinancing"
 ---
+
+Retorna o **valor mínimo e máximo** que pode ser pedido em cada prazo de refinanciamento de uma placa, na loja informada.
+
+<Tip title="Valide antes de simular" horizontal>
+  Um `valorSolicitado` fora desta faixa retorna `Simulation.Refinancing.AmountOutOfRange` na simulação.
+</Tip>

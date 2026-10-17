@@ -2,3 +2,30 @@
 title: 'Criar simulação de financiamento'
 openapi: "POST /v2/proposal/simulation/financing"
 ---
+
+Calcula as condições de financiamento e retorna **uma opção por prazo**, cada uma com o seu `id_simulacao`.
+
+**Exemplo:**
+```json
+{
+  "cpf": "12345678901",
+  "placa": "ABC1D23",
+  "valorVeiculo": 45000,
+  "valorEntrada": 5000,
+  "uf": "SP",
+  "isVeiculoZeroKm": false,
+  "cnpjLoja": "11.222.333/0001-81"
+}
+```
+
+<Tip title="Pré-requisitos" horizontal>
+  O cliente precisa estar [cadastrado](/pages/customer/unified) e o `cnpjLoja` vinculado ao seu cadastro de parceiro.
+</Tip>
+
+<Tip title="Entrada" horizontal>
+  `valorEntrada` pode ser `0` e precisa ser menor que `valorVeiculo`. Consulte a [faixa financiável](/pages/v2/simulation/range-financing) para a entrada mínima por prazo.
+</Tip>
+
+<Note>
+  Veja como ler cada campo da resposta na [referência de simulação](/pages/v2/simulation/reference).
+</Note>

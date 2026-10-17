@@ -1,0 +1,83 @@
+---
+title: 'Referência'
+description: 'O cadastro de webhooks: tipos, autenticação, status e o que é retornado'
+icon: 'book-open-cover'
+---
+
+Um **webhook** é uma URL do seu sistema que recebe notificações da Credicarro. Os webhooks são vinculados ao parceiro do token e ao ambiente (staging ou produção) em que foram cadastrados.
+
+## Endpoints
+
+| Endpoint | Para quê |
+| --- | --- |
+| [`POST /v1/webhook`](/pages/webhook/create) | Cadastrar. Retorna o `segredo_assinatura` — só nesta resposta. |
+| [`GET /v1/webhook`](/pages/webhook/list) | Listar, paginado. Não retorna a credencial nem o segredo. |
+| [`PUT /v1/webhook/{webhookId}`](/pages/webhook/update) | Alterar tipo, URL e status. |
+| [`DELETE /v1/webhook/{webhookId}`](/pages/webhook/delete) | Excluir. O webhook deixa de receber notificações. |
+
+## Tipo (`tipo`)
+
+| Código | Tipo | Notificações |
+| --- | --- | --- |
+| 1 | Customer | ⚪ Sem envio no momento |
+| 2 | Simulation | ⚪ Sem envio no momento |
+| 3 | Proposal | 🟢 A cada atualização da proposta |
+
+## Autenticação (`tipo_autenticacao`)
+
+| Código | Tipo | Header enviado |
+| --- | --- | --- |
+| 1 | None | Nenhum (não recomendado) |
+| 2 | Basic | `Authorization: Basic {credencial}` — `credencial` em Base64 de `usuario:senha` |
+| 3 | Jwt | `Authorization: Bearer {credencial}` |
+
+<Warning>
+  O tipo de autenticação e a credencial **não podem ser alterados**. Para trocá-los, exclua o webhook e cadastre outro.
+</Warning>
+
+## Status (`status`)
+
+| Código | Status | Efeito |
+| --- | --- | --- |
+| 1 | Active | Recebe notificações. |
+| 2 | Inactive | Não recebe notificações. |
+
+Use `PUT /v1/webhook/{webhookId}` com `status` = 2 para pausar um webhook sem perder o cadastro.
+
+## Objeto webhook
+
+```json GET /v1/webhook
+{
+  "itens": [
+    {
+      "id_webhook": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "tipo": "Proposal",
+      "url": "https://parceiro.com.br/webhooks/credicarro",
+      "tipo_autenticacao": "Basic",
+      "status": "Active"
+    }
+  ],
+  "pagina": { "numero": 1, "tamanho": 10, "total": 1, "tem_proximo": false, "tem_anterior": false }
+}
+```
+
+<Note>
+  Na listagem, `tipo`, `tipo_autenticacao` e `status` vêm como texto. No cadastro e na edição, são enviados como código numérico.
+</Note>
+
+## Boas práticas
+
+<CardGroup cols={2}>
+  <Card title="Um webhook por ambiente" icon="server">
+    Cadastre um webhook no staging e outro na produção, cada um com o seu segredo.
+  </Card>
+  <Card title="Mais de um por tipo" icon="clone">
+    É permitido. Cada notificação é enviada para todos os webhooks ativos do tipo.
+  </Card>
+  <Card title="Valide a assinatura" icon="signature" href="/pages/webhooks/security">
+    Toda notificação traz `X-CrediCarro-Signature` (HMAC-SHA256).
+  </Card>
+  <Card title="Payload da proposta" icon="code" href="/pages/v2/webhooks">
+    Veja o retrato enviado para propostas v2.
+  </Card>
+</CardGroup>

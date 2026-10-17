@@ -44,7 +44,7 @@ mode: "custom"
     gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
     gap: "16px"
   }}>
-    <a href="/pages/for-developers" style={{ textDecoration: "none", display: "flex", height: "100%" }}>
+    <a href="/pages/concepts/overview" style={{ textDecoration: "none", display: "flex", height: "100%" }}>
       <div style={{
         display: "flex",
         flexDirection: "column",
@@ -55,20 +55,20 @@ mode: "custom"
         background: "rgba(254, 185, 22, 0.06)",
         cursor: "pointer"
       }}>
-        <div style={{ fontSize: "28px", marginBottom: "12px" }}>💻</div>
+        <div style={{ fontSize: "28px", marginBottom: "12px" }}>🚗</div>
         <div style={{ fontSize: "17px", fontWeight: "700", color: "#b07d00", marginBottom: "8px" }}>
-          Sou desenvolvedor
+          Sou lojista
         </div>
         <div style={{ fontSize: "14px", opacity: 0.7, lineHeight: "1.6" }}>
-          Quero entender ambientes, autenticação, formato de respostas e erros antes de integrar.
+          Quero entender financiamento e refinanciamento, as etapas da proposta e o que pedir ao cliente — sem precisar programar.
         </div>
         <div style={{ marginTop: "auto", paddingTop: "16px", fontSize: "13px", color: "#b07d00", fontWeight: "600" }}>
-          Ver documentação técnica →
+          Começar por aqui →
         </div>
       </div>
     </a>
 
-    <a href="/pages/v2/overview" style={{ textDecoration: "none", display: "flex", height: "100%" }}>
+    <a href="/pages/for-developers" style={{ textDecoration: "none", display: "flex", height: "100%" }}>
       <div style={{
         display: "flex",
         flexDirection: "column",
@@ -79,15 +79,15 @@ mode: "custom"
         background: "rgba(254, 185, 22, 0.03)",
         cursor: "pointer"
       }}>
-        <div style={{ fontSize: "28px", marginBottom: "12px" }}>🚗</div>
+        <div style={{ fontSize: "28px", marginBottom: "12px" }}>💻</div>
         <div style={{ fontSize: "17px", fontWeight: "700", marginBottom: "8px" }}>
-          Quero seguir o fluxo da proposta
+          Sou desenvolvedor
         </div>
         <div style={{ fontSize: "14px", opacity: 0.7, lineHeight: "1.6" }}>
-          Veja a ordem das chamadas, do token de acesso até a conta de recebimento.
+          Quero integrar a API: autenticação, simulação, proposta, envio de documentos e webhooks.
         </div>
         <div style={{ marginTop: "auto", paddingTop: "16px", fontSize: "13px", color: "#b07d00", fontWeight: "600" }}>
-          Ver fluxo de integração →
+          Ver documentação técnica →
         </div>
       </div>
     </a>
@@ -119,8 +119,8 @@ mode: "custom"
       <Card title="v2 — recomendada" icon="rocket" href="/pages/v2/overview" horizontal>
         Simulação por loja, acompanhamento das etapas e envio de documentos, dados do veículo e conta de recebimento pela API.
       </Card>
-      <Card title="v1 — legado" icon="clock-rotate-left" href="/pages/proposal/create" horizontal>
-        Simulação e proposta sem acompanhamento de etapas. Continua disponível.
+      <Card title="v1 — legado" icon="clock-rotate-left" href="/pages/v1/introduction" horizontal>
+        Simulação e proposta sem acompanhamento de etapas. Continua disponível — troque pelo seletor de versão no topo.
       </Card>
     </div>
   </div>
@@ -143,6 +143,12 @@ mode: "custom"
   }}>
     <Card icon="arrow-right-arrow-left" title="Fluxo da proposta" href="/pages/v2/overview">
       Siga o fluxo completo de uma proposta, do token de acesso à conta de recebimento.
+    </Card>
+    <Card icon="car" title="Financiamento ponta a ponta" href="/pages/guides/financing-integration">
+      Guia com todas as chamadas de um financiamento, com exemplos prontos.
+    </Card>
+    <Card icon="money-bill-transfer" title="Refinanciamento ponta a ponta" href="/pages/guides/refinancing-integration">
+      Guia completo de um refinanciamento, incluindo a conta de recebimento.
     </Card>
     <Card icon="calculator" title="Simular" href="/pages/v2/simulation/create-financing">
       Calcule as condições de financiamento ou refinanciamento por prazo.
@@ -173,6 +179,9 @@ mode: "custom"
     <Card icon="list-check" title="Etapas e status" href="/pages/v2/steps">
       Entenda os códigos de status, etapas e documentos da proposta.
     </Card>
+    <Card icon="rocket" title="Ir para produção" href="/pages/production">
+      Checklist para sair do staging e processar propostas reais.
+    </Card>
   </div>
 </div>
 
@@ -190,6 +199,12 @@ mode: "custom"
     gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
     gap: "24px"
   }}>
+    <Card icon="circle-question" title="FAQ e glossário" href="/pages/faq">
+      Dúvidas frequentes e termos de crédito explicados.
+    </Card>
+    <Card icon="scroll" title="Changelog" href="/pages/changelog">
+      O que mudou na API e nesta documentação.
+    </Card>
     <Card icon="envelope" title="Fale com o time Credicarro" href="mailto:atendimento@credicarro.com.br">
       atendimento@credicarro.com.br — para credenciais e dúvidas sobre o produto.
     </Card>
