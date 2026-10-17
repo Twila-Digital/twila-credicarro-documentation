@@ -4,33 +4,36 @@ description: 'Como enviar documentos em Base64, tratar recusas e reenviar com se
 icon: 'file-arrow-up'
 ---
 
-Os documentos do comprador e da loja são enviados por `POST /v2/proposal/{propostaId}/document`, **um arquivo por chamada**.
+Os documentos do comprador, do vendedor e da loja são enviados por `POST /v2/proposal/{propostaId}/document`, **um arquivo por chamada**.
 
 ## Quando enviar
 
 | Etapa ativa do participante | O que enviar |
 | --- | --- |
 | `ENVIO_DOCUMENTOS` (6), com a proposta aprovada | Os documentos pedidos |
-| `CORRECAO_DOCUMENTOS` (7) | Só os tipos com status `INVALIDO` |
+| `CORRECAO_DOCUMENTOS` (7), com a proposta pendente | Só os tipos com status `INVALIDO` |
 
-Fora dessas etapas, a API retorna `Document.InvalidProposalStage`.
+Fora dessas etapas, a API retorna `422` com `Document.InvalidProposalStage`.
 
 <Note>
-  O comprador e a loja têm etapas separadas. Olhe o `status_ativo` de **cada** participante antes de enviar.
+  Cada participante tem a sua etapa. Olhe o `status_ativo` de **cada** participante antes de enviar.
 </Note>
 
 ## Tipos aceitos
 
-| Código | Tipo | Comprador | Loja |
-| --- | --- | :---: | :---: |
-| 1 | `CNH` | ✓ | |
-| 4 | `COMPROVANTE_RENDA` | ✓ | |
-| 5 | `COMPROVANTE_RESIDENCIA` | ✓ | |
-| 6 | `DOCUMENTO_VEICULO` | ✓ | ✓ |
-| 7 | `CNH_DIGITAL` | ✓ | |
-| 8 | `LAUDO_ECV` | | ✓ |
-| 9 | `LAUDO_VISTORIA` | ✓ | |
-| 57 | `ATPV` | ✓ | |
+| Código | Tipo | Comprador | Vendedor | Loja |
+| --- | --- | :---: | :---: | :---: |
+| 1 | `CNH` | ✓ | ✓ | |
+| 2 | `CPF` | | ✓ | |
+| 3 | `RG` | | ✓ | |
+| 4 | `COMPROVANTE_RENDA` | ✓ | | |
+| 5 | `COMPROVANTE_RESIDENCIA` | ✓ | ✓ | |
+| 6 | `DOCUMENTO_VEICULO` | ✓ | ✓ | ✓ |
+| 7 | `CNH_DIGITAL` | ✓ | ✓ | |
+| 8 | `LAUDO_ECV` | | ✓ | ✓ |
+| 9 | `LAUDO_VISTORIA` | ✓ | ✓ | |
+| 11 | `CARTAO_CNPJ` | | ✓ | |
+| 57 | `ATPV` | ✓ | | |
 
 ## Regras do arquivo
 
@@ -62,10 +65,10 @@ Para montar o `conteudoBase64`, leia os bytes do arquivo e codifique em Base64 p
 
 Gere a chave uma vez por envio — por exemplo, um UUID salvo junto ao registro do documento no seu sistema — e passe a mesma chave em todas as tentativas desse envio.
 
-Resposta: `200 OK`, sem corpo. O documento entra com status `RECEBIDO` e passa por análise.
+Resposta: `204 No Content`, sem corpo. O documento entra com status `RECEBIDO` e passa por análise. Um novo envio do mesmo tipo e participante substitui o anterior.
 
 <Warning>
-  Gere a `Idempotency-Key` **uma vez por envio** e reaproveite a mesma chave nas retentativas desse envio. Uma chave nova a cada tentativa pode registrar o documento duas vezes; a mesma chave com outro arquivo retorna `Idempotency.KeyConflict`.
+  Gere a `Idempotency-Key` **uma vez por envio** e reaproveite a mesma chave nas retentativas desse envio. Com a mesma chave e o mesmo conteúdo, um envio bem-sucedido nas últimas 24 horas não é processado de novo. Uma chave nova a cada tentativa reenvia e substitui o documento.
 </Warning>
 
 ---
@@ -86,7 +89,7 @@ Quando um documento é recusado, o participante vai para `CORRECAO_DOCUMENTOS` e
   },
   "documentos": [
     { "enum_tipo": 1, "tipo": "CNH", "enum_status": 2, "status": "INVALIDO", "motivo": "Documento ilegível" },
-    { "enum_tipo": 5, "tipo": "COMPROVANTE_RESIDENCIA", "enum_status": 1, "status": "VALIDO", "motivo": null }
+    { "enum_tipo": 5, "tipo": "COMPROVANTE_RESIDENCIA", "enum_status": 1, "status": "VALIDO" }
   ]
 }
 ```
@@ -99,7 +102,7 @@ Quando um documento é recusado, o participante vai para `CORRECAO_DOCUMENTOS` e
     Exiba o `motivo` para a loja ou o cliente corrigir o arquivo.
   </Step>
   <Step title="Reenvie o mesmo tipo">
-    Envie de novo com o mesmo `participante` e `tipoDocumento`, com uma **nova** `Idempotency-Key`. Enviar um tipo que não está recusado retorna `Document.NotPendingCorrection`.
+    Envie de novo com o mesmo `participante` e `tipoDocumento`, com uma **nova** `Idempotency-Key`. Enviar um tipo que não está recusado retorna `422` com `Document.NotPendingCorrection`.
   </Step>
 </Steps>
 
@@ -107,15 +110,27 @@ Quando um documento é recusado, o participante vai para `CORRECAO_DOCUMENTOS` e
 
 ## Erros
 
-| Código | Como resolver |
+Erros de formato retornam `400`, com o campo em `campo`:
+
+| `tipo` | Como resolver |
 | --- | --- |
-| `Document.InvalidParticipant` | Use `COMPRADOR` ou `LOJA`. |
-| `Document.InvalidType` | Confira a tabela de tipos por participante. |
-| `Document.InvalidName` | Use só o nome do arquivo, com extensão `.pdf`, `.jpg`, `.jpeg` ou `.png`. |
-| `Document.InvalidBase64` | Remova o prefixo `data:` e quebras de linha. |
-| `Document.Empty` | O arquivo está vazio. |
-| `Document.TooLarge` | Comprima ou reduza a resolução do arquivo. |
-| `Document.InvalidContent` | A extensão não corresponde ao conteúdo. Não renomeie arquivos de outro formato. |
-| `Document.InvalidProposalStage` | Aguarde a etapa `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`. |
-| `Document.NotPendingCorrection` | Na correção, reenvie só os tipos com status `INVALIDO`. |
-| `Idempotency.KeyConflict` | Use uma nova chave para um novo envio. |
+| `Validation.Field.Required` | Envie o campo indicado em `campo` (inclusive o header `Idempotency-Key`). |
+| `Validation.IdempotencyKey.Invalid` | Use uma `Idempotency-Key` de 1 a 200 caracteres. |
+| `Validation.Field.InvalidOption` | Use `COMPRADOR`, `VENDEDOR` ou `LOJA` e um `tipoDocumento` da tabela. |
+| `Validation.Document.TypeNotAllowed` | O tipo não é aceito para o participante. Confira a tabela. |
+| `Validation.File.InvalidName` | Use só o nome do arquivo, sem caminho, com até 255 caracteres. |
+| `Validation.File.InvalidExtension` | Use `.pdf`, `.jpg`, `.jpeg` ou `.png`. |
+| `Validation.File.InvalidBase64` | Remova o prefixo `data:` e quebras de linha. |
+| `Validation.File.Empty` | O arquivo está vazio. |
+| `Validation.File.TooLarge` | Comprima ou reduza a resolução do arquivo. |
+
+Regras que dependem da proposta e do arquivo:
+
+| `tipo` | Status | Como resolver |
+| --- | --- | --- |
+| `Document.InvalidProposalStage` | `422` | Aguarde a etapa `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`. |
+| `Document.NotPendingCorrection` | `422` | Na correção, reenvie só os tipos com status `INVALIDO`. |
+| `Document.InvalidContent` | `422` | A extensão não corresponde ao conteúdo. Não renomeie arquivos de outro formato. |
+| `Document.InvalidProposalModality` | `422` | A modalidade da proposta não permite envio de documentos pela integração. Fale com o time Credicarro. |
+| `Idempotency.KeyConflict` | `409` | Use uma nova chave para um novo envio. |
+| `Document.UploadFailed` | `502` | Falha temporária ao armazenar o arquivo. Repita com a mesma `Idempotency-Key`. |

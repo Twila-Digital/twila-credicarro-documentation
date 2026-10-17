@@ -6,22 +6,19 @@ icon: 'triangle-exclamation'
 
 ## <Icon icon="triangle-exclamation" type="solid"/> Formato de erro
 
-Os erros retornados pela API seguem o formato abaixo, com campos em português:
+Os erros retornados pela API seguem o formato abaixo, com campos em português. Um campo inválido retorna o primeiro erro encontrado, com o nome do campo em `campo`:
 
 ```json
 {
-  "tipo": "ValidationError",
-  "titulo": "Validation Error",
+  "tipo": "Validation.Cpf.Invalid",
+  "titulo": "Requisição inválida",
   "status": 400,
-  "detalhe": "A validation problem occurred.",
-  "erros": [
-    { "codigo": "Proposal.InvalidCpf", "mensagem": "O CPF informado é inválido.", "campo": "cpf" },
-    { "codigo": "Proposal.PlateIsInvalid", "mensagem": "A placa informada é inválida. Use o formato ABC-1234 ou ABC1D23.", "campo": "placa" }
-  ]
+  "detalhe": "O CPF informado em 'cpf' é inválido.",
+  "campo": "cpf"
 }
 ```
 
-Um erro de regra de negócio vem sem a lista `erros`:
+Um erro de regra de negócio vem sem `campo`:
 
 ```json
 {
@@ -38,12 +35,8 @@ Um erro de regra de negócio vem sem a lista `erros`:
 | `titulo` | Categoria do erro. |
 | `status` | Status HTTP. |
 | `detalhe` | Mensagem do erro, para logs e suporte. Pode mudar sem aviso. |
-| `campo` | Campo da requisição relacionado ao erro, quando houver. |
-| `erros` | Lista com `codigo`, `mensagem` e `campo` de cada campo inválido. |
-
-<Card title="erros vs. detalhe" icon="list-check" horizontal>
-  O campo `erros` aparece apenas em erros de **validação de payload**. Erros de **regra de negócio** não preenchem `erros` — a explicação vem em `tipo` e `detalhe`.
-</Card>
+| `campo` | Campo da requisição relacionado ao erro, quando houver (por exemplo, `endereco.cep`). |
+| `erros` | Lista com `codigo`, `mensagem` e `campo`. Aparece só quando o JSON enviado está malformado ou tem um valor de tipo errado (`codigo` = `Validation.InvalidFormat`). |
 
 ## <Icon icon="list" type="solid"/> Status HTTP
 
@@ -53,7 +46,7 @@ Um erro de regra de negócio vem sem a lista `erros`:
 | `401` | Token ausente, inválido ou expirado. | Gere um novo token e repita |
 | `403` | Integração inativa ou sem acesso. | Não — fale com o time Credicarro |
 | `404` | Recurso não encontrado ou de outro parceiro (proposta, simulação, cliente, loja ou webhook). | Não |
-| `409` | `Idempotency-Key` reutilizada com outro conteúdo. | Não — use uma nova chave |
+| `409` | CPF, e-mail ou celular já cadastrado, `Idempotency-Key` reutilizada com outro conteúdo ou edição simultânea de webhook. | Não — trate pelo `tipo` |
 | `422` | Regra de negócio não atendida (por exemplo, loja com intermediação ou cadastro do cliente incompleto). | Não — trate pelo `tipo` |
 | `500` | Erro inesperado. | Sim, com a mesma `Idempotency-Key` |
 | `502` | Falha ao comunicar com um serviço interno ou externo. | Sim, com espera crescente |
@@ -65,60 +58,94 @@ Um erro de regra de negócio vem sem a lista `erros`:
 
 ## <Icon icon="hashtag" type="solid"/> Códigos de erro
 
-Os códigos abaixo chegam em `tipo` (regra de negócio) ou em `erros[].codigo` (validação).
+Os códigos abaixo chegam em `tipo`.
+
+### Validação de campos
+
+Todos retornam `400`, com o campo em `campo`.
+
+| Código | Quando ocorre |
+| --- | --- |
+| `Validation.Field.Required` | Campo obrigatório ausente (inclusive headers, como `Idempotency-Key` no envio de documento). |
+| `Validation.Field.TooLong` | Texto maior que o permitido. |
+| `Validation.Field.InvalidOption` | Valor fora das opções aceitas (por exemplo, `tipoOcupacao` ou `participante`). |
+| `Validation.Cpf.Invalid` | CPF inválido. |
+| `Validation.Phone.Invalid` | Celular fora do formato `+55 (DD) 99999-9999`. |
+| `Validation.ZipCode.Invalid` | CEP inválido. |
+| `Validation.BirthDate.Invalid`, `.BelowMinimumAge`, `.AboveMaximumAge` | Data de nascimento futura ou cliente fora da faixa de 18 a 75 anos. |
+| `Validation.LicensePlate.Invalid` | Placa inválida. |
+| `Validation.Renavam.Invalid` | Renavam inválido. |
+| `Validation.Bank.InvalidCode`, `.InvalidAgency`, `.InvalidAccountNumber` | Dados bancários inválidos. |
+| `Validation.IdempotencyKey.Invalid` | `Idempotency-Key` vazia ou com mais de 200 caracteres. |
+| `Validation.Document.TypeNotAllowed` | Tipo de documento não aceito para o participante. |
+| `Validation.File.InvalidName`, `.InvalidExtension`, `.InvalidBase64`, `.Empty`, `.TooLarge` | Arquivo do documento inválido. Veja [Enviar documentos](/pages/guides/document-upload). |
 
 ### Acesso e autenticação
 
 | Código | Status | Quando ocorre |
 | --- | --- | --- |
-| `Integration.Authentication.InvalidCredentials` | `401` | `clientId` ou `clientSecret` inválidos. |
+| `Integration.Authentication.InvalidCredentials` | `401` | `clientId` ou `clientSecret` inválidos, ou integração inativa. |
 | `Integration.Access.Inactive` | `403` | A integração do parceiro está inativa. |
 | `Integration.Access.OrganizationNotFound` | `403` | O parceiro do token não foi encontrado. |
 
-### Cliente, loja e simulação
+### Cliente
 
 | Código | Status | Quando ocorre |
 | --- | --- | --- |
 | `Customer.Account.NotFound` | `404` | O CPF não tem cadastro. Cadastre o cliente antes de simular. |
-| `Customer.Account.Incomplete` | `422` | O cadastro do cliente está incompleto (endereço, ocupação ou renda). |
+| `Customer.Account.Incomplete` | `422` | Na proposta, o cadastro está incompleto (endereço, ocupação ou renda). |
+| `Cpf.CpfAlreadyAdded`, `Email.EmailAlreadyAdded`, `Phone.PhoneAlreadyAdded` | `409` | Na criação, o CPF, o e-mail ou o celular já estão cadastrados. |
+| `Account.IdempotencyKeyReused` | `409` | `Idempotency-Key` reutilizada com outro conteúdo. |
+
+### Loja e simulação
+
+| Código | Status | Quando ocorre |
+| --- | --- | --- |
 | `Store.Integration.NotFound` | `404` | O `cnpjLoja` não existe ou não está vinculado ao parceiro. |
 | `Store.Integration.Intermediation` | `422` | A loja tem contrato de intermediação e não pode ser usada na integração. |
 | `Simulation.Access.NotFound` | `404` | A simulação não existe ou é de outro parceiro. |
-| `Simulation.Access.NotFromStore` | `422` | A simulação não foi feita em uma loja de integração do parceiro. |
+| `Simulation.Access.NotFromStore` | `422` | Na proposta, a simulação não foi feita para uma loja. |
 | `Simulation.Terms.Unavailable` | `422` | Não há prazos disponíveis para o veículo. |
-| `Simulation.Refinancing.AmountOutOfRange` | `422` | O `valorSolicitado` está fora da faixa refinanciável da placa. O `detalhe` informa o mínimo e o máximo. |
+| `Proposal.DownPaymentInvalid` | `422` | Nenhum prazo aceita a entrada informada. |
+| `Proposal.RequestAmountInvalid` | `422` | Valor solicitado inválido: entrada que deixa menos de 10% do veículo para financiar, ou valor fora da faixa refinanciável. |
+| `Simulation.Refinancing.AmountOutOfRange` | `422` | O `valorSolicitado` não cabe na faixa de nenhum prazo. |
 | `Simulation.Refinancing.UfUnavailable` | `422` | Não foi possível identificar a UF do veículo nem do endereço do cliente. |
+| `Proposal.SimulationIdempotencyConflict` | `409` | `Idempotency-Key` reutilizada com outro conteúdo na simulação. |
 
 ### Proposta
 
 | Código | Status | Quando ocorre |
 | --- | --- | --- |
 | `Proposal.Access.NotFound` | `404` | A proposta não existe ou é de outro parceiro. |
-| `Proposal.Access.NotIntegrationV2` | `422` | Rota `/v2` chamada com uma proposta criada pela v1. |
+| `Proposal.Access.NotIntegrationV2` | `422` | A proposta não pode ser consultada ou alterada por esta rota. |
 | `Proposal.Customer.ProfileNotFound` | `404` | O cliente da proposta não foi encontrado. |
+| `Proposal.Customer.ProfileAmbiguous` | `502` | Na listagem, não foi possível identificar o cliente de uma proposta. |
+| `Proposal.IdempotencyKeyReused` | `409` | `Idempotency-Key` reutilizada com outro conteúdo na criação da proposta. |
+| `Proposal.InvalidStatus` | `422` | Dados do veículo enviados fora da etapa `DADOS_VEICULO`. |
+| `Proposal.ProposalIsNotInDepositAccountStatus` | `422` | Conta de recebimento enviada fora da etapa `CONTA_RECEBIMENTO`. |
 | `Proposal.DepositAccount.OnlyRefinancing` | `422` | Conta de recebimento enviada para uma proposta de financiamento. |
 | `Proposal.DepositAccount.HolderNotBuyer` | `422` | O `cpfTitular` da conta não é o CPF do cliente da proposta. |
 
-### Envio de documentos
+### Envio de documento
 
-| Código | Quando ocorre |
-| --- | --- |
-| `Document.InvalidParticipant` | `participante` diferente de `COMPRADOR` ou `LOJA`. |
-| `Document.InvalidType` | Tipo de documento não aceito para o participante. |
-| `Document.InvalidName` | Nome de arquivo vazio, com caminho, com mais de 255 caracteres ou com extensão não aceita. |
-| `Document.InvalidBase64` | Conteúdo Base64 inválido. |
-| `Document.Empty` | Arquivo vazio. |
-| `Document.TooLarge` | Arquivo maior que 10 MiB depois de decodificado. |
-| `Document.InvalidContent` | O conteúdo não corresponde à extensão informada. |
-| `Document.InvalidProposalStage` | A etapa ativa não permite o envio de documentos. |
-| `Document.NotPendingCorrection` | Em correção, o tipo enviado não está recusado. |
-| `Idempotency.KeyConflict` | A `Idempotency-Key` já foi usada com outro conteúdo. |
+| Código | Status | Quando ocorre |
+| --- | --- | --- |
+| `Document.InvalidProposalStage` | `422` | A etapa ativa não permite o envio de documentos. |
+| `Document.NotPendingCorrection` | `422` | Na correção, o tipo enviado não está recusado. |
+| `Document.InvalidContent` | `422` | O conteúdo real do arquivo não corresponde à extensão informada. |
+| `Document.InvalidProposalModality` | `422` | A modalidade da proposta não permite envio de documentos pela integração. |
+| `Idempotency.KeyConflict` | `409` | A `Idempotency-Key` já foi usada com outro conteúdo. |
+| `Document.UploadFailed` | `502` | Não foi possível armazenar o documento. Tente de novo com a mesma `Idempotency-Key`. |
 
 ### Webhooks
 
 | Código | Status | Quando ocorre |
 | --- | --- | --- |
 | `Webhook.Registration.NotFound` | `404` | O webhook não existe ou é de outro parceiro. |
+| `Organization.Webhook.InvalidEndpoint` | `422` | URL inválida: precisa ser HTTPS pública, sem localhost, IP privado, usuário/senha ou `#fragmento`. |
+| `Organization.Webhook.ActivationIntegrationInactive` | `422` | Não é possível ativar o webhook com a integração inativa. |
+| `Organization.Webhook.ConcurrencyConflict` | `409` | O webhook foi alterado ao mesmo tempo por outra requisição. Tente de novo. |
+| `Organization.Webhook.CredentialProtectionUnavailable` | `503` | Não foi possível proteger a credencial agora. Tente de novo. |
 
 <Tip>
   Trate os códigos que fazem sentido para o seu fluxo e tenha um tratamento genérico por status para os demais. Novos códigos podem ser adicionados.
@@ -126,7 +153,7 @@ Os códigos abaixo chegam em `tipo` (regra de negócio) ou em `erros[].codigo` (
 
 ## <Icon icon="repeat" type="solid"/> Reenvio seguro com Idempotency-Key
 
-As rotas que criam ou alteram dados aceitam o cabeçalho `Idempotency-Key`. Ele permite repetir uma requisição com segurança após um timeout ou erro de rede, sem criar registros duplicados.
+As rotas listadas abaixo aceitam o cabeçalho `Idempotency-Key`. Ele permite repetir uma requisição com segurança após um timeout ou erro de rede, sem criar registros duplicados.
 
 <Steps>
   <Step title="Gere uma chave única por operação">
@@ -145,12 +172,16 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
   -H "Authorization: Bearer {token}" \
   -H "Content-Type: application/json" \
   -H "Idempotency-Key: 6f1c9a2e-3b7d-4e2a-9c51-0d8f3a7b2e10" \
-  -d '{ "cpf": "12345678901", "simulacaoId": "bea8d060-f93d-48eb-b6c4-45f64483cdd9" }'
+  -d '{ "cpf": "12345678909", "simulacaoId": "bea8d060-f93d-48eb-b6c4-45f64483cdd9" }'
 ```
 
-<Card title="Chave reutilizada com corpo diferente" icon="ban" color="#f44336" horizontal>
-  Retorna `409 Conflict`. Uma mesma `Idempotency-Key` está atrelada ao corpo exato da primeira requisição.
+<Card title="Chave reutilizada com outro conteúdo" icon="ban" color="#f44336" horizontal>
+  Retorna `409 Conflict`. Uma mesma `Idempotency-Key` fica atrelada ao conteúdo da primeira requisição.
 </Card>
+
+<Warning>
+  No cadastro de cliente, a chave muda o comportamento: com `Idempotency-Key`, `POST /v1/customer/unified` só cria. Para atualizar um cliente, envie sem a chave. Veja [Cliente](/pages/customer/reference#criar-x-atualizar).
+</Warning>
 
 ### Estratégia de retentativa
 
@@ -159,7 +190,7 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
 - Limite o número de tentativas (por exemplo, 4) e registre a falha depois disso
 
 <Warning>
-  Gere a `Idempotency-Key` **fora** da função de retentativa. Todas as tentativas precisam usar a mesma chave.
+  Gere a `Idempotency-Key` **fora** da rotina de retentativa. Todas as tentativas precisam usar a mesma chave.
 </Warning>
 
 ### Rotas que aceitam Idempotency-Key
@@ -171,3 +202,5 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
 | `POST /v2/proposal/simulation/financing`, `/v2/proposal/simulation/refinancing` | Opcional |
 | `POST /v1/proposal`, `POST /v2/proposal` | Opcional |
 | `POST /v2/proposal/{propostaId}/document` | **Obrigatório** |
+
+As rotas de webhook, de dados do veículo e de conta de recebimento não usam o header.

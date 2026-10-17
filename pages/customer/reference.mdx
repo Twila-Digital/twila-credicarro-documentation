@@ -11,12 +11,27 @@ O **cliente** é a pessoa que pede o crédito. Ele é identificado pelo **CPF** 
 | Parte do cadastro | Simulação de financiamento | Simulação de refinanciamento | Proposta |
 | --- | :---: | :---: | :---: |
 | Dados pessoais | ✓ | ✓ | ✓ |
-| Endereço | | ✓ | ✓ |
+| Endereço | | Recomendado¹ | ✓ |
 | Ocupação e renda | | | ✓ |
 
+¹ No refinanciamento, o estado do endereço só é usado quando a consulta da placa não traz a UF do veículo. Sem nenhuma das duas, a simulação retorna `422` com `Simulation.Refinancing.UfUnavailable`.
+
 <Tip title="Use o endpoint unificado" horizontal>
-  `POST /v1/customer/unified` envia dados pessoais, endereço e dados profissionais de uma vez — e já deixa o cliente pronto para a proposta. Chamá-lo de novo atualiza o cadastro.
+  `POST /v1/customer/unified` envia dados pessoais, endereço e dados profissionais de uma vez — e já deixa o cliente pronto para a proposta.
 </Tip>
+
+## Criar x atualizar
+
+| Endpoint | CPF ainda não cadastrado | CPF já cadastrado |
+| --- | --- | --- |
+| `POST /v1/customer/unified` **sem** `Idempotency-Key` | Cria | Atualiza o cadastro |
+| `POST /v1/customer/unified` **com** `Idempotency-Key` | Cria | `409` (`Cpf.CpfAlreadyAdded`) |
+| `POST /v1/customer` | Cria | `409` (`Cpf.CpfAlreadyAdded`) |
+| `POST /v1/customer/address` e `/professional` | `404` (`Customer.Account.NotFound`) | Cria ou atualiza |
+
+<Note>
+  Na criação, e-mail e celular também precisam ser únicos. Se já estiverem em outro cadastro, a API retorna `409` com `Email.EmailAlreadyAdded` ou `Phone.PhoneAlreadyAdded`.
+</Note>
 
 ## Endpoints
 
@@ -31,11 +46,11 @@ O **cliente** é a pessoa que pede o crédito. Ele é identificado pelo **CPF** 
 
 ```json POST /v1/customer/unified
 {
-  "cpf": "12345678901",
+  "cpf": "12345678909",
   "nome": "Maria",
   "sobrenome": "Souza",
   "email": "maria.souza@exemplo.com.br",
-  "celular": "+5511998765432",
+  "celular": "+55 (11) 99876-5432",
   "dataDeNascimento": "1990-05-20T00:00:00-03:00",
   "endereco": {
     "rua": "Av. Paulista",
@@ -68,13 +83,21 @@ O **cliente** é a pessoa que pede o crédito. Ele é identificado pelo **CPF** 
 
 | Campo | Regra |
 | --- | --- |
-| `cpf` | 11 dígitos, só números. |
-| `celular` | Formato E.164: código do país, DDD e número (`+5511998765432`). |
-| `dataDeNascimento` | ISO-8601 com fuso horário. |
-| `endereco.cep` | Só números. |
-| `endereco.estado` | Sigla com 2 letras (`SP`). |
-| `endereco.numero`, `endereco.complemento` | Opcionais. |
-| `dadosProfissionais.renda` | Renda mensal em reais, com ponto decimal. |
+| `cpf` | 11 dígitos, com ou sem pontuação (`123.456.789-01`). Os dígitos verificadores são validados. |
+| `nome`, `sobrenome` | Até 100 caracteres cada. |
+| `email` | E-mail válido, até 254 caracteres. |
+| `celular` | Exatamente no formato `+55 (DD) 99999-9999` (ex.: `+55 (11) 99876-5432`), com espaço, parênteses e hífen. |
+| `dataDeNascimento` | ISO-8601 (ex.: `1990-05-20T00:00:00-03:00`). Não pode ser futura e o cliente precisa ter entre 18 e 75 anos. |
+| `endereco.rua` | Até 200 caracteres. |
+| `endereco.bairro`, `endereco.cidade` | Até 100 caracteres cada. |
+| `endereco.numero` | Opcional, até 20 caracteres. |
+| `endereco.complemento` | Opcional, até 100 caracteres. |
+| `endereco.estado` | Sigla de uma UF válida (`SP`). |
+| `endereco.cep` | 8 dígitos, com ou sem hífen (`01311000` ou `01311-000`). |
+| `dadosProfissionais.tipoOcupacao` | Um dos códigos da tabela acima. |
+| `dadosProfissionais.renda` | Renda mensal em reais, maior que zero, com ponto decimal. |
+
+Um campo inválido retorna `400` com o nome do campo em `campo` (por exemplo, `endereco.cep`). Os códigos mais comuns são `Validation.Field.Required`, `Validation.Field.TooLong`, `Validation.Cpf.Invalid`, `Validation.Phone.Invalid`, `Validation.ZipCode.Invalid` e `Validation.BirthDate.BelowMinimumAge`.
 
 <Note>
   Os dados do cliente precisam bater com os documentos enviados depois. Divergências de nome, CPF ou endereço podem causar a recusa de documentos.

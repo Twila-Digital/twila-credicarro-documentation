@@ -3,8 +3,8 @@ title: 'Criar ou atualizar endereço do cliente'
 openapi: "POST /v1/customer/address"
 ---
 
-Cria ou atualiza o endereço de um cliente já cadastrado. O endereço é exigido na simulação de refinanciamento e na proposta.
+Cria ou atualiza o endereço de um cliente já cadastrado. O endereço é exigido na proposta. No refinanciamento, ele também é usado para obter a UF quando a consulta da placa não a informa.
 
 <Note>
-  Retorna `202 Accepted`, sem corpo.
+  Retorna `202 Accepted`, sem corpo. Se o CPF não estiver cadastrado, retorna `404` com `Customer.Account.NotFound`.
 </Note>

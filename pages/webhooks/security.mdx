@@ -12,7 +12,7 @@ Cada notificação é um `POST` com corpo JSON (`Content-Type: application/json`
 | --- | --- |
 | `Authorization` | Conforme o [tipo de autenticação](/pages/webhooks#tipos-de-autenticacao) do webhook (ausente quando for 1 - Sem autenticação). |
 | `X-CrediCarro-Signature` | Assinatura HMAC do corpo, no formato `t={timestamp},v1={assinatura}`. |
-| `Idempotency-Key` | Identificador da notificação. Retentativas da mesma notificação repetem a chave. |
+| `Idempotency-Key` | Identificador da notificação para aquele webhook, no formato `{id_mensagem}:{id_webhook}`. Retentativas da mesma notificação repetem a chave. |
 
 ## Assinatura HMAC-SHA256
 
@@ -22,8 +22,8 @@ Toda notificação de webhook é assinada com **HMAC-SHA256**, enviada no cabeç
 X-CrediCarro-Signature: t=1715792400,v1=5f2b3c8e1a9d7c6b4e2f1a0d9c8b7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d
 ```
 
-- `t` — timestamp Unix (segundos) de quando a notificação foi enviada.
-- `v1` — HMAC-SHA256 em hexadecimal minúsculo, calculado sobre a string `{t}.{corpo_bruto_da_requisição}`, usando o `segredo_assinatura` do webhook.
+- `t` — timestamp Unix (segundos) do início desta tentativa de entrega. Cada retentativa é assinada de novo, com um novo `t`.
+- `v1` — HMAC-SHA256 em hexadecimal minúsculo, calculado sobre a string `{t}.{corpo_bruto_da_requisição}`, usando o `segredo_assinatura` do webhook como chave — o texto do segredo como está, em UTF-8 (não decodifique o hexadecimal).
 
 <Card title="Quando o segredo é gerado" icon="key" horizontal color="#25c2a0">
   O `segredo_assinatura` é gerado ao [cadastrar](/pages/webhook/create) o webhook e retornado **apenas nessa resposta** — ele não é devolvido por nenhuma outra consulta. Guarde-o com segurança.
@@ -54,9 +54,9 @@ Com estes valores, a sua implementação precisa chegar à mesma assinatura:
 | --- | --- |
 | `segredo_assinatura` | `segredo-de-exemplo` |
 | `t` | `1715792400` |
-| Corpo bruto | `{"id_proposta":"bea8d060-f93d-48eb-b6c4-45f64483cdd9","enum_status":2,"status":"APROVADA"}` |
-| Conteúdo assinado | `1715792400.{"id_proposta":"bea8d060-f93d-48eb-b6c4-45f64483cdd9","enum_status":2,"status":"APROVADA"}` |
-| `v1` esperado | `695da9818229f76b5a2efc1d5803310ac8f5f247b398d20bcd35e7d52436bab4` |
+| Corpo bruto | `{"id_proposta":"bea8d060-f93d-48eb-b6c4-45f64483cdd9","enum_status":2,"status":"Approved"}` |
+| Conteúdo assinado | `1715792400.{"id_proposta":"bea8d060-f93d-48eb-b6c4-45f64483cdd9","enum_status":2,"status":"Approved"}` |
+| `v1` esperado | `db66c554eb116ef2577deb63f72619793502a31520f622b2d59864b074eb8df2` |
 
 <Note>
   A tolerância de 5 minutos é uma sugestão. Ajuste conforme a sua necessidade.
@@ -80,16 +80,17 @@ Com estes valores, a sua implementação precisa chegar à mesma assinatura:
 ## Respostas e retentativas
 
 <Card title="Responda com 2xx" icon="check" horizontal>
-  - Qualquer resposta `2xx` confirma o recebimento.
-  - Respostas `408`, `425`, `429` e `5xx`, falhas de rede e tempo esgotado (15 segundos) são retentadas automaticamente.
-  - As demais respostas `4xx` não são retentadas.
+  - Qualquer resposta `2xx` com corpo de até 1 MiB confirma o recebimento.
+  - Respostas `408`, `425`, `429` e `5xx`, falhas de rede e tempo esgotado (15 segundos) são retentadas automaticamente: até 3 novas tentativas, com espera de cerca de 1 s, 5 s e 30 s.
+  - As demais respostas `4xx`, redirecionamentos (`3xx`) e respostas com corpo acima de 1 MiB são tratados como falha e não são retentados.
 </Card>
 
 ## Deduplicação
 
 <Card title="Trate o webhook como idempotente" icon="clone" horizontal>
   - Use o header `Idempotency-Key` como chave de deduplicação — uma retentativa da mesma notificação repete a chave.
-  - As notificações podem chegar fora de ordem. Em propostas v2, use `data_evento` ou consulte a proposta para obter o estado mais recente.
+  - Notificações de eventos diferentes (por exemplo, mudança de status e mudança de etapas) chegam com chaves diferentes.
+  - As notificações podem chegar fora de ordem. Para saber o estado mais recente, consulte a proposta.
 </Card>
 
 ## Checklist de segurança

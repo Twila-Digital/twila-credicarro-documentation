@@ -3,12 +3,12 @@ title: 'Criar simulação de refinanciamento'
 openapi: "POST /v2/proposal/simulation/refinancing"
 ---
 
-Calcula as condições de refinanciamento e retorna **uma opção por prazo**, cada uma com o seu `id_simulacao`.
+Calcula as condições de refinanciamento e retorna **uma opção para cada prazo** em cuja faixa o valor solicitado cabe, cada uma com o seu `id_simulacao`.
 
 **Exemplo:**
 ```json
 {
-  "cpf": "12345678901",
+  "cpf": "12345678909",
   "placa": "ABC1D23",
   "valorSolicitado": 25000,
   "cnpjLoja": "11.222.333/0001-81"
@@ -16,7 +16,7 @@ Calcula as condições de refinanciamento e retorna **uma opção por prazo**, c
 ```
 
 <Tip title="Pré-requisitos" horizontal>
-  O cliente precisa estar cadastrado **com endereço**, e o `valorSolicitado` precisa estar dentro da [faixa refinanciável](/pages/v2/simulation/range-refinancing).
+  O cliente precisa estar cadastrado, e o `valorSolicitado` precisa estar dentro da [faixa refinanciável](/pages/v2/simulation/range-refinancing). A UF vem do veículo; se a placa não a informar, é usado o estado do endereço do cliente.
 </Tip>
 
 <Note>

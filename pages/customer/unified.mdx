@@ -6,5 +6,9 @@ openapi: "POST /v1/customer/unified"
 Cria ou atualiza o cliente com dados pessoais, endereço e dados profissionais em uma chamada. Depois dela, o cliente já pode simular e criar a proposta.
 
 <Tip title="Recomendado" horizontal>
-  É o jeito mais simples de deixar o cadastro completo. Chame de novo sempre que um dado mudar. Veja a [referência de cliente](/pages/customer/reference).
+  É o jeito mais simples de deixar o cadastro completo. Veja a [visão geral de cliente](/pages/customer/reference).
 </Tip>
+
+<Warning>
+  Para **atualizar** um cliente já cadastrado, envie **sem** `Idempotency-Key`. Com a chave, a chamada só cria e retorna `409` se o CPF, o e-mail ou o celular já estiverem cadastrados.
+</Warning>

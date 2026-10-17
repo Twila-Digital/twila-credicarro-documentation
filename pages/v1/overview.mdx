@@ -1,12 +1,8 @@
 ---
-title: 'Fluxo de integração v1'
-description: 'Ordem de chamadas para criar e acompanhar uma proposta v1'
+title: 'Fluxo de integração'
+description: 'Ordem de chamadas para criar e acompanhar uma proposta'
 icon: 'arrow-right-arrow-left'
 ---
-
-<Warning>
-  Fluxo **legado**. Para novas integrações, siga o [fluxo v2](/pages/v2/overview).
-</Warning>
 
 <Steps>
   <Step title="Gerar token de acesso" icon="key">
@@ -38,10 +34,10 @@ icon: 'arrow-right-arrow-left'
 
     <CardGroup cols={2}>
       <Card title="GET Faixa financiável" icon="car" href="/pages/simulation/range-financing">
-        Simulação · v1
+        Simulação
       </Card>
       <Card title="GET Faixa refinanciável" icon="car-side" href="/pages/simulation/range-refinancing">
-        Simulação · v1
+        Simulação
       </Card>
     </CardGroup>
   </Step>
@@ -51,10 +47,10 @@ icon: 'arrow-right-arrow-left'
 
     <CardGroup cols={2}>
       <Card title="POST Simulação de financiamento" icon="calculator" href="/pages/simulation/create-financing">
-        Simulação · v1
+        Simulação
       </Card>
       <Card title="POST Simulação de refinanciamento" icon="calculator" href="/pages/simulation/create-refinancing">
-        Simulação · v1
+        Simulação
       </Card>
     </CardGroup>
   </Step>
@@ -63,20 +59,20 @@ icon: 'arrow-right-arrow-left'
     Escolha um `id_simulacao` e crie a proposta.
 
     <Card title="POST Criar proposta" icon="file-signature" href="/pages/proposal/create">
-      Proposta · v1
+      Proposta
     </Card>
   </Step>
 
   <Step title="Acompanhar o status" icon="magnifying-glass">
-    Receba o [webhook v1](/pages/v1/webhooks) ou consulte a proposta.
+    Receba o [webhook de proposta](/pages/v1/webhooks) ou consulte a proposta.
 
     <Card title="GET Buscar proposta" icon="magnifying-glass" href="/pages/proposal/get">
-      Proposta · v1
+      Proposta
     </Card>
   </Step>
 </Steps>
 
-## Status da proposta v1
+## Status da proposta
 
 | `status` | Significado |
 | --- | --- |

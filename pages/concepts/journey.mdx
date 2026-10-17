@@ -7,78 +7,109 @@ icon: 'route'
 Toda proposta passa por uma sequência de etapas. Em cada momento, a Credicarro mostra **a etapa atual** e **quem precisa agir**: o cliente, a loja (pelo integrador) ou a própria Credicarro.
 
 <Tip>
-  A regra de ouro: **olhe sempre a etapa atual**. A ordem e as etapas exatas podem variar conforme a modalidade (financiamento ou refinanciamento) e o resultado da análise.
+  A regra de ouro: **olhe sempre a etapa atual**. O cliente e a loja têm etapas separadas, que andam em paralelo.
 </Tip>
 
 ---
 
-## As etapas
+## Antes da formalização
 
 <Steps>
   <Step title="Proposta criada" icon="paper-plane">
-    O cliente escolheu um prazo e a proposta foi enviada. A Credicarro faz a **análise de crédito**.
+    O cliente escolheu um prazo e a proposta foi enviada. A análise de crédito começa automaticamente.
 
     **Quem age:** Credicarro.
   </Step>
 
   <Step title="Proposta aprovada" icon="circle-check">
-    O crédito foi aprovado. Começa a formalização.
+    O crédito foi aprovado e começa a formalização. Nesse momento, a Credicarro envia ao cliente, por WhatsApp e e-mail, o link da biometria.
 
     **Quem age:** ninguém por enquanto — a próxima etapa é liberada automaticamente.
   </Step>
-
-  <Step title="Biometria" icon="fingerprint">
-    O cliente confirma a identidade por biometria facial, em um link próprio. Oriente o cliente a fazer a biometria logo — é ela que destrava as próximas etapas.
-
-    **Quem age:** cliente.
-  </Step>
-
-  <Step title="Envio de documentos" icon="file-arrow-up">
-    A loja envia os documentos do cliente e do veículo. Veja [quais documentos](/pages/concepts/documents).
-
-    **Quem age:** loja (pelo integrador).
-  </Step>
-
-  <Step title="Correção de documentos" icon="file-pen">
-    Se algum documento for recusado, a Credicarro informa o motivo (por exemplo, "documento ilegível"). Basta reenviar **o mesmo tipo** de documento corrigido.
-
-    **Quem age:** loja (pelo integrador).
-  </Step>
-
-  <Step title="Dados do veículo" icon="car">
-    A loja informa placa, Renavam, chassi e cor do veículo.
-
-    **Quem age:** loja (pelo integrador).
-  </Step>
-
-  <Step title="Conta de recebimento (só refinanciamento)" icon="building-columns">
-    A loja informa a conta bancária do cliente onde o crédito vai ser depositado. A conta precisa estar no CPF do cliente.
-
-    **Quem age:** loja (pelo integrador).
-  </Step>
-
-  <Step title="Vistoria" icon="magnifying-glass">
-    O veículo passa pela vistoria.
-
-    **Quem age:** cliente.
-  </Step>
-
-  <Step title="Assinatura" icon="file-signature">
-    O cliente assina o contrato.
-
-    **Quem age:** cliente.
-  </Step>
-
-  <Step title="Pagamento" icon="money-bill-wave">
-    A Credicarro faz o pagamento da operação.
-
-    **Quem age:** Credicarro.
-  </Step>
-
-  <Step title="Proposta finalizada" icon="flag-checkered">
-    Tudo concluído.
-  </Step>
 </Steps>
+
+<Note>
+  Se a sua integração foi configurada para a loja falar diretamente com o cliente, a Credicarro não envia esses avisos. Nesse caso, o link da biometria aparece na consulta da proposta e você precisa repassá-lo ao cliente.
+</Note>
+
+---
+
+## Formalização
+
+<Tabs>
+  <Tab title="Financiamento">
+    <Steps>
+      <Step title="Envio de documentos" icon="file-arrow-up">
+        A loja envia os documentos do cliente e os dela. Veja [quais documentos](/pages/concepts/documents).
+
+        **Quem age:** loja (pelo integrador).
+      </Step>
+      <Step title="Dados do veículo" icon="car">
+        A loja informa placa, Renavam, chassi e cor do veículo.
+
+        **Quem age:** loja (pelo integrador).
+      </Step>
+      <Step title="Biometria" icon="fingerprint">
+        O cliente confirma a identidade por biometria facial, pelo link que recebeu. É a última etapa antes do pagamento.
+
+        **Quem age:** cliente.
+      </Step>
+      <Step title="Pagamento" icon="money-bill-wave">
+        A Credicarro conclui o contrato e paga o valor financiado **à loja**.
+
+        **Quem age:** Credicarro.
+      </Step>
+      <Step title="Proposta finalizada" icon="flag-checkered">
+        Tudo concluído.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Refinanciamento">
+    <Steps>
+      <Step title="Conta de recebimento" icon="building-columns">
+        A loja informa a conta bancária do cliente onde o crédito vai ser depositado. A conta precisa estar no CPF do cliente.
+
+        **Quem age:** loja (pelo integrador).
+      </Step>
+      <Step title="Envio de documentos" icon="file-arrow-up">
+        A loja envia os documentos do cliente e os dela. Veja [quais documentos](/pages/concepts/documents).
+
+        **Quem age:** loja (pelo integrador).
+      </Step>
+      <Step title="Dados do veículo" icon="car">
+        A loja informa placa, Renavam, chassi e cor do veículo.
+
+        **Quem age:** loja (pelo integrador).
+      </Step>
+      <Step title="Vistoria" icon="magnifying-glass">
+        O veículo do cliente passa pela vistoria.
+
+        **Quem age:** cliente.
+      </Step>
+      <Step title="Biometria" icon="fingerprint">
+        O cliente confirma a identidade por biometria facial, pelo link que recebeu. É a última etapa antes do pagamento.
+
+        **Quem age:** cliente.
+      </Step>
+      <Step title="Pagamento" icon="money-bill-wave">
+        A Credicarro conclui o contrato e deposita o crédito **na conta do cliente**.
+
+        **Quem age:** Credicarro.
+      </Step>
+      <Step title="Proposta finalizada" icon="flag-checkered">
+        Tudo concluído.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
+
+<Tip title="Biometria pode ser feita antes" horizontal>
+  O link da biometria existe desde a aprovação. O cliente pode fazê-la a qualquer momento, mas a proposta só segue para o pagamento depois que ela é aprovada.
+</Tip>
+
+<Card title="Correção de documentos" icon="file-pen" horizontal>
+  Se algum documento for recusado, a Credicarro informa o motivo (por exemplo, "documento ilegível") e a etapa vira **correção de documentos**. Basta reenviar **o mesmo tipo** de documento corrigido.
+</Card>
 
 ---
 
@@ -89,11 +120,11 @@ Além da etapa, a Credicarro informa a **situação** dela. Assim você sabe se 
 | Situação | O que significa | O que fazer |
 | --- | --- | --- |
 | Aguardando envio | Falta a loja enviar algo | Envie o que a etapa pede |
-| Aguardando cliente | Falta o cliente agir (biometria, vistoria ou assinatura) | Lembre o cliente |
-| Em processamento | A Credicarro está analisando | Aguarde |
+| Aguardando cliente | Falta o cliente agir (biometria ou vistoria) | Lembre o cliente |
+| Em processamento | A Credicarro está cuidando da etapa | Aguarde |
 | Pendente de correção | Um documento foi recusado | Reenvie o documento corrigido |
 | Bloqueada | A etapa não pode continuar (por exemplo, biometria reprovada) | Fale com o time Credicarro |
-| Concluída | A proposta foi finalizada | — |
+| Concluída | As etapas deste participante (ou a proposta inteira) terminaram | — |
 | Cancelada | A proposta foi recusada, cancelada ou expirou | — |
 
 ---
@@ -106,19 +137,19 @@ Em paralelo às etapas, a proposta tem um status geral:
 | --- | --- |
 | Em análise | A análise de crédito está em andamento |
 | Análise manual | A proposta está com o time de crédito da Credicarro |
+| Pendente | A análise de crédito precisa de uma verificação adicional da Credicarro |
 | Aprovada | O crédito foi aprovado e a formalização está em andamento |
 | Recusada | O crédito não foi aprovado. O motivo é informado quando houver |
-| Pendente | A proposta tem uma pendência |
-| Em negociação | A proposta está em negociação |
+| Em negociação | A Credicarro ofereceu outras condições. Propostas feitas pela integração não recebem contraproposta: nesse caso, são recusadas com esse motivo |
 | Cancelada | A proposta foi cancelada |
-| Expirada | A proposta passou do prazo sem ser concluída |
+| Expirada | A proposta não foi concluída em até um mês depois de criada |
 | Finalizada | A operação foi concluída |
 
 ---
 
 ## A loja também tem etapas
 
-O cliente e a loja têm **etapas separadas**. Enquanto o cliente faz a biometria, por exemplo, a loja já pode estar no envio dos documentos dela. Acompanhe as duas.
+O cliente e a loja têm **etapas separadas**. No financiamento, por exemplo, o cliente já pode estar com a biometria concluída enquanto a loja ainda está no pagamento. Acompanhe as duas.
 
 <Card title="Desenvolvedor? Veja os códigos" icon="code" href="/pages/v2/steps" horizontal>
   Os códigos de etapa, situação e status usados pela API estão em **Etapas e status**.

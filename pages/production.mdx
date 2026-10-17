@@ -39,9 +39,9 @@ Quando o fluxo estiver validado no [ambiente de testes](/pages/development), sig
   - [ ] `Idempotency-Key` gerada por operação e reaproveitada nas retentativas
   - [ ] Retentativa com espera crescente em `500`, `502` e `503`
   - [ ] Tratamento por `tipo` dos erros de negócio que o seu fluxo usa
-  - [ ] Webhook com assinatura HMAC validada e autenticação Basic ou JWT
+  - [ ] Webhook em URL HTTPS pública, com assinatura HMAC validada e autenticação Basic ou JWT
   - [ ] Webhook responde `2xx` rápido e processa de forma assíncrona
-  - [ ] Notificações deduplicadas pelo `Idempotency-Key` e ordenadas por `data_evento`
+  - [ ] Notificações deduplicadas pelo `Idempotency-Key`, com a proposta consultada para obter o estado mais recente
   - [ ] Logs sem CPF completo, token, `clientSecret` ou conteúdo de documentos
 </Card>
 
@@ -54,7 +54,7 @@ Quando o fluxo estiver validado no [ambiente de testes](/pages/development), sig
     Confira se as etapas avançam e se os documentos estão sendo aceitos.
   </Card>
   <Card title="Monitore os webhooks" icon="bell">
-    Falhas de entrega (`4xx` não são retentados) fazem você perder atualizações. Reconcilie consultando a proposta.
+    Depois de 3 retentativas, ou em respostas `4xx`, a notificação deixa de ser enviada. Reconcilie consultando a proposta.
   </Card>
 </CardGroup>
 

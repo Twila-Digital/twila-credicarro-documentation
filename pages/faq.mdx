@@ -12,7 +12,7 @@ icon: 'circle-question'
   </Accordion>
 
   <Accordion title="O cliente precisa dar entrada no financiamento?" icon="hand-holding-dollar">
-    Não é obrigatório — a entrada pode ser zero. Mas cada prazo tem uma **entrada mínima**, que pode ser consultada antes da simulação.
+    Não é obrigatório — a entrada pode ser zero. Mas cada prazo tem uma **entrada mínima**, que pode ser consultada antes da simulação, e a entrada precisa deixar pelo menos 10% do valor do veículo para financiar.
   </Accordion>
 
   <Accordion title="Quanto o cliente consegue no refinanciamento?" icon="sack-dollar">
@@ -28,7 +28,7 @@ icon: 'circle-question'
   </Accordion>
 
   <Accordion title="O cliente não fez a biometria. O que acontece?" icon="fingerprint">
-    A proposta fica parada aguardando o cliente. Lembre o cliente de acessar o link da biometria. Se a biometria for reprovada, a etapa fica bloqueada — fale com o time Credicarro.
+    A biometria é a última etapa antes do pagamento: sem ela, a proposta não é paga. A Credicarro envia o link ao cliente por WhatsApp e e-mail na aprovação — lembre o cliente de acessá-lo. Se a biometria for reprovada, a etapa fica bloqueada — fale com o time Credicarro.
   </Accordion>
 
   <Accordion title="Posso usar a conta bancária de outra pessoa no refinanciamento?" icon="building-columns">
@@ -36,7 +36,7 @@ icon: 'circle-question'
   </Accordion>
 
   <Accordion title="A proposta expirou. Dá para retomar?" icon="clock">
-    Uma proposta expirada não continua. Faça uma nova simulação e crie uma nova proposta.
+    A proposta expira um mês depois de criada, se não for concluída. Uma proposta expirada não continua: faça uma nova simulação e crie uma nova proposta.
   </Accordion>
 </AccordionGroup>
 
@@ -45,20 +45,16 @@ icon: 'circle-question'
 ## Para desenvolvedores
 
 <AccordionGroup>
-  <Accordion title="Devo usar a v1 ou a v2?" icon="code-branch">
-    Use a **v2** em novas integrações. Ela traz a simulação por loja, o acompanhamento das etapas e o envio de documentos, dados do veículo e conta de recebimento pela API. A v1 continua disponível como legado.
-  </Accordion>
-
-  <Accordion title="O mesmo token serve para v1 e v2?" icon="key">
-    Sim. O token gerado em `POST /v1/authentication/accesstoken` vale para as rotas `/v1` e `/v2`.
+  <Accordion title="Preciso de um token para cada rota?" icon="key">
+    Não. O token gerado em `POST /v1/authentication/accesstoken` vale para todas as rotas da API até expirar.
   </Accordion>
 
   <Accordion title="Recebo 404 em uma proposta que existe" icon="magnifying-glass">
-    Confira se o token é do mesmo ambiente (staging ou produção) em que a proposta foi criada. A API também retorna 404 para recursos de outro parceiro. Uma proposta v1 consultada em `/v2` retorna `422` com `Proposal.Access.NotIntegrationV2`.
+    Confira se o token é do mesmo ambiente (staging ou produção) em que a proposta foi criada. A API também retorna 404 para recursos de outro parceiro.
   </Accordion>
 
   <Accordion title="Como sei o que enviar em cada etapa?" icon="list-check">
-    Consulte a proposta (ou use o webhook v2) e olhe o `status_ativo` do comprador e da loja. Quando `responsavel_acao` for `INTEGRADOR`, a `etapa` diz qual endpoint chamar. Veja [Etapas e status](/pages/v2/steps).
+    Consulte a proposta (ou use o webhook de proposta) e olhe o `status_ativo` do comprador e da loja. Quando `responsavel_acao` for `INTEGRADOR`, a `etapa` diz qual endpoint chamar. Veja [Etapas e status](/pages/v2/steps).
   </Accordion>
 
   <Accordion title="Preciso consultar a proposta o tempo todo?" icon="arrows-rotate">

@@ -32,8 +32,8 @@ paths:
                 cpf:
                   minLength: 11
                   type: string
-                  description: CPF do cliente **somente números** (11 dígitos).
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 simulacaoId:
                   type: string
                   format: uuid
@@ -54,6 +54,18 @@ paths:
                     example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente ou simulação não encontrados (`Customer.Account.NotFound`, `Simulation.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra de negócio não atendida (por exemplo, `Customer.Account.Incomplete`)
           content:
             application/json:
               schema:
@@ -132,6 +144,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/proposal/simulation/range/financing:
     get:
       tags:
@@ -174,7 +192,6 @@ paths:
                           description: Valor mínimo de entrada para o prazo
                           example: 5000.00
                       additionalProperties: false
-                    nullable: true
                 additionalProperties: false
         '400':
           description: Bad Request — parâmetros inválidos ou ausentes
@@ -182,8 +199,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
-        '401':
-          description: Unauthorized — token ausente ou inválido
+        '422':
+          description: Sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -235,10 +252,15 @@ paths:
                           description: Máximo valor refinanciavel
                           example: 35720
                       additionalProperties: false
-                    nullable: true
                 additionalProperties: false
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -318,6 +340,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Simulação não encontrada para este parceiro (`Simulation.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/proposal/simulation/financing:
     post:
       tags:
@@ -340,8 +368,8 @@ paths:
                 cpf:
                   minLength: 11
                   type: string
-                  description: CPF do cliente **somente números** (11 dígitos)
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 isVeiculoZeroKm:
                   type: boolean
                   description: Indica se o veículo é zero quilômetro. true para novo, false para usado.
@@ -440,10 +468,21 @@ paths:
                         valor_retencao_diaria_aproximado:
                           type: number
                           format: double
-                          nullable: true
-                          example: null
+                          description: Valor aproximado de retenção diária. Omitido quando não se aplica.
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -470,8 +509,8 @@ paths:
                 cpf:
                   minLength: 11
                   type: string
-                  description: CPF do cliente **somente números** (11 dígitos)
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 placa:
                   minLength: 1
                   type: string
@@ -558,10 +597,21 @@ paths:
                         valor_retencao_diaria_aproximado:
                           type: number
                           format: double
-                          nullable: true
-                          example: null
+                          description: Valor aproximado de retenção diária. Omitido quando não se aplica.
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `Simulation.Refinancing.UfUnavailable`
           content:
             application/json:
               schema:
@@ -605,7 +655,11 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '401':
-          description: Credenciais inválidas
+          description: Credenciais inválidas ou integração inativa (`Integration.Authentication.InvalidCredentials`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/customer:
     post:
       tags:
@@ -629,18 +683,18 @@ paths:
                 celular:
                   type: string
                   minLength: 1
-                  description: Telefone celular no formato E.164 (código do país + DDD + número).
+                  description: Telefone celular exatamente no formato `+55 (DD) 99999-9999`.
                   example: "+55 (11) 99876-5432"
                 cpf:
                   type: string
                   minLength: 1
                   maxLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 dataDeNascimento:
                   type: string
                   format: date-time
-                  description: Data de nascimento em formato ISO-8601.
+                  description: Data de nascimento em ISO-8601. O cliente precisa ter entre 18 e 75 anos.
                   example: "1990-05-20T00:00:00-03:00"
                 email:
                   type: string
@@ -659,7 +713,7 @@ paths:
                   example: "Souza"
       responses:
         '200':
-          description: Cliente criado com sucesso
+          description: Cliente criado ou atualizado
           content:
             application/json:
               schema:
@@ -676,8 +730,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          description: Integração inativa (`Integration.Access.Inactive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
         '409':
-          description: A Idempotency-Key já foi usada com outro conteúdo
+          description: CPF, e-mail ou celular já cadastrado (`Cpf.CpfAlreadyAdded`, `Email.EmailAlreadyAdded`, `Phone.PhoneAlreadyAdded`), ou Idempotency-Key reutilizada com outro conteúdo
           content:
             application/json:
               schema:
@@ -706,8 +766,8 @@ paths:
                   type: string
                   minLength: 11
                   maxLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 endereco:
                   type: object
                   required: ['rua', 'cidade', 'estado', 'bairro', 'cep']
@@ -731,7 +791,7 @@ paths:
                       example: "Bela Vista"
                     cep:
                       type: string
-                      description: CEP (somente números).
+                      description: CEP com 8 dígitos, com ou sem hífen.
                       example: "01311000"
                     numero:
                       type: string
@@ -746,6 +806,24 @@ paths:
           description: Endereço aceito para criação ou atualização
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          description: Integração inativa (`Integration.Access.Inactive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo
           content:
             application/json:
               schema:
@@ -774,8 +852,8 @@ paths:
                   type: string
                   minLength: 11
                   maxLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 tipoOcupacao:
                   type: integer
                   format: int32
@@ -803,6 +881,24 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          description: Integração inativa (`Integration.Access.Inactive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/customer/unified:
     post:
       tags:
@@ -826,18 +922,18 @@ paths:
                 celular:
                   type: string
                   minLength: 1
-                  description: Telefone celular no formato E.164 (código do país + DDD + número).
+                  description: Telefone celular exatamente no formato `+55 (DD) 99999-9999`.
                   example: "+55 (11) 99876-5432"
                 cpf:
                   type: string
                   minLength: 11
                   maxLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 dataDeNascimento:
                   type: string
                   format: date-time
-                  description: Data de nascimento em formato ISO-8601.
+                  description: Data de nascimento em ISO-8601. O cliente precisa ter entre 18 e 75 anos.
                   example: "1990-05-20T00:00:00-03:00"
                 email:
                   type: string
@@ -903,7 +999,7 @@ paths:
                       example: 6500.00
       responses:
         '200':
-          description: Cliente criado com sucesso
+          description: Cliente criado ou atualizado
           content:
             application/json:
               schema:
@@ -916,6 +1012,18 @@ paths:
                     example: 123e4567-e89b-12d3-a456-426614174000
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          description: Integração inativa (`Integration.Access.Inactive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: CPF, e-mail ou celular já cadastrado na criação com Idempotency-Key, ou Idempotency-Key reutilizada com outro conteúdo
           content:
             application/json:
               schema:
@@ -952,7 +1060,7 @@ paths:
                   example: 3
                 url:
                   type: string
-                  description: URL absoluta (http ou https) que receberá as notificações.
+                  description: URL HTTPS pública, com até 2048 caracteres, que receberá as notificações (sem localhost, IP privado, usuário/senha ou fragmento).
                   example: https://parceiro.com.br/webhooks/credicarro
                 tipo_autenticacao:
                   type: integer
@@ -1068,7 +1176,7 @@ paths:
                   example: 3
                 url:
                   type: string
-                  description: URL absoluta (http ou https) que receberá as notificações.
+                  description: URL HTTPS pública, com até 2048 caracteres, que receberá as notificações (sem localhost, IP privado, usuário/senha ou fragmento).
                   example: https://parceiro.com.br/webhooks/credicarro
                 status:
                   type: integer
@@ -1170,16 +1278,9 @@ paths:
                           description: Valor mínimo de entrada para o prazo
                           example: 5000.00
                       additionalProperties: false
-                    nullable: true
                 additionalProperties: false
         '400':
           description: Bad Request — parâmetros inválidos ou ausentes
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-        '401':
-          description: Unauthorized — token ausente ou inválido
           content:
             application/json:
               schema:
@@ -1253,7 +1354,6 @@ paths:
                           description: Máximo valor refinanciavel
                           example: 35720
                       additionalProperties: false
-                    nullable: true
                 additionalProperties: false
         '400':
           description: Erro na requisição
@@ -1281,7 +1381,7 @@ paths:
       description: |
         Cria uma nova simulação de financiamento selecionando a loja de integração pelo CNPJ (`cnpjLoja`).
         A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de intermediação.
-        O cliente precisa estar cadastrado antes da simulação, pelas rotas de Cliente da v1.
+        O cliente precisa estar cadastrado antes da simulação, pelas rotas de Cliente.
       security:
         - bearerAuth: []
       parameters:
@@ -1298,8 +1398,8 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos)
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 placa:
                   type: string
                   description: Placa do veículo no padrão antigo (ABC-1234) ou Mercosul (ABC1D23)
@@ -1345,6 +1445,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal/simulation/refinancing:
     post:
       tags:
@@ -1370,8 +1476,8 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos)
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 placa:
                   type: string
                   description: Placa do veículo no padrão antigo (ABC-1234) ou Mercosul (ABC1D23)
@@ -1404,13 +1510,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `Simulation.Refinancing.UfUnavailable`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal:
     post:
       tags:
         - Proposta
       summary: Criar uma nova proposta
       description: |
-        Cria uma proposta a partir de uma simulação criada pela v2. A simulação precisa pertencer ao parceiro e ter
+        Cria uma proposta a partir de uma simulação feita com `cnpjLoja`. A simulação precisa pertencer ao parceiro e ter
         sido feita em uma loja de integração vinculada a ele. O cliente precisa estar com o cadastro completo
         (endereço, tipo de ocupação e renda).
       security:
@@ -1429,8 +1541,8 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos).
-                  example: "12345678901"
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
+                  example: "12345678909"
                 simulacaoId:
                   type: string
                   format: uuid
@@ -1467,15 +1579,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Simulation.Access.NotFromStore` ou `Store.Integration.Intermediation`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal/{propostaId}:
     get:
       tags:
         - Proposta
       summary: Consultar proposta pelo ID.
       description: |
-        Consulta o retrato atual de uma proposta criada pela v2, com status, link de biometria e as etapas do
-        comprador e da loja. Propostas criadas pela v1 retornam `422` com `Proposal.Access.NotIntegrationV2`;
-        consulte-as por `GET /v1/proposal/{propostaId}`.
+        Consulta o retrato atual de uma proposta, com status, link de biometria e as etapas do
+        comprador e da loja.
       security:
         - bearerAuth: []
       parameters:
@@ -1500,7 +1617,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Proposta criada pela v1 (`Proposal.Access.NotIntegrationV2`)
+          description: Proposta não disponível nesta rota (`Proposal.Access.NotIntegrationV2`)
           content:
             application/json:
               schema:
@@ -1511,8 +1628,8 @@ paths:
         - Proposta
       summary: Incluir os dados do veículo
       description: |
-        Inclui ou atualiza placa, Renavam, chassi e cor do veículo de uma proposta criada pela v2. Aceito somente
-        enquanto a etapa ativa for `DADOS_VEICULO` (8).
+        Inclui ou atualiza placa, Renavam, chassi e cor do veículo de uma proposta. Aceito somente
+        enquanto a etapa `DADOS_VEICULO` (8) estiver ativa: na loja, no financiamento; no comprador, no refinanciamento.
       security:
         - bearerAuth: []
       parameters:
@@ -1528,23 +1645,23 @@ paths:
               properties:
                 renavam:
                   type: string
-                  description: Renavam do veículo (11 dígitos).
-                  example: "12345678901"
+                  description: Renavam do veículo, com até 11 dígitos e dígito verificador válido.
+                  example: "12345678900"
                 chassi:
                   type: string
-                  description: Chassi do veículo.
+                  description: Chassi do veículo, com 17 caracteres, sem as letras I, O e Q.
                   example: 9BWZZZ377VT004251
                 placa:
                   type: string
-                  description: Placa do veículo.
+                  description: Placa do veículo (ABC-1234, ABC1234 ou ABC1D23).
                   example: ABC1D23
                 cor:
                   type: string
-                  description: Cor do veículo (não pode conter números).
+                  description: Cor do veículo, sem números, com até 30 caracteres.
                   example: PRATA
       responses:
-        '202':
-          description: Dados do veículo aceitos
+        '204':
+          description: Dados do veículo registrados
         '400':
           description: Erro na requisição
           content:
@@ -1557,13 +1674,19 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Etapa não permite o envio (`Proposal.InvalidStatus`) ou proposta não disponível nesta rota
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal/{propostaId}/deposit-account:
     post:
       tags:
         - Proposta
       summary: Incluir a conta de recebimento
       description: |
-        Inclui ou substitui a conta de recebimento de uma proposta de **refinanciamento** criada pela v2, enquanto a
+        Inclui ou substitui a conta de recebimento de uma proposta de **refinanciamento**, enquanto a
         etapa ativa for `CONTA_RECEBIMENTO` (5). O titular deve ser o cliente da proposta. Propostas de financiamento
         não são aceitas. Enviar novamente substitui a conta anterior.
       security:
@@ -1582,14 +1705,14 @@ paths:
                 cpfTitular:
                   type: string
                   description: CPF do titular da conta, formatado ou apenas números. Deve ser o CPF do cliente da proposta.
-                  example: "12345678901"
+                  example: "12345678909"
                 codigoBanco:
                   type: string
                   description: Código do banco (COMPE) com 3 dígitos.
                   example: "001"
                 agencia:
                   type: string
-                  description: Número da agência com 4 dígitos, sem o dígito verificador.
+                  description: Número da agência com até 4 dígitos, sem o dígito verificador.
                   example: "1234"
                 digitoAgencia:
                   type: string
@@ -1609,7 +1732,7 @@ paths:
                   enum: ['CORRENTE', 'POUPANCA', 'PAGAMENTO']
                   example: CORRENTE
       responses:
-        '200':
+        '204':
           description: Conta de recebimento registrada
         '400':
           description: Erro na requisição
@@ -1623,28 +1746,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra não atendida — `Proposal.DepositAccount.OnlyRefinancing`, `Proposal.DepositAccount.HolderNotBuyer` ou `Proposal.ProposalIsNotInDepositAccountStatus`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal/{propostaId}/document:
     post:
       tags:
         - Proposta
       summary: Enviar documento de participante
       description: |
-        Envia um documento do comprador ou da loja em Base64 (até 10 MiB decodificado; PDF, JPG/JPEG ou PNG).
+        Envia um documento do comprador, do vendedor ou da loja em Base64 (até 10 MiB decodificado; PDF, JPG/JPEG ou PNG).
         Aceito quando a etapa ativa do participante for `ENVIO_DOCUMENTOS` (6) com a proposta aprovada, ou
         `CORRECAO_DOCUMENTOS` (7) para reenviar um tipo atualmente recusado (`INVALIDO`). O header `Idempotency-Key` é obrigatório.
 
-        | Código de erro | Quando ocorre |
-        | --- | --- |
-        | `Document.InvalidParticipant` | `participante` diferente de `COMPRADOR` ou `LOJA`. |
-        | `Document.InvalidType` | Tipo de documento não aceito para o participante. |
-        | `Document.InvalidName` | Nome de arquivo vazio, com caminho, com mais de 255 caracteres ou com extensão não aceita. |
-        | `Document.InvalidBase64` | Conteúdo Base64 inválido. |
-        | `Document.Empty` | Arquivo vazio. |
-        | `Document.TooLarge` | Arquivo maior que 10 MiB depois de decodificado. |
-        | `Document.InvalidContent` | O conteúdo não corresponde à extensão informada. |
-        | `Document.InvalidProposalStage` | A etapa ativa não permite o envio de documentos. |
-        | `Document.NotPendingCorrection` | Em correção, o tipo enviado não está recusado. |
-        | `Idempotency.KeyConflict` | A `Idempotency-Key` já foi usada com outro conteúdo. |
       security:
         - bearerAuth: []
       parameters:
@@ -1652,7 +1769,7 @@ paths:
         - name: Idempotency-Key
           in: header
           required: true
-          description: Chave única por envio (1 a 200 caracteres). Reenviar a mesma chave com o mesmo conteúdo devolve o mesmo resultado; com conteúdo diferente retorna `Idempotency.KeyConflict`.
+          description: Chave única por envio (1 a 200 caracteres). Com a mesma chave e o mesmo conteúdo, um envio bem-sucedido nas últimas 24 horas não é processado de novo.
           schema:
             type: string
             example: doc-7f3c2a10-comprador-cnh
@@ -1668,7 +1785,7 @@ paths:
                 participante:
                   type: string
                   description: Participante dono do documento.
-                  enum: ['COMPRADOR', 'LOJA']
+                  enum: ['COMPRADOR', 'VENDEDOR', 'LOJA']
                   example: COMPRADOR
                 tipoDocumento:
                   type: integer
@@ -1676,10 +1793,11 @@ paths:
                   description: |
                     Código do tipo de documento. Tipos aceitos por participante:
                       - COMPRADOR: 1, 4, 5, 6, 7, 9, 57
+                      - VENDEDOR: 1, 2, 3, 5, 6, 7, 8, 9, 11
                       - LOJA: 6, 8
 
-                    Códigos: 1 = CNH, 4 = Comprovante de renda, 5 = Comprovante de residência,
-                    6 = Documento do veículo, 7 = CNH digital, 8 = Laudo ECV, 9 = Laudo de vistoria, 57 = ATPV.
+                    Códigos: 1 = CNH, 2 = CPF, 3 = RG, 4 = Comprovante de renda, 5 = Comprovante de residência,
+                    6 = Documento do veículo, 7 = CNH digital, 8 = Laudo ECV, 9 = Laudo de vistoria, 11 = Cartão CNPJ, 57 = ATPV.
                   example: 1
                 nomeArquivo:
                   type: string
@@ -1691,7 +1809,7 @@ paths:
                   description: Conteúdo do arquivo em Base64 puro (sem prefixo `data:`), até 10 MiB depois de decodificado.
                   example: JVBERi0xLjcKJcOkw7zDtsOfCjIgMCBvYmoK...
       responses:
-        '200':
+        '204':
           description: Documento recebido
         '400':
           description: Erro na requisição
@@ -1701,6 +1819,24 @@ paths:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
           description: Proposta não encontrada para este parceiro
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra não atendida — `Document.InvalidProposalStage`, `Document.NotPendingCorrection`, `Document.InvalidContent` ou `Document.InvalidProposalModality`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: Idempotency-Key reutilizada com outro conteúdo (`Idempotency.KeyConflict`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '502':
+          description: Falha ao armazenar o documento (`Document.UploadFailed`). Repita com a mesma Idempotency-Key.
           content:
             application/json:
               schema:
@@ -1763,7 +1899,7 @@ components:
               valor_parcela:
                 type: number
                 format: double
-                example: 1890.55
+                example: 2042.42
               valor_tac:
                 type: number
                 format: double
@@ -1787,11 +1923,11 @@ components:
               valor_credito_total:
                 type: number
                 format: double
-                example: 42372
+                example: 42722
               valor_divida_total:
                 type: number
                 format: double
-                example: 68059.8
+                example: 73527.12
               percentual_cet_mensal:
                 type: number
                 format: double
@@ -1811,11 +1947,10 @@ components:
               valor_retencao_diaria_aproximado:
                 type: number
                 format: double
-                nullable: true
-                example: null
+                description: Valor aproximado de retenção diária. Omitido quando não se aplica.
     ProposalV2Response:
       type: object
-      description: Retrato atual da proposta v2
+      description: Retrato atual da proposta
       properties:
         id_proposta:
           type: string
@@ -1861,6 +1996,8 @@ components:
           example: https://onboarding.exemplo.com/sessao/abc123
         comprador:
           $ref: "#/components/schemas/ProposalV2Participant"
+        vendedor:
+          $ref: "#/components/schemas/ProposalV2Participant"
         loja:
           $ref: "#/components/schemas/ProposalV2Store"
     ProposalV2Participant:
@@ -1868,7 +2005,7 @@ components:
       properties:
         cpf:
           type: string
-          example: "12345678901"
+          example: "12345678909"
         enum_biometria:
           type: integer
           format: int32
@@ -1969,7 +2106,7 @@ components:
         motivo:
           type: string
           nullable: true
-          description: Motivo da recusa do documento, quando houver
+          description: Motivo da recusa do documento. Omitido quando vazio
           example: Documento ilegível
     WebhookResponse:
       type: object
@@ -2199,8 +2336,8 @@ components:
         expira_em:
           type: string
           format: date-time
-          description: Data e hora de expiração do token
-          example: 2025-10-22T12:57:21.948Z
+          description: Data e hora (UTC) até quando reaproveitar o token. Já vem com 60 segundos de margem antes da expiração real.
+          example: 2025-10-22T12:57:21.948+00:00
         escopo:
           type: string
           description: Escopo do token de acesso
@@ -2233,7 +2370,7 @@ components:
         status:
           type: string
           description: Status atual da proposta
-          enum: ['Analysing', 'Approved', 'Refused', 'Canceled', 'ManualAnalysis', 'Completed', 'InNegotiation', 'Expired']
+          enum: ['Analysing', 'Approved', 'Refused', 'Canceled', 'ManualAnalysis', 'Completed', 'InNegotiation', 'Expired', 'Pending']
           example: Approved
         comprador:
           $ref: "#/components/schemas/Buyer"
@@ -2294,11 +2431,11 @@ components:
         tipo:
           type: string
           description: Tipo de problema encontrado
-          example: Partner.AccountIsIncompleted
+          example: Validation.Cpf.Invalid
         titulo:
           type: string
           description: Título do erro
-          example: Bad Request
+          example: Requisição inválida
         status:
           type: integer
           format: int32
@@ -2307,7 +2444,7 @@ components:
         detalhe:
           type: string
           description: Descrição do erro
-          example: Cadastro de conta não finalizado
+          example: O CPF informado em 'cpf' é inválido.
         campo:
           type: string
           nullable: true
@@ -2315,18 +2452,18 @@ components:
           example: cpf
         erros:
           type: array
-          description: Lista de erros de validação. Presente somente em erros de validação (`tipo` igual a `ValidationError`).
+          description: Lista de erros. Presente só quando o JSON enviado está malformado ou tem um valor de tipo errado.
           items:
             type: object
             properties:
               codigo:
                 type: string
                 description: Código estável do erro
-                example: Proposal.InvalidCpf
+                example: Validation.InvalidFormat
               mensagem:
                 type: string
                 description: Mensagem em português
-                example: O CPF informado é inválido.
+                example: O valor informado para 'valorVeiculo' não é um número válido.
               campo:
                 type: string
                 nullable: true

@@ -25,19 +25,6 @@ A API da Credicarro é REST, autenticada por Bearer token, com campos JSON em po
 
 O ambiente é determinado pela URL base que você chama — as credenciais (`ClientId`/`ClientSecret`) são específicas de cada ambiente.
 
-## Versões
-
-Os endpoints ficam em `/v1` e `/v2`. O mesmo token vale para as duas versões.
-
-| Versão | Uso |
-| --- | --- |
-| `/v2` | Simulação por loja, criação e acompanhamento da proposta, envio de documentos, dados do veículo e conta de recebimento. Recomendada para novas integrações. |
-| `/v1` | Autenticação, cliente, consultas e paginações de simulação e proposta, e webhooks — usados também no fluxo v2. Simulação e proposta v1 continuam disponíveis como legado. |
-
-<Note>
-  Uma proposta criada pela v1 é consultada pela v1. Uma proposta criada pela v2 só aceita os endpoints `/v2` de acompanhamento e envio.
-</Note>
-
 ## Autenticação
 
 Toda requisição autenticada usa um Bearer token, obtido via `ClientId`/`ClientSecret` solicitados ao nosso suporte.
@@ -71,7 +58,7 @@ Os campos JSON são em português. Listas paginadas seguem sempre o mesmo format
 
 ## Erros
 
-Toda resposta de erro traz os campos `tipo` (código estável do erro), `titulo`, `status` e `detalhe`. Quando o erro é de um campo, vem também `campo`. Erros de validação trazem a lista `erros`.
+As respostas de erro trazem os campos `tipo` (código estável do erro), `titulo`, `status` e `detalhe`. Quando o erro é de um campo, vem também `campo`. As exceções são o `401`, que vem sem corpo, e falhas inesperadas, que podem vir no formato padrão Problem Details.
 
 <Card title="Formato completo de erro e Idempotency-Key" icon="triangle-exclamation" href="/pages/errors" horizontal>
   Veja o formato de erro, os status HTTP e o reenvio seguro de operações.
@@ -79,7 +66,7 @@ Toda resposta de erro traz os campos `tipo` (código estável do erro), `titulo`
 
 ## Idempotência
 
-Rotas que criam ou alteram dados aceitam o cabeçalho `Idempotency-Key`: reenviar a mesma chave com o mesmo corpo retorna o resultado original em vez de repetir a operação. No [envio de documentos v2](/pages/v2/proposal/document) o cabeçalho é obrigatório.
+As rotas de cliente, simulação, proposta e documento aceitam o cabeçalho `Idempotency-Key`: reenviar a mesma chave com o mesmo corpo retorna o resultado original em vez de repetir a operação. No [envio de documentos](/pages/v2/proposal/document) o cabeçalho é obrigatório.
 
 ## Troubleshooting
 
@@ -93,11 +80,8 @@ Rotas que criam ou alteram dados aceitam o cabeçalho `Idempotency-Key`: reenvia
   <Accordion title="409 Conflict em POST" icon="ban">
     Uma `Idempotency-Key` já usada com um corpo diferente. Gere uma nova chave para uma nova operação — veja [Erros e idempotência](/pages/errors).
   </Accordion>
-  <Accordion title="404 ou 422 na simulação v2" icon="store">
+  <Accordion title="404 ou 422 na simulação" icon="store">
     `404` (`Store.Integration.NotFound`): o `cnpjLoja` não existe ou não está vinculado ao seu cadastro de parceiro. `422` (`Store.Integration.Intermediation`): a loja tem contrato de intermediação e não pode ser usada na integração.
-  </Accordion>
-  <Accordion title="422 Proposal.Access.NotIntegrationV2" icon="code-branch">
-    Você chamou uma rota `/v2` com uma proposta criada pela v1. Consulte-a por `GET /v1/proposal/{propostaId}`.
   </Accordion>
 </AccordionGroup>
 

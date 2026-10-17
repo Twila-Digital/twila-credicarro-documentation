@@ -39,7 +39,7 @@ mintlify dev
 │   ├── proposal/        # Endpoints de proposta v1 e listagem
 │   ├── webhook/         # Endpoints de webhook (compartilhados)
 │   ├── webhooks/        # Segurança dos webhooks
-│   ├── v1/              # Páginas exclusivas da versão v1 (legado)
+│   ├── v1/              # Páginas exclusivas da versão v1
 │   └── v2/              # Fluxo, etapas, webhook e endpoints v2
 ├── docs.json            # Navegação (versões v2 e v1) e configuração do Mintlify
 ├── favicon.ico

@@ -1,10 +1,10 @@
 ---
 title: 'Etapas e status'
-description: 'Significado dos códigos usados na consulta e no webhook da proposta v2'
+description: 'Significado dos códigos usados na consulta e no webhook da proposta'
 icon: 'list-check'
 ---
 
-A consulta `GET /v2/proposal/{propostaId}` e o webhook v2 usam os mesmos códigos. Todo valor vem em par: o número (`enum_...`) e o nome. Prefira tratar o número no seu sistema e usar o nome para exibição e logs.
+A consulta `GET /v2/proposal/{propostaId}` e o webhook de proposta usam os mesmos códigos. Todo valor vem em par: o número (`enum_...`) e o nome. Prefira tratar o número no seu sistema e usar o nome para exibição e logs.
 
 ## <Icon icon="flag" type="solid"/> Status da proposta (`enum_status` / `status`)
 
@@ -22,7 +22,7 @@ A consulta `GET /v2/proposal/{propostaId}` e o webhook v2 usam os mesmos código
 
 ## <Icon icon="shoe-prints" type="solid"/> Etapas (`enum_etapa` / `etapa`)
 
-Cada participante (comprador e loja) tem a sua etapa ativa em `status_ativo` e o histórico em `etapas_concluidas`.
+Cada participante (comprador, loja e, quando houver, vendedor) tem a sua etapa ativa em `status_ativo` e o histórico em `etapas_concluidas`. O histórico não inclui a etapa ativa e mostra cada etapa uma vez, com a data mais recente.
 
 | Código | Nome | O que acontece |
 | --- | --- | --- |
@@ -61,8 +61,23 @@ Cada participante (comprador e loja) tem a sua etapa ativa em `status_ativo` e o
 | 2 | `INTEGRADOR` | Seu sistema precisa enviar algo pela API. |
 | 3 | `CREDICARRO` | A Credicarro está cuidando da etapa. |
 
-<Card title="Como a situação é definida" icon="lightbulb" horizontal>
-  Com a proposta recusada, cancelada ou expirada, a situação é sempre `CANCELADA` e o responsável é `NENHUM`. Com a proposta finalizada, a situação é `CONCLUIDA`. Nos demais casos: `CONTA_RECEBIMENTO`, `ENVIO_DOCUMENTOS` e `DADOS_VEICULO` ficam `AGUARDANDO_ENVIO` com o `INTEGRADOR`; `CORRECAO_DOCUMENTOS` fica `PENDENTE_CORRECAO` com o `INTEGRADOR`; `VISTORIA` e `ASSINATURA` ficam `AGUARDANDO_CLIENTE`; na `ANALISE_BIOMETRIA` a situação acompanha a biometria (sessão criada aguarda o cliente, reprovada fica bloqueada, o restante está em processamento).
+<Card title="Como a situação é definida" icon="lightbulb">
+  Com a proposta recusada, cancelada ou expirada, a situação é sempre `CANCELADA` e o responsável é `NENHUM`. Com a proposta finalizada, a situação é `CONCLUIDA` e o responsável é `NENHUM`.
+
+  Nos demais casos, depende da etapa:
+
+  | Etapa | Situação | Responsável |
+  | --- | --- | --- |
+  | `CONTA_RECEBIMENTO`, `ENVIO_DOCUMENTOS`, `DADOS_VEICULO` | `AGUARDANDO_ENVIO` | `INTEGRADOR` |
+  | `CORRECAO_DOCUMENTOS` | `PENDENTE_CORRECAO` | `INTEGRADOR` |
+  | `VISTORIA`, `ASSINATURA` | `AGUARDANDO_CLIENTE` | `CLIENTE` |
+  | `ANALISE_BIOMETRIA` com sessão criada | `AGUARDANDO_CLIENTE` | `CLIENTE` |
+  | `ANALISE_BIOMETRIA` com biometria reprovada | `BLOQUEADA` | `CREDICARRO` |
+  | `ANALISE_BIOMETRIA` nos demais casos | `EM_PROCESSAMENTO` | `CREDICARRO` |
+  | `PROPOSTA_FINALIZADA` | `CONCLUIDA` | `NENHUM` |
+  | Demais etapas | `EM_PROCESSAMENTO` | `CREDICARRO` |
+
+  Na loja, a situação da `ANALISE_BIOMETRIA` acompanha a biometria do comprador.
 </Card>
 
 ## <Icon icon="fingerprint" type="solid"/> Biometria (`enum_biometria` / `biometria`)
@@ -70,14 +85,14 @@ Cada participante (comprador e loja) tem a sua etapa ativa em `status_ativo` e o
 | Código | Nome | Significado |
 | --- | --- | --- |
 | 0 | `NAO_INICIADA` | A biometria ainda não foi iniciada. |
-| 1 | `SESSAO_CRIADA` | A sessão foi criada e o cliente precisa acessá-la pelo `link_biometria`. |
+| 1 | `SESSAO_CRIADA` | A sessão foi criada e o cliente precisa acessá-la pelo link recebido (o mesmo de `link_biometria`). |
 | 2 | `EM_ANALISE` | A biometria está em análise. |
 | 3 | `APROVADA` | A biometria foi aprovada. |
 | 4 | `REPROVADA` | A biometria foi reprovada. |
 
 ## <Icon icon="file-lines" type="solid"/> Documentos
 
-Status (`enum_status` / `status` dentro de `documentos`):
+Status (`enum_status` / `status` dentro de `documentos`). O `motivo` só aparece quando houver:
 
 | Código | Nome | Significado |
 | --- | --- | --- |
@@ -89,15 +104,18 @@ Status (`enum_status` / `status` dentro de `documentos`):
 
 Tipos aceitos no [envio de documentos](/pages/v2/proposal/document) (`enum_tipo` / `tipo`):
 
-| Código | Nome | Comprador | Loja |
-| --- | --- | :---: | :---: |
-| 1 | `CNH` | ✓ | |
-| 4 | `COMPROVANTE_RENDA` | ✓ | |
-| 5 | `COMPROVANTE_RESIDENCIA` | ✓ | |
-| 6 | `DOCUMENTO_VEICULO` | ✓ | ✓ |
-| 7 | `CNH_DIGITAL` | ✓ | |
-| 8 | `LAUDO_ECV` | | ✓ |
-| 9 | `LAUDO_VISTORIA` | ✓ | |
-| 57 | `ATPV` | ✓ | |
+| Código | Nome | Comprador | Vendedor | Loja |
+| --- | --- | :---: | :---: | :---: |
+| 1 | `CNH` | ✓ | ✓ | |
+| 2 | `CPF` | | ✓ | |
+| 3 | `RG` | | ✓ | |
+| 4 | `COMPROVANTE_RENDA` | ✓ | | |
+| 5 | `COMPROVANTE_RESIDENCIA` | ✓ | ✓ | |
+| 6 | `DOCUMENTO_VEICULO` | ✓ | ✓ | ✓ |
+| 7 | `CNH_DIGITAL` | ✓ | ✓ | |
+| 8 | `LAUDO_ECV` | | ✓ | ✓ |
+| 9 | `LAUDO_VISTORIA` | ✓ | ✓ | |
+| 11 | `CARTAO_CNPJ` | | ✓ | |
+| 57 | `ATPV` | ✓ | | |
 
 A consulta e o webhook podem listar outros tipos de documento anexados pela Credicarro; eles seguem o mesmo par código e nome.
