@@ -45,82 +45,20 @@ Fora dessas etapas, a API retorna `Document.InvalidProposalStage`.
 
 ## Exemplo
 
-<CodeGroup>
-
-```javascript Node.js
-import { readFile } from "node:fs/promises";
-
-async function enviarDocumento({ propostaId, participante, tipoDocumento, caminho, idempotencyKey, token }) {
-  const conteudo = await readFile(caminho);
-  const nomeArquivo = caminho.split(/[\\/]/).pop();
-
-  const resposta = await fetch(`${BASE_URL}/v2/proposal/${propostaId}/document`, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${token}`,
-      "Content-Type": "application/json",
-      "Idempotency-Key": idempotencyKey,
-    },
-    body: JSON.stringify({
-      participante,
-      tipoDocumento,
-      nomeArquivo,
-      conteudoBase64: conteudo.toString("base64"),
-    }),
-  });
-
-  if (!resposta.ok) throw await resposta.json();
-}
+```bash
+curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal/{propostaId}/document \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: 7c9e6679-7425-40de-944b-e07fc1f90ae7" \
+  -d '{
+    "participante": "COMPRADOR",
+    "tipoDocumento": 1,
+    "nomeArquivo": "cnh-comprador.pdf",
+    "conteudoBase64": "JVBERi0xLjcKJcOkw7zDtsOfCjIgMCBvYmoK..."
+  }'
 ```
 
-```python Python
-import base64
-from pathlib import Path
-
-import requests
-
-def enviar_documento(proposta_id, participante, tipo_documento, caminho, idempotency_key, token):
-    arquivo = Path(caminho)
-
-    resposta = requests.post(
-        f"{BASE_URL}/v2/proposal/{proposta_id}/document",
-        headers={
-            "Authorization": f"Bearer {token}",
-            "Idempotency-Key": idempotency_key,
-        },
-        json={
-            "participante": participante,
-            "tipoDocumento": tipo_documento,
-            "nomeArquivo": arquivo.name,
-            "conteudoBase64": base64.b64encode(arquivo.read_bytes()).decode(),
-        },
-        timeout=60,
-    )
-    resposta.raise_for_status()
-```
-
-```csharp C#
-public async Task EnviarDocumentoAsync(HttpClient http, Guid propostaId, string participante, int tipoDocumento, string caminho, string idempotencyKey)
-{
-    var conteudo = await File.ReadAllBytesAsync(caminho);
-    using var requisicao = new HttpRequestMessage(HttpMethod.Post, $"v2/proposal/{propostaId}/document")
-    {
-        Content = JsonContent.Create(new
-        {
-            participante,
-            tipoDocumento,
-            nomeArquivo = Path.GetFileName(caminho),
-            conteudoBase64 = Convert.ToBase64String(conteudo)
-        })
-    };
-    requisicao.Headers.Add("Idempotency-Key", idempotencyKey);
-
-    var resposta = await http.SendAsync(requisicao);
-    resposta.EnsureSuccessStatusCode();
-}
-```
-
-</CodeGroup>
+Para montar o `conteudoBase64`, leia os bytes do arquivo e codifique em Base64 padrão, sem quebras de linha e sem o prefixo `data:`.
 
 Gere a chave uma vez por envio — por exemplo, um UUID salvo junto ao registro do documento no seu sistema — e passe a mesma chave em todas as tentativas desse envio.
 

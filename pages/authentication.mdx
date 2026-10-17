@@ -14,58 +14,11 @@ A API usa **Bearer token**. Você troca seu `clientId` e `clientSecret` por um t
 
 ## Gerar o token
 
-<CodeGroup>
-
-```bash cURL
+```bash
 curl -X POST https://api.staging.credicarro.com.br/integration/v1/authentication/accesstoken \
   -H "Content-Type: application/json" \
   -d '{ "clientId": "<client-id>", "clientSecret": "<client-secret>" }'
 ```
-
-```javascript Node.js
-const resposta = await fetch(
-  "https://api.staging.credicarro.com.br/integration/v1/authentication/accesstoken",
-  {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({
-      clientId: process.env.CREDICARRO_CLIENT_ID,
-      clientSecret: process.env.CREDICARRO_CLIENT_SECRET,
-    }),
-  }
-);
-const { token_de_acesso, expira_em } = await resposta.json();
-```
-
-```python Python
-import os
-import requests
-
-resposta = requests.post(
-    "https://api.staging.credicarro.com.br/integration/v1/authentication/accesstoken",
-    json={
-        "clientId": os.environ["CREDICARRO_CLIENT_ID"],
-        "clientSecret": os.environ["CREDICARRO_CLIENT_SECRET"],
-    },
-    timeout=15,
-)
-resposta.raise_for_status()
-token = resposta.json()["token_de_acesso"]
-```
-
-```csharp C#
-using var http = new HttpClient { BaseAddress = new Uri("https://api.staging.credicarro.com.br/integration/") };
-
-var resposta = await http.PostAsJsonAsync("v1/authentication/accesstoken", new
-{
-    clientId = Environment.GetEnvironmentVariable("CREDICARRO_CLIENT_ID"),
-    clientSecret = Environment.GetEnvironmentVariable("CREDICARRO_CLIENT_SECRET")
-});
-resposta.EnsureSuccessStatusCode();
-var token = await resposta.Content.ReadFromJsonAsync<JsonElement>();
-```
-
-</CodeGroup>
 
 **Resposta (200)**
 
@@ -102,25 +55,11 @@ curl https://api.staging.credicarro.com.br/integration/v2/proposal/{propostaId} 
 
 ## Reaproveite o token
 
-Não gere um token por requisição. Guarde o token em cache e gere outro só quando ele estiver perto de expirar.
+Não gere um token por requisição. Guarde o token em cache e gere outro só quando ele estiver perto de expirar:
 
-```javascript
-let cache = { token: null, expiraEm: 0 };
-
-async function obterToken() {
-  const margem = 60_000;
-  if (cache.token && Date.now() < cache.expiraEm - margem) return cache.token;
-
-  const resposta = await fetch(`${BASE_URL}/v1/authentication/accesstoken`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ clientId: CLIENT_ID, clientSecret: CLIENT_SECRET }),
-  });
-  const dados = await resposta.json();
-  cache = { token: dados.token_de_acesso, expiraEm: Date.parse(dados.expira_em) };
-  return cache.token;
-}
-```
+1. Guarde `token_de_acesso` e `expira_em` em memória (ou em um cache compartilhado, se você tiver várias instâncias)
+2. Antes de cada chamada, use o token guardado se faltar mais de um minuto para `expira_em`
+3. Caso contrário, gere um novo token e substitua o guardado
 
 <Note>
   Se uma chamada retornar `401`, gere um novo token e repita a chamada uma vez.

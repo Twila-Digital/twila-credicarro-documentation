@@ -154,16 +154,9 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
 
 ### Estratégia de retentativa
 
-```javascript
-async function chamarComRetentativa(fazerChamada, tentativas = 4) {
-  for (let tentativa = 0; tentativa < tentativas; tentativa++) {
-    const resposta = await fazerChamada();
-    if (![500, 502, 503].includes(resposta.status)) return resposta;
-    await new Promise((r) => setTimeout(r, 2 ** tentativa * 500));
-  }
-  throw new Error("Credicarro indisponível após retentativas");
-}
-```
+- Repita só respostas `500`, `502` e `503`, falhas de rede e timeouts
+- Espere um tempo crescente entre as tentativas (por exemplo, 0,5 s, 1 s, 2 s e 4 s)
+- Limite o número de tentativas (por exemplo, 4) e registre a falha depois disso
 
 <Warning>
   Gere a `Idempotency-Key` **fora** da função de retentativa. Todas as tentativas precisam usar a mesma chave.
