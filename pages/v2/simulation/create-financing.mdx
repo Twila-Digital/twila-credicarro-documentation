@@ -3,7 +3,7 @@ title: 'Criar simulação de financiamento'
 openapi: "POST /v2/proposal/simulation/financing"
 ---
 
-Calcula as condições de financiamento e retorna **uma opção por prazo**, cada uma com o seu `id_simulacao`.
+Calcula as condições de financiamento e retorna **uma opção para cada prazo elegível**, cada uma com o seu `id_simulacao`.
 
 **Exemplo:**
 ```json
@@ -23,7 +23,7 @@ Calcula as condições de financiamento e retorna **uma opção por prazo**, cad
 </Tip>
 
 <Tip title="Entrada" horizontal>
-  `valorEntrada` pode ser `0` e precisa ser menor que `valorVeiculo`. Consulte a [faixa financiável](/pages/v2/simulation/range-financing) para a entrada mínima por prazo.
+  `valorEntrada` pode ser `0` e precisa deixar ao menos 10% de `valorVeiculo` para financiar. Só voltam os prazos cuja entrada mínima foi atingida — consulte a [faixa financiável](/pages/v2/simulation/range-financing). Se nenhum prazo servir, a API retorna `422` com `Proposal.DownPaymentInvalid`.
 </Tip>
 
 <Note>

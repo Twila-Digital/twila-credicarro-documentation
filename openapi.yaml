@@ -174,7 +174,6 @@ paths:
                           description: Valor mínimo de entrada para o prazo
                           example: 5000.00
                       additionalProperties: false
-                    nullable: true
                 additionalProperties: false
         '400':
           description: Bad Request — parâmetros inválidos ou ausentes
@@ -235,7 +234,6 @@ paths:
                           description: Máximo valor refinanciavel
                           example: 35720
                       additionalProperties: false
-                    nullable: true
                 additionalProperties: false
         '400':
           description: Erro na requisição
@@ -340,7 +338,7 @@ paths:
                 cpf:
                   minLength: 11
                   type: string
-                  description: CPF do cliente **somente números** (11 dígitos)
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678909"
                 isVeiculoZeroKm:
                   type: boolean
@@ -440,8 +438,7 @@ paths:
                         valor_retencao_diaria_aproximado:
                           type: number
                           format: double
-                          nullable: true
-                          example: null
+                          description: Valor aproximado de retenção diária. Omitido quando não se aplica.
         '400':
           description: Erro na requisição
           content:
@@ -470,7 +467,7 @@ paths:
                 cpf:
                   minLength: 11
                   type: string
-                  description: CPF do cliente **somente números** (11 dígitos)
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678909"
                 placa:
                   minLength: 1
@@ -558,8 +555,7 @@ paths:
                         valor_retencao_diaria_aproximado:
                           type: number
                           format: double
-                          nullable: true
-                          example: null
+                          description: Valor aproximado de retenção diária. Omitido quando não se aplica.
         '400':
           description: Erro na requisição
           content:
@@ -1010,7 +1006,7 @@ paths:
                   example: 3
                 url:
                   type: string
-                  description: URL absoluta (http ou https) que receberá as notificações.
+                  description: URL HTTPS pública, com até 2048 caracteres, que receberá as notificações (sem localhost, IP privado, usuário/senha ou fragmento).
                   example: https://parceiro.com.br/webhooks/credicarro
                 tipo_autenticacao:
                   type: integer
@@ -1126,7 +1122,7 @@ paths:
                   example: 3
                 url:
                   type: string
-                  description: URL absoluta (http ou https) que receberá as notificações.
+                  description: URL HTTPS pública, com até 2048 caracteres, que receberá as notificações (sem localhost, IP privado, usuário/senha ou fragmento).
                   example: https://parceiro.com.br/webhooks/credicarro
                 status:
                   type: integer
@@ -1228,7 +1224,6 @@ paths:
                           description: Valor mínimo de entrada para o prazo
                           example: 5000.00
                       additionalProperties: false
-                    nullable: true
                 additionalProperties: false
         '400':
           description: Bad Request — parâmetros inválidos ou ausentes
@@ -1311,7 +1306,6 @@ paths:
                           description: Máximo valor refinanciavel
                           example: 35720
                       additionalProperties: false
-                    nullable: true
                 additionalProperties: false
         '400':
           description: Erro na requisição
@@ -1356,7 +1350,7 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos)
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678909"
                 placa:
                   type: string
@@ -1428,7 +1422,7 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  description: CPF do cliente **somente números** (11 dígitos)
+                  description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678909"
                 placa:
                   type: string
@@ -1827,7 +1821,7 @@ components:
               valor_parcela:
                 type: number
                 format: double
-                example: 1890.55
+                example: 2042.42
               valor_tac:
                 type: number
                 format: double
@@ -1851,11 +1845,11 @@ components:
               valor_credito_total:
                 type: number
                 format: double
-                example: 42372
+                example: 42722
               valor_divida_total:
                 type: number
                 format: double
-                example: 68059.8
+                example: 73527.12
               percentual_cet_mensal:
                 type: number
                 format: double
@@ -1875,8 +1869,7 @@ components:
               valor_retencao_diaria_aproximado:
                 type: number
                 format: double
-                nullable: true
-                example: null
+                description: Valor aproximado de retenção diária. Omitido quando não se aplica.
     ProposalV2Response:
       type: object
       description: Retrato atual da proposta
@@ -2299,7 +2292,7 @@ components:
         status:
           type: string
           description: Status atual da proposta
-          enum: ['Analysing', 'Approved', 'Refused', 'Canceled', 'ManualAnalysis', 'Completed', 'InNegotiation', 'Expired']
+          enum: ['Analysing', 'Approved', 'Refused', 'Canceled', 'ManualAnalysis', 'Completed', 'InNegotiation', 'Expired', 'Pending']
           example: Approved
         comprador:
           $ref: "#/components/schemas/Buyer"
@@ -2360,11 +2353,11 @@ components:
         tipo:
           type: string
           description: Tipo de problema encontrado
-          example: Partner.AccountIsIncompleted
+          example: Validation.Cpf.Invalid
         titulo:
           type: string
           description: Título do erro
-          example: Bad Request
+          example: Requisição inválida
         status:
           type: integer
           format: int32
@@ -2373,7 +2366,7 @@ components:
         detalhe:
           type: string
           description: Descrição do erro
-          example: Cadastro de conta não finalizado
+          example: O CPF informado em 'cpf' é inválido.
         campo:
           type: string
           nullable: true
@@ -2381,18 +2374,18 @@ components:
           example: cpf
         erros:
           type: array
-          description: Lista de erros de validação. Presente somente em erros de validação (`tipo` igual a `ValidationError`).
+          description: Lista de erros. Presente só quando o JSON enviado está malformado ou tem um valor de tipo errado.
           items:
             type: object
             properties:
               codigo:
                 type: string
                 description: Código estável do erro
-                example: Proposal.InvalidCpf
+                example: Validation.InvalidFormat
               mensagem:
                 type: string
                 description: Mensagem em português
-                example: O CPF informado é inválido.
+                example: O valor informado para 'valorVeiculo' não é um número válido.
               campo:
                 type: string
                 nullable: true

@@ -5,6 +5,10 @@ openapi: "POST /v1/webhook"
 
 Cadastra uma configuração de webhook para o parceiro identificado automaticamente pelo token de acesso.
 
+<Warning>
+  A `url` precisa ser **HTTPS** e pública, com até 2048 caracteres: sem `localhost`, IP privado, usuário/senha ou `#fragmento`. Caso contrário, a API retorna `Organization.Webhook.InvalidEndpoint`.
+</Warning>
+
 ## Tipos de webhook
 
 | Valor | Tipo | Disponibilidade |
@@ -26,7 +30,7 @@ Cadastra uma configuração de webhook para o parceiro identificado automaticame
 | `3` | **JWT** — envia `Authorization: Bearer {credencial}`. |
 
 <Note>
-  A credencial é obrigatória para Basic e JWT. O tipo de autenticação e a credencial não podem ser alterados depois do cadastro. É permitido mais de um webhook por tipo.
+  A credencial é obrigatória para Basic e JWT, com até 2048 caracteres. Com `tipo_autenticacao` = 1, ela é ignorada. O tipo de autenticação e a credencial não podem ser alterados depois do cadastro. É permitido mais de um webhook por tipo.
 </Note>
 
 ## Segredo de assinatura

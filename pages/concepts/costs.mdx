@@ -10,21 +10,22 @@ Toda simulação mostra, para cada prazo, quanto o cliente vai pagar e por quê.
 
 ## Um exemplo
 
-Veja uma simulação de financiamento de R$ 40.000,00 em 36 meses:
+Veja um financiamento de R$ 40.000,00 em 36 meses:
 
 | Item | Valor |
 | --- | --- |
 | Valor solicitado | R$ 40.000,00 |
 | Tarifa de cadastro (TAC) | R$ 1.500,00 |
 | IOF | R$ 872,00 |
-| **Valor total do crédito** | **R$ 42.372,00** |
-| Parcela | 36 × R$ 1.890,55 |
-| **Valor total a pagar** | **R$ 68.059,80** |
-| Juros | 3,29% ao mês · 47,53% ao ano |
-| **CET** | **3,62% ao mês · 53,25% ao ano** |
+| Registro do contrato | R$ 350,00 |
+| **Valor total do crédito** | **R$ 42.722,00** |
+| Parcela | 36 × R$ 2.042,42 |
+| **Valor total a pagar** | **R$ 73.527,12** |
+| Juros | 3,29% ao mês · 47,47% ao ano |
+| **CET** | **3,75% ao mês · 55,52% ao ano** |
 
 <Note>
-  Os valores acima são só um exemplo. As condições reais dependem do cliente, do veículo e do prazo.
+  Os valores acima são só um exemplo. As condições reais dependem do cliente, do veículo, da UF e do prazo.
 </Note>
 
 ---
@@ -41,20 +42,23 @@ Veja uma simulação de financiamento de R$ 40.000,00 em 36 meses:
   <Accordion title="IOF — Imposto sobre Operações Financeiras" icon="landmark">
     Imposto federal cobrado em toda operação de crédito. A simulação mostra o valor e o percentual.
   </Accordion>
+  <Accordion title="Registro do contrato" icon="stamp">
+    Taxa de registro do contrato no órgão de trânsito. O valor varia conforme a UF.
+  </Accordion>
   <Accordion title="Boleto e seguro" icon="file-invoice-dollar">
     A simulação também mostra o valor do boleto e o valor do seguro, quando houver. Eles podem vir zerados.
   </Accordion>
   <Accordion title="Valor total do crédito" icon="sack-dollar">
-    O valor solicitado somado aos custos que entram no financiamento (como TAC e IOF). É sobre esse valor que os juros são calculados.
+    O valor solicitado somado aos custos que entram no financiamento: TAC, IOF e registro do contrato.
   </Accordion>
   <Accordion title="Juros" icon="percent">
     A taxa de juros da operação, ao mês e ao ano.
   </Accordion>
   <Accordion title="CET — Custo Efetivo Total" icon="chart-line">
-    A taxa que reúne **todos** os custos: juros, tarifas, impostos e seguros. É o melhor número para comparar ofertas de crédito diferentes. O CET é sempre maior ou igual à taxa de juros.
+    A taxa que reúne **todos** os custos: juros, tarifas, impostos e seguros. É o melhor número para comparar ofertas de crédito diferentes.
   </Accordion>
   <Accordion title="Valor total a pagar" icon="calculator">
-    A soma de todas as parcelas. No exemplo, 36 × R$ 1.890,55 = R$ 68.059,80.
+    A soma de todas as parcelas. No exemplo, 36 × R$ 2.042,42 = R$ 73.527,12.
   </Accordion>
 </AccordionGroup>
 

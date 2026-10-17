@@ -21,7 +21,7 @@ Envie `Authorization: Bearer {token_de_acesso}` em todas as requisições, excet
 
 <AccordionGroup>
   <Accordion title="Nomes dos campos" icon="font">
-    Os campos são em português. No **corpo das requisições**, os nomes usam `camelCase` (`simulacaoId`, `cnpjLoja`). Nas **respostas**, usam `snake_case` (`id_simulacao`, `valor_parcela`).
+    Os campos são em português. No **corpo das requisições**, os nomes usam `camelCase` (`simulacaoId`, `cnpjLoja`). Nas **respostas**, usam `snake_case` (`id_simulacao`, `valor_parcela`). Exceções: o cadastro de webhook usa `tipo_autenticacao`, e os parâmetros de paginação são `pagina_inicial` e `limite`.
   </Accordion>
   <Accordion title="CPF e CNPJ" icon="id-card">
     CPF com 11 dígitos, só números. O `cnpjLoja` aceita formatado (`11.222.333/0001-81`) ou só números.
@@ -39,7 +39,7 @@ Envie `Authorization: Bearer {token_de_acesso}` em todas as requisições, excet
     Na consulta e no webhook da proposta, os códigos vêm em par: o número (`enum_status`) e o nome (`status`). Trate o número no seu sistema e use o nome em telas e logs. Veja [Etapas e status](/pages/v2/steps).
   </Accordion>
   <Accordion title="Campos desconhecidos" icon="ban">
-    O contrato não prevê campos adicionais. Envie só os campos documentados.
+    Campos não documentados são ignorados — não geram erro, mas também não têm efeito. Envie só os campos documentados.
   </Accordion>
 </AccordionGroup>
 
@@ -62,7 +62,7 @@ As rotas de listagem aceitam `pagina_inicial` (mínimo 1) e `limite` (1 a 100) e
 
 ## Erros
 
-Todo erro traz `tipo`, `titulo`, `status` e `detalhe`. Use `tipo` no seu tratamento. Veja [Erros e idempotência](/pages/errors).
+Os erros trazem `tipo`, `titulo`, `status` e `detalhe` (o `401` vem sem corpo). Use `tipo` no seu tratamento. Veja [Erros e idempotência](/pages/errors).
 
 ## Recursos
 

@@ -4,7 +4,7 @@ description: 'Notificações com o retrato completo da proposta a cada mudança'
 icon: 'webhook'
 ---
 
-Cada webhook ativo do tipo **Proposal** (`tipo` = 3) recebe o retrato atual da proposta sempre que muda o status, uma etapa ou um documento.
+Cada webhook ativo do tipo **Proposal** (`tipo` = 3) recebe o retrato atual da proposta sempre que muda o status, uma etapa ou um documento. Este retrato é enviado para propostas criadas por `POST /v2/proposal`.
 
 Cadastre e gerencie seus webhooks pela API em [Cadastrar webhook](/pages/webhook/create). Autenticação, assinatura e retentativas funcionam como descrito em [Verificação e segurança](/pages/webhooks/security).
 
@@ -50,7 +50,8 @@ Cadastre e gerencie seus webhooks pela API em [Cadastrar webhook](/pages/webhook
     },
     "etapas_concluidas": [],
     "documentos": []
-  }
+  },
+  "vendedor": null
 }
 ```
 
@@ -60,9 +61,10 @@ Cadastre e gerencie seus webhooks pela API em [Cadastrar webhook](/pages/webhook
 | `enum_status` / `status` | Status atual da proposta. Veja [Etapas e status](/pages/v2/steps). |
 | `motivo_evento` | O que disparou a notificação: `STATUS_ALTERADO`, `ETAPAS_ALTERADAS` ou `DOCUMENTOS_ALTERADOS`. |
 | `motivo_recusa` | Motivo da recusa, ou `null`. |
-| `data_evento` | Momento em que a notificação foi gerada (UTC). |
+| `data_evento` | Momento em que este retrato foi montado (UTC). Muda a cada retentativa. |
 | `comprador` | Biometria, etapa ativa, etapas concluídas e documentos do comprador. |
 | `loja` | Etapa ativa, etapas concluídas e documentos da loja, ou `null`. |
+| `vendedor` | Reservado. Hoje sempre `null`. |
 
 O formato de `status_ativo`, `etapas_concluidas` e `documentos` é o mesmo da [consulta da proposta](/pages/v2/proposal/get).
 
@@ -71,5 +73,6 @@ O formato de `status_ativo`, `etapas_concluidas` e `documentos` é o mesmo da [c
 <Card title="Trate o webhook como idempotente" icon="shield-check" horizontal>
   - Cada notificação traz o header `Idempotency-Key`. Uma retentativa da mesma notificação usa a mesma chave.
   - A Credicarro não reenvia um retrato idêntico ao último entregue com sucesso para o mesmo webhook, mesmo que o evento se repita.
-  - As notificações podem chegar fora de ordem. Use `data_evento` ou consulte a proposta para obter o estado mais recente.
+  - Cada retentativa monta o retrato de novo, então pode trazer um estado mais recente da proposta.
+  - As notificações podem chegar fora de ordem. Para saber o estado mais recente, consulte a proposta.
 </Card>

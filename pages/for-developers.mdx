@@ -58,7 +58,7 @@ Os campos JSON são em português. Listas paginadas seguem sempre o mesmo format
 
 ## Erros
 
-Toda resposta de erro traz os campos `tipo` (código estável do erro), `titulo`, `status` e `detalhe`. Quando o erro é de um campo, vem também `campo`. Erros de validação trazem a lista `erros`.
+As respostas de erro trazem os campos `tipo` (código estável do erro), `titulo`, `status` e `detalhe`. Quando o erro é de um campo, vem também `campo`. As exceções são o `401`, que vem sem corpo, e falhas inesperadas, que podem vir no formato padrão Problem Details.
 
 <Card title="Formato completo de erro e Idempotency-Key" icon="triangle-exclamation" href="/pages/errors" horizontal>
   Veja o formato de erro, os status HTTP e o reenvio seguro de operações.
@@ -66,7 +66,7 @@ Toda resposta de erro traz os campos `tipo` (código estável do erro), `titulo`
 
 ## Idempotência
 
-Rotas que criam ou alteram dados aceitam o cabeçalho `Idempotency-Key`: reenviar a mesma chave com o mesmo corpo retorna o resultado original em vez de repetir a operação. No [envio de documentos](/pages/v2/proposal/document) o cabeçalho é obrigatório.
+As rotas de cliente, simulação, proposta e documento aceitam o cabeçalho `Idempotency-Key`: reenviar a mesma chave com o mesmo corpo retorna o resultado original em vez de repetir a operação. No [envio de documentos](/pages/v2/proposal/document) o cabeçalho é obrigatório.
 
 ## Troubleshooting
 

@@ -42,7 +42,7 @@ Um **webhook** é uma URL do seu sistema que recebe notificações da Credicarro
 | 1 | Active | Recebe notificações. |
 | 2 | Inactive | Não recebe notificações. |
 
-Use `PUT /v1/webhook/{webhookId}` com `status` = 2 para pausar um webhook sem perder o cadastro.
+Para pausar um webhook sem perder o cadastro, use `PUT /v1/webhook/{webhookId}` reenviando o `tipo` e a `url` atuais com `status` = 2.
 
 ## Objeto webhook
 

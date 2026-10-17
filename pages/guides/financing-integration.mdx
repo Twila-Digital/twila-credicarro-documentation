@@ -25,10 +25,9 @@ sequenceDiagram
     I->>C: POST /v2/proposal/simulation/financing
     I->>C: POST /v2/proposal
     C-->>I: Webhook (status e etapas)
-    P->>C: Biometria pelo link_biometria
     I->>C: POST /v2/proposal/{id}/document
     I->>C: POST /v2/proposal/{id}/vehicle-detail
-    P->>C: Vistoria e assinatura
+    P->>C: Biometria pelo link recebido
     C-->>I: Webhook (FINALIZADA)
 ```
 
@@ -147,25 +146,24 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
           "id_simulacao": "123e4567-e89b-12d3-a456-426614174000",
           "valor_solicitado": 40000,
           "prazo": 36,
-          "valor_parcela": 1890.55,
+          "valor_parcela": 2042.42,
           "valor_tac": 1500,
           "valor_boleto": 3.5,
           "valor_seguro": 0,
           "valor_iof": 872,
           "percentual_iof": 1.92,
-          "valor_credito_total": 42372,
-          "valor_divida_total": 68059.8,
-          "percentual_cet_mensal": 3.62,
-          "percentual_cet_anual": 53.25,
+          "valor_credito_total": 42722,
+          "valor_divida_total": 73527.12,
+          "percentual_cet_mensal": 3.75,
+          "percentual_cet_anual": 55.52,
           "percentual_juros_mensal": 3.29,
-          "percentual_juros_anual": 47.53,
-          "valor_retencao_diaria_aproximado": null
+          "percentual_juros_anual": 47.47
         }
       ]
     }
     ```
 
-    A resposta traz **uma simulação por prazo**. Mostre as opções ao cliente e guarde o `id_simulacao` escolhido. Veja [Simulação](/pages/v2/simulation/reference).
+    A resposta traz **uma simulação para cada prazo elegível**. Mostre as opções ao cliente e guarde o `id_simulacao` escolhido. Veja [Simulação](/pages/v2/simulation/reference).
   </Step>
 
   <Step title="Crie a proposta">
@@ -190,7 +188,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
     | `responsavel_acao` | O que fazer |
     | --- | --- |
     | `INTEGRADOR` | Chame o endpoint da `etapa` (tabela abaixo). |
-    | `CLIENTE` | Oriente o cliente. Na `ANALISE_BIOMETRIA`, envie a ele o `link_biometria` da [consulta da proposta](/pages/v2/proposal/get). |
+    | `CLIENTE` | Oriente o cliente. Na `ANALISE_BIOMETRIA`, o cliente usa o link recebido da Credicarro — ou o `link_biometria` da [consulta da proposta](/pages/v2/proposal/get), se a sua integração conduz o contato. |
     | `CREDICARRO` | Aguarde. |
     | `NENHUM` | A proposta foi encerrada. |
 
@@ -237,8 +235,8 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
     Resposta: `204 No Content`.
   </Step>
 
-  <Step title="Aguarde vistoria, assinatura e pagamento">
-    O cliente faz a vistoria e assina o contrato. Depois do pagamento, a proposta chega a `FINALIZADA` e o `responsavel_acao` passa a `NENHUM`.
+  <Step title="Aguarde a biometria e o pagamento">
+    O cliente faz a biometria pelo link que a Credicarro envia por WhatsApp e e-mail na aprovação (ou pelo `link_biometria`, se a sua integração conduz o contato com o cliente). Depois, a Credicarro conclui o contrato e paga a loja. A proposta chega a `FINALIZADA` e o `responsavel_acao` passa a `NENHUM`.
   </Step>
 </Steps>
 
@@ -252,7 +250,8 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
 | `Store.Integration.NotFound` | Faixa ou simulação | Confira o `cnpjLoja` e o vínculo da loja com o seu cadastro. |
 | `Store.Integration.Intermediation` | Faixa ou simulação | Use outra loja ou fale com o time Credicarro. |
 | `Customer.Account.Incomplete` | Proposta | Complete endereço, ocupação e renda em `/v1/customer/unified`. |
-| `Simulation.Access.NotFromStore` | Proposta | Use um `id_simulacao` de uma simulação feita com `cnpjLoja`. |
+| `Proposal.DownPaymentInvalid` | Simulação | Nenhum prazo aceita a entrada informada. Consulte a faixa financiável. |
+| `Proposal.RequestAmountInvalid` | Simulação | A entrada deixa menos de 10% do valor do veículo para financiar. |
 | `Proposal.InvalidStatus` | Dados do veículo | Envie só quando a etapa ativa da loja for `DADOS_VEICULO`. |
 
 <Card title="Todos os códigos" icon="triangle-exclamation" href="/pages/errors" horizontal>

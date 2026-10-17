@@ -22,10 +22,10 @@ No financiamento, o cliente **compra um veículo na sua loja**, paga uma entrada
 
 | Informação | Exemplo | Observação |
 | --- | --- | --- |
-| CPF do cliente | `123.456.789-01` | O cliente precisa estar cadastrado antes da simulação |
+| CPF do cliente | `123.456.789-09` | O cliente precisa estar cadastrado antes da simulação |
 | Placa do veículo | `ABC1D23` | Padrão antigo (`ABC-1234`) ou Mercosul (`ABC1D23`) |
 | Valor do veículo | R$ 45.000,00 | Precisa ser maior que zero |
-| Valor da entrada | R$ 5.000,00 | Pode ser zero. Precisa ser menor que o valor do veículo |
+| Valor da entrada | R$ 5.000,00 | Pode ser zero. Precisa deixar pelo menos 10% do valor do veículo para financiar |
 | UF de registro | `SP` | Estado onde o veículo é registrado |
 | Zero quilômetro? | Sim / Não | Indica se o veículo é novo ou usado |
 | CNPJ da loja | `11.222.333/0001-81` | A loja precisa estar vinculada ao integrador |
@@ -38,17 +38,17 @@ No financiamento, o cliente **compra um veículo na sua loja**, paga uma entrada
 
 ## Como o valor é calculado
 
-O valor financiado é o valor do veículo menos a entrada. Sobre ele entram os custos da operação — tarifa de cadastro, IOF e juros.
+O valor financiado é o valor do veículo menos a entrada. Sobre ele entram os custos da operação — tarifa de cadastro, IOF, registro do contrato e juros.
 
 ```
 Valor do veículo ........ R$ 45.000,00
 (-) Entrada ............. R$  5.000,00
 (=) Valor solicitado .... R$ 40.000,00
-(+) Tarifa de cadastro, IOF e outros custos financiados
+(+) Tarifa de cadastro, IOF e registro do contrato
 (=) Valor total do crédito
 ```
 
-A simulação devolve **uma opção por prazo**. Cada opção mostra o valor da parcela, as taxas de juros e o Custo Efetivo Total (CET).
+A simulação devolve **uma opção para cada prazo disponível** — só entram os prazos em que a entrada informada atinge a entrada mínima. Cada opção mostra o valor da parcela, as taxas de juros e o Custo Efetivo Total (CET).
 
 <Card title="Entenda cada custo" icon="receipt" href="/pages/concepts/costs" horizontal>
   Veja o que significam TAC, IOF, juros e CET — e como explicar ao cliente.
@@ -66,7 +66,7 @@ A simulação devolve **uma opção por prazo**. Cada opção mostra o valor da 
     Com o cadastro do cliente completo (dados pessoais, endereço, ocupação e renda), a proposta é criada e analisada.
   </Step>
   <Step title="Formalização">
-    Aprovada a proposta, seguem a biometria, os documentos, os dados do veículo, a vistoria e a assinatura. Veja a [jornada da proposta](/pages/concepts/journey).
+    Aprovada a proposta, a loja envia os documentos e os dados do veículo, e o cliente faz a biometria. Depois, a Credicarro paga o valor financiado à loja. Veja a [jornada da proposta](/pages/concepts/journey).
   </Step>
 </Steps>
 
@@ -79,7 +79,7 @@ A simulação devolve **uma opção por prazo**. Cada opção mostra o valor da 
     A simulação é feita em nome de uma loja, identificada pelo CNPJ. Se a loja não estiver vinculada ao cadastro do integrador, a simulação é recusada.
   </Accordion>
   <Accordion title="Lojas com contrato de intermediação não simulam pela integração" icon="handshake-slash">
-    Uma loja com contrato de intermediação não pode ser usada nas simulações da integração. Fale com o time Credicarro se for o seu caso.
+    Uma loja com contrato de intermediação não pode ser usada nas simulações e propostas da integração. Fale com o time Credicarro se for o seu caso.
   </Accordion>
   <Accordion title="O cadastro do cliente precisa estar completo para criar a proposta" icon="user-check">
     A simulação já exige o cliente cadastrado. Para criar a proposta, o cadastro também precisa de endereço, tipo de ocupação e renda.
