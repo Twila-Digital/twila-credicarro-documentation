@@ -126,9 +126,16 @@ Todos retornam `400`, com o campo em `campo`.
 | `Proposal.DepositAccount.OnlyRefinancing` | `422` | Conta de recebimento enviada para uma proposta de financiamento. |
 | `Proposal.DepositAccount.HolderNotBuyer` | `422` | O `cpfTitular` da conta não é o CPF do cliente da proposta. |
 
-<Note>
-  No envio de documento, as regras que dependem da proposta — etapa que não permite envio, tipo que não está recusado na correção, conteúdo que não corresponde à extensão e `Idempotency-Key` reutilizada com outro conteúdo — retornam `422` com um `tipo` genérico. Veja [Enviar documentos](/pages/guides/document-upload#erros).
-</Note>
+### Envio de documento
+
+| Código | Status | Quando ocorre |
+| --- | --- | --- |
+| `Document.InvalidProposalStage` | `422` | A etapa ativa não permite o envio de documentos. |
+| `Document.NotPendingCorrection` | `422` | Na correção, o tipo enviado não está recusado. |
+| `Document.InvalidContent` | `422` | O conteúdo real do arquivo não corresponde à extensão informada. |
+| `Document.InvalidProposalModality` | `422` | A modalidade da proposta não permite envio de documentos pela integração. |
+| `Idempotency.KeyConflict` | `409` | A `Idempotency-Key` já foi usada com outro conteúdo. |
+| `Document.UploadFailed` | `502` | Não foi possível armazenar o documento. Tente de novo com a mesma `Idempotency-Key`. |
 
 ### Webhooks
 
@@ -169,7 +176,7 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
 ```
 
 <Card title="Chave reutilizada com outro conteúdo" icon="ban" color="#f44336" horizontal>
-  Retorna `409 Conflict` (no envio de documento, `422`). Uma mesma `Idempotency-Key` fica atrelada ao conteúdo da primeira requisição.
+  Retorna `409 Conflict`. Uma mesma `Idempotency-Key` fica atrelada ao conteúdo da primeira requisição.
 </Card>
 
 <Warning>

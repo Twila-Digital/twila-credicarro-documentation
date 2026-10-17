@@ -13,7 +13,7 @@ Os documentos do comprador, do vendedor e da loja são enviados por `POST /v2/pr
 | `ENVIO_DOCUMENTOS` (6), com a proposta aprovada | Os documentos pedidos |
 | `CORRECAO_DOCUMENTOS` (7), com a proposta pendente | Só os tipos com status `INVALIDO` |
 
-Fora dessas etapas, a API retorna `422`.
+Fora dessas etapas, a API retorna `422` com `Document.InvalidProposalStage`.
 
 <Note>
   Cada participante tem a sua etapa. Olhe o `status_ativo` de **cada** participante antes de enviar.
@@ -102,7 +102,7 @@ Quando um documento é recusado, o participante vai para `CORRECAO_DOCUMENTOS` e
     Exiba o `motivo` para a loja ou o cliente corrigir o arquivo.
   </Step>
   <Step title="Reenvie o mesmo tipo">
-    Envie de novo com o mesmo `participante` e `tipoDocumento`, com uma **nova** `Idempotency-Key`. Enviar um tipo que não está recusado retorna `422`.
+    Envie de novo com o mesmo `participante` e `tipoDocumento`, com uma **nova** `Idempotency-Key`. Enviar um tipo que não está recusado retorna `422` com `Document.NotPendingCorrection`.
   </Step>
 </Steps>
 
@@ -124,11 +124,13 @@ Erros de formato retornam `400`, com o campo em `campo`:
 | `Validation.File.Empty` | O arquivo está vazio. |
 | `Validation.File.TooLarge` | Comprima ou reduza a resolução do arquivo. |
 
-Regras que dependem da proposta retornam `422`:
+Regras que dependem da proposta e do arquivo:
 
-| Situação | Como resolver |
-| --- | --- |
-| A etapa ativa não permite envio | Aguarde a etapa `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`. |
-| Na correção, o tipo enviado não está recusado | Reenvie só os tipos com status `INVALIDO`. |
-| O conteúdo não corresponde à extensão | Não renomeie arquivos de outro formato. |
-| A `Idempotency-Key` já foi usada com outro conteúdo | Use uma nova chave para um novo envio. |
+| `tipo` | Status | Como resolver |
+| --- | --- | --- |
+| `Document.InvalidProposalStage` | `422` | Aguarde a etapa `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`. |
+| `Document.NotPendingCorrection` | `422` | Na correção, reenvie só os tipos com status `INVALIDO`. |
+| `Document.InvalidContent` | `422` | A extensão não corresponde ao conteúdo. Não renomeie arquivos de outro formato. |
+| `Document.InvalidProposalModality` | `422` | A modalidade da proposta não permite envio de documentos pela integração. Fale com o time Credicarro. |
+| `Idempotency.KeyConflict` | `409` | Use uma nova chave para um novo envio. |
+| `Document.UploadFailed` | `502` | Falha temporária ao armazenar o arquivo. Repita com a mesma `Idempotency-Key`. |

@@ -58,6 +58,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente ou simulação não encontrados (`Customer.Account.NotFound`, `Simulation.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra de negócio não atendida (por exemplo, `Customer.Account.Incomplete`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
     get:
       tags:
         - Proposta
@@ -132,6 +144,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/proposal/simulation/range/financing:
     get:
       tags:
@@ -181,8 +199,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
-        '401':
-          description: Unauthorized — token ausente ou inválido
+        '422':
+          description: Sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -237,6 +255,12 @@ paths:
                 additionalProperties: false
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -312,6 +336,12 @@ paths:
                 $ref: "#/components/schemas/SimulationResponse"
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Simulação não encontrada para este parceiro (`Simulation.Access.NotFound`)
           content:
             application/json:
               schema:
@@ -445,6 +475,18 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/proposal/simulation/refinancing:
     post:
       tags:
@@ -558,6 +600,18 @@ paths:
                           description: Valor aproximado de retenção diária. Omitido quando não se aplica.
         '400':
           description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '404':
+          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `Simulation.Refinancing.UfUnavailable`
           content:
             application/json:
               schema:
@@ -1231,12 +1285,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
-        '401':
-          description: Unauthorized — token ausente ou inválido
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
         '404':
           description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
           content:
@@ -1397,6 +1445,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal/simulation/refinancing:
     post:
       tags:
@@ -1452,6 +1506,12 @@ paths:
                 $ref: "#/components/schemas/ProblemDetails"
         '404':
           description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `Simulation.Refinancing.UfUnavailable`
           content:
             application/json:
               schema:
@@ -1515,6 +1575,12 @@ paths:
                 $ref: "#/components/schemas/ProblemDetails"
         '409':
           description: A Idempotency-Key já foi usada com outro conteúdo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Simulation.Access.NotFromStore` ou `Store.Integration.Intermediation`)
           content:
             application/json:
               schema:
@@ -1758,7 +1824,19 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Etapa não permite o envio, tipo não está recusado na correção, conteúdo não corresponde à extensão ou chave reutilizada com outro conteúdo
+          description: Regra não atendida — `Document.InvalidProposalStage`, `Document.NotPendingCorrection`, `Document.InvalidContent` ou `Document.InvalidProposalModality`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: Idempotency-Key reutilizada com outro conteúdo (`Idempotency.KeyConflict`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '502':
+          description: Falha ao armazenar o documento (`Document.UploadFailed`). Repita com a mesma Idempotency-Key.
           content:
             application/json:
               schema:
