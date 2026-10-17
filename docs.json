@@ -12,7 +12,12 @@
   },
   "favicon": "/favicon.ico",
   "contextual": {
-    "options": ["copy", "view", "chatgpt", "claude"]
+    "options": [
+      "copy",
+      "view",
+      "chatgpt",
+      "claude"
+    ]
   },
   "redirects": [
     {
@@ -35,7 +40,9 @@
             "groups": [
               {
                 "group": "Comece aqui",
-                "pages": ["pages/introduction"]
+                "pages": [
+                  "pages/introduction"
+                ]
               }
             ]
           },
@@ -55,11 +62,16 @@
               },
               {
                 "group": "Guias rápidos",
-                "pages": ["pages/guides/first-proposal"]
+                "pages": [
+                  "pages/guides/first-proposal"
+                ]
               },
               {
                 "group": "Ajuda",
-                "pages": ["pages/faq", "pages/glossary"]
+                "pages": [
+                  "pages/faq",
+                  "pages/glossary"
+                ]
               }
             ]
           },
@@ -70,15 +82,11 @@
                 "group": "Integração",
                 "pages": [
                   "pages/for-developers",
-                  "pages/authentication",
+                  "pages/reference/introduction",
                   "pages/development",
                   "pages/production",
                   "pages/errors"
                 ]
-              },
-              {
-                "group": "Fluxo da proposta",
-                "pages": ["pages/v2/overview", "pages/v2/steps"]
               },
               {
                 "group": "Guias",
@@ -90,37 +98,39 @@
               },
               {
                 "group": "Ajuda",
-                "pages": ["pages/faq", "pages/glossary"]
+                "pages": [
+                  "pages/faq",
+                  "pages/glossary"
+                ]
               }
             ]
           },
           {
-            "tab": "Webhooks",
+            "tab": "Autenticação",
             "groups": [
               {
                 "group": "Visão geral",
-                "pages": ["pages/webhooks"]
+                "pages": [
+                  "pages/authentication"
+                ]
               },
               {
-                "group": "Segurança",
-                "pages": ["pages/webhooks/security"]
-              },
-              {
-                "group": "Eventos",
-                "pages": ["pages/v2/webhooks"]
+                "group": "Autenticação",
+                "pages": [
+                  "pages/authentication/accesstoken"
+                ]
               }
             ]
           },
           {
-            "tab": "Referência",
+            "tab": "Proposta",
             "groups": [
               {
-                "group": "Introdução",
-                "pages": ["pages/reference/introduction"]
-              },
-              {
-                "group": "Autenticação",
-                "pages": ["pages/authentication/accesstoken"]
+                "group": "Fluxo",
+                "pages": [
+                  "pages/v2/overview",
+                  "pages/v2/steps"
+                ]
               },
               {
                 "group": "Cliente",
@@ -155,11 +165,34 @@
                   "pages/v2/proposal/deposit-account",
                   "pages/proposal/pagination"
                 ]
+              }
+            ]
+          },
+          {
+            "tab": "Webhooks",
+            "groups": [
+              {
+                "group": "Visão geral",
+                "pages": [
+                  "pages/webhooks",
+                  "pages/webhook/reference"
+                ]
+              },
+              {
+                "group": "Segurança",
+                "pages": [
+                  "pages/webhooks/security"
+                ]
+              },
+              {
+                "group": "Eventos",
+                "pages": [
+                  "pages/v2/webhooks"
+                ]
               },
               {
                 "group": "Webhooks",
                 "pages": [
-                  "pages/webhook/reference",
                   "pages/webhook/create",
                   "pages/webhook/list",
                   "pages/webhook/update",
@@ -170,7 +203,9 @@
           },
           {
             "tab": "Changelog",
-            "pages": ["pages/changelog"]
+            "pages": [
+              "pages/changelog"
+            ]
           }
         ]
       },
@@ -183,34 +218,40 @@
             "groups": [
               {
                 "group": "Introdução",
-                "pages": ["pages/v1/introduction", "pages/v1/overview"]
+                "pages": [
+                  "pages/v1/introduction",
+                  "pages/v1/overview"
+                ]
               },
               {
                 "group": "Integração",
-                "pages": ["pages/authentication", "pages/development", "pages/errors"]
+                "pages": [
+                  "pages/development",
+                  "pages/errors"
+                ]
               }
             ]
           },
           {
-            "tab": "Webhooks",
+            "tab": "Autenticação",
             "groups": [
               {
                 "group": "Visão geral",
-                "pages": ["pages/v1/webhooks"]
+                "pages": [
+                  "pages/authentication"
+                ]
               },
               {
-                "group": "Segurança",
-                "pages": ["pages/webhooks/security"]
+                "group": "Autenticação",
+                "pages": [
+                  "pages/authentication/accesstoken"
+                ]
               }
             ]
           },
           {
-            "tab": "Referência",
+            "tab": "Proposta",
             "groups": [
-              {
-                "group": "Autenticação",
-                "pages": ["pages/authentication/accesstoken"]
-              },
               {
                 "group": "Cliente",
                 "pages": [
@@ -237,6 +278,23 @@
                   "pages/proposal/create",
                   "pages/proposal/get",
                   "pages/proposal/pagination"
+                ]
+              }
+            ]
+          },
+          {
+            "tab": "Webhooks",
+            "groups": [
+              {
+                "group": "Visão geral",
+                "pages": [
+                  "pages/v1/webhooks"
+                ]
+              },
+              {
+                "group": "Segurança",
+                "pages": [
+                  "pages/webhooks/security"
                 ]
               },
               {

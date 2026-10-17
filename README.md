@@ -33,7 +33,7 @@ mintlify dev
 │   ├── introduction.mdx # Página inicial (lojista x desenvolvedor)
 │   ├── concepts/        # Para lojistas: produto, jornada, documentos, custos
 │   ├── guides/          # Guias (lojista e desenvolvedor)
-│   ├── reference/       # Introdução da aba Referência
+│   ├── reference/       # Convenções da API
 │   ├── customer/        # Endpoints de cliente (v1, compartilhados)
 │   ├── simulation/      # Endpoints de simulação v1 e consultas
 │   ├── proposal/        # Endpoints de proposta v1 e listagem
