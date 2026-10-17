@@ -1,6 +1,6 @@
 ---
 title: 'Integrar um financiamento'
-description: 'Todas as chamadas de um financiamento v2, do token à proposta finalizada, com exemplos prontos'
+description: 'Todas as chamadas de um financiamento, do token à proposta finalizada, com exemplos prontos'
 icon: 'car'
 ---
 
@@ -186,7 +186,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
   </Step>
 
   <Step title="Acompanhe pelo webhook">
-    A cada mudança, a Credicarro envia o [webhook v2](/pages/v2/webhooks) com o retrato da proposta. Para cada participante (`comprador` e `loja`), olhe o `status_ativo`:
+    A cada mudança, a Credicarro envia o [webhook de proposta](/pages/v2/webhooks) com o retrato da proposta. Para cada participante (`comprador` e `loja`), olhe o `status_ativo`:
 
     | `responsavel_acao` | O que fazer |
     | --- | --- |
@@ -253,7 +253,7 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
 | `Store.Integration.NotFound` | Faixa ou simulação | Confira o `cnpjLoja` e o vínculo da loja com o seu cadastro. |
 | `Store.Integration.Intermediation` | Faixa ou simulação | Use outra loja ou fale com o time Credicarro. |
 | `Customer.Account.Incomplete` | Proposta | Complete endereço, ocupação e renda em `/v1/customer/unified`. |
-| `Simulation.Access.NotFromStore` | Proposta | Use um `id_simulacao` criado pela simulação v2, com `cnpjLoja`. |
+| `Simulation.Access.NotFromStore` | Proposta | Use um `id_simulacao` de uma simulação feita com `cnpjLoja`. |
 | `Document.InvalidProposalStage` | Documentos | Envie só quando a etapa ativa for `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`. |
 
 <Card title="Todos os códigos" icon="triangle-exclamation" href="/pages/errors" horizontal>

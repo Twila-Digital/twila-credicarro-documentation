@@ -1,16 +1,16 @@
 ---
 title: 'Visão geral'
-description: 'O objeto proposta v2, como ler as etapas e qual endpoint chamar em cada uma'
+description: 'O objeto proposta, como ler as etapas e qual endpoint chamar em cada uma'
 icon: 'book-open-cover'
 ---
 
-A **proposta** é o pedido de crédito, criado a partir de uma opção de simulação. Na v2, ela traz o status geral e, para cada participante (comprador e loja), a etapa ativa e quem precisa agir.
+A **proposta** é o pedido de crédito, criado a partir de uma opção de simulação. Ela traz o status geral e, para cada participante (comprador e loja), a etapa ativa e quem precisa agir.
 
 ## Ciclo de vida
 
 ```mermaid
 flowchart LR
-    A[Simulação v2] -->|POST /v2/proposal| B[EM_ANALISE]
+    A[Simulação] -->|POST /v2/proposal| B[EM_ANALISE]
     B --> C[APROVADA]
     B --> R[RECUSADA]
     B --> M[ANALISE_MANUAL]
@@ -109,6 +109,3 @@ Para **cada** participante (`comprador` e `loja`), leia `status_ativo`:
   No seu sistema, prefira comparar `enum_etapa` e `enum_responsavel_acao` e usar os nomes em telas e logs.
 </Tip>
 
-<Note>
-  Propostas criadas pela v1 não são aceitas pelas rotas `/v2/proposal/{propostaId}` e retornam `422` com `Proposal.Access.NotIntegrationV2`. Consulte-as por [`GET /v1/proposal/{propostaId}`](/pages/proposal/get).
-</Note>

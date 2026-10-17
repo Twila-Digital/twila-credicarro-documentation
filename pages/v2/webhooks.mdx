@@ -1,10 +1,10 @@
 ---
-title: 'Webhook de proposta v2'
+title: 'Webhook de proposta'
 description: 'Notificações com o retrato completo da proposta a cada mudança'
 icon: 'webhook'
 ---
 
-Propostas criadas pela v2 enviam, para cada webhook ativo do tipo **Proposal** (`tipo` = 3), o retrato atual da proposta sempre que muda o status, uma etapa ou um documento. Elas **não** recebem o payload simplificado da v1.
+Cada webhook ativo do tipo **Proposal** (`tipo` = 3) recebe o retrato atual da proposta sempre que muda o status, uma etapa ou um documento.
 
 Cadastre e gerencie seus webhooks pela API em [Cadastrar webhook](/pages/webhook/create). Autenticação, assinatura e retentativas funcionam como descrito em [Verificação e segurança](/pages/webhooks/security).
 
@@ -64,7 +64,7 @@ Cadastre e gerencie seus webhooks pela API em [Cadastrar webhook](/pages/webhook
 | `comprador` | Biometria, etapa ativa, etapas concluídas e documentos do comprador. |
 | `loja` | Etapa ativa, etapas concluídas e documentos da loja, ou `null`. |
 
-O formato de `status_ativo`, `etapas_concluidas` e `documentos` é o mesmo da [consulta da proposta v2](/pages/v2/proposal/get).
+O formato de `status_ativo`, `etapas_concluidas` e `documentos` é o mesmo da [consulta da proposta](/pages/v2/proposal/get).
 
 ## <Icon icon="clone" type="solid"/> Entregas repetidas
 

@@ -89,7 +89,7 @@ Com estes valores, a sua implementação precisa chegar à mesma assinatura:
 
 <Card title="Trate o webhook como idempotente" icon="clone" horizontal>
   - Use o header `Idempotency-Key` como chave de deduplicação — uma retentativa da mesma notificação repete a chave.
-  - As notificações podem chegar fora de ordem. Em propostas v2, use `data_evento` ou consulte a proposta para obter o estado mais recente.
+  - As notificações podem chegar fora de ordem. Quando houver `data_evento`, use-o — ou consulte a proposta para obter o estado mais recente.
 </Card>
 
 ## Checklist de segurança

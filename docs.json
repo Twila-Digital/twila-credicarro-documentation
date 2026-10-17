@@ -33,7 +33,6 @@
     "versions": [
       {
         "version": "v2",
-        "tag": "Atual",
         "tabs": [
           {
             "tab": "Comece aqui",
@@ -205,7 +204,6 @@
       },
       {
         "version": "v1",
-        "tag": "Legado",
         "tabs": [
           {
             "tab": "Comece aqui",
@@ -217,7 +215,7 @@
                 ]
               },
               {
-                "group": "Sobre a v1",
+                "group": "Visão geral",
                 "pages": [
                   "pages/v1/introduction"
                 ]

@@ -1,18 +1,14 @@
 ---
-title: 'Webhook de proposta v1'
-description: 'Payload enviado para propostas criadas pela v1'
+title: 'Webhook de proposta'
+description: 'Notificação enviada a cada atualização de status da proposta'
 icon: 'webhook'
 ---
 
-<Warning>
-  Esta página documenta o webhook de propostas criadas pela **v1**. Propostas criadas pela v2 recebem o [webhook detalhado da v2](/pages/v2/webhooks).
-</Warning>
-
-Cada webhook ativo do tipo Proposta (`tipo` = 3) recebe uma notificação a cada atualização de status de uma proposta v1. Cadastro, autenticação, assinatura HMAC e retentativas funcionam igual nas duas versões — veja [Cadastrar webhook](/pages/webhook/create) e [Verificação e segurança](/pages/webhooks/security).
+Cada webhook ativo do tipo Proposta (`tipo` = 3) recebe uma notificação a cada atualização de status de uma proposta. Para cadastro, autenticação, assinatura HMAC e retentativas, veja [Cadastrar webhook](/pages/webhook/create) e [Verificação e segurança](/pages/webhooks/security).
 
 ## <Icon icon="code" type="solid"/> Payload
 
-Quando uma proposta criada pela v1 é atualizada, o payload enviado para o endpoint é um JSON com a seguinte estrutura:
+Quando uma proposta é atualizada, o payload enviado para o endpoint é um JSON com a seguinte estrutura:
 
 ```json
 {
@@ -24,7 +20,7 @@ Quando uma proposta criada pela v1 é atualizada, o payload enviado para o endpo
 
 ### Status enviados pelo webhook
 
-Os valores abaixo são os status que podem ser enviados no campo `enum_status` do webhook de proposta v1.
+Os valores abaixo são os status que podem ser enviados no campo `enum_status` do webhook de proposta.
 
 <CardGroup>
   <Card title="1 - Analysing" icon="magnifying-glass-chart" color="#ff9800" horizontal>
@@ -64,6 +60,3 @@ Os valores abaixo são os status que podem ser enviados no campo `enum_status` d
   </Card>
 </CardGroup>
 
-<Tip title="Migrando para a v2?" horizontal>
-  O webhook v2 traz a etapa ativa e quem precisa agir, sem precisar consultar a proposta. Veja [Introdução à v1](/pages/v1/introduction#migrar-para-a-v2).
-</Tip>

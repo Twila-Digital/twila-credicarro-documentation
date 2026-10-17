@@ -14,7 +14,7 @@ Cria a proposta a partir da opção de simulação escolhida pelo cliente. A an�
 ```
 
 <Tip title="Pré-requisitos" horizontal>
-  Use um `id_simulacao` de uma simulação **v2**, e o cliente precisa estar com o cadastro completo (endereço, ocupação e renda). Senão, a API retorna `Simulation.Access.NotFromStore` ou `Customer.Account.Incomplete`.
+  Use um `id_simulacao` de uma simulação feita com `cnpjLoja`, e o cliente precisa estar com o cadastro completo (endereço, ocupação e renda). Senão, a API retorna `Simulation.Access.NotFromStore` ou `Customer.Account.Incomplete`.
 </Tip>
 
 <Tip title="Envie Idempotency-Key" horizontal>
@@ -22,5 +22,5 @@ Cria a proposta a partir da opção de simulação escolhida pelo cliente. A an�
 </Tip>
 
 <Note>
-  Acompanhe a proposta pelo [webhook v2](/pages/v2/webhooks) ou pela [consulta](/pages/v2/proposal/get).
+  Acompanhe a proposta pelo [webhook de proposta](/pages/v2/webhooks) ou pela [consulta](/pages/v2/proposal/get).
 </Note>

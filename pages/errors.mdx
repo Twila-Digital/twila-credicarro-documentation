@@ -94,7 +94,7 @@ Os códigos abaixo chegam em `tipo` (regra de negócio) ou em `erros[].codigo` (
 | Código | Status | Quando ocorre |
 | --- | --- | --- |
 | `Proposal.Access.NotFound` | `404` | A proposta não existe ou é de outro parceiro. |
-| `Proposal.Access.NotIntegrationV2` | `422` | Rota `/v2` chamada com uma proposta criada pela v1. |
+| `Proposal.Access.NotIntegrationV2` | `422` | A proposta não pode ser consultada ou alterada por esta rota. |
 | `Proposal.Customer.ProfileNotFound` | `404` | O cliente da proposta não foi encontrado. |
 | `Proposal.DepositAccount.OnlyRefinancing` | `422` | Conta de recebimento enviada para uma proposta de financiamento. |
 | `Proposal.DepositAccount.HolderNotBuyer` | `422` | O `cpfTitular` da conta não é o CPF do cliente da proposta. |

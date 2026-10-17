@@ -1,6 +1,6 @@
 ---
 title: 'Visão geral'
-description: 'Faixas e simulações v2: o que enviar e como ler cada campo da resposta'
+description: 'Faixas e simulações: o que enviar e como ler cada campo da resposta'
 icon: 'book-open-cover'
 ---
 
@@ -89,5 +89,5 @@ A **simulação** calcula as condições de crédito para um cliente, um veícul
 </Tip>
 
 <Note>
-  Use sempre um `id_simulacao` criado pela **v2** (com `cnpjLoja`) para criar a proposta v2. Uma simulação v1 retorna `Simulation.Access.NotFromStore`.
+  Use sempre um `id_simulacao` de uma simulação feita com `cnpjLoja` para criar a proposta. Caso contrário, a API retorna `Simulation.Access.NotFromStore`.
 </Note>

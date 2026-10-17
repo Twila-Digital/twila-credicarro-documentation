@@ -34,10 +34,6 @@ Webhooks permitem que sua aplicação receba notificações em tempo real sobre 
   </Card>
 </CardGroup>
 
-<Card title="Payload por versão da proposta" icon="code-branch" horizontal>
-  Propostas criadas pela v2 recebem o [webhook detalhado da v2](/pages/v2/webhooks). Propostas criadas pela v1 recebem o [payload de status da v1](/pages/v1/webhooks).
-</Card>
-
 ## <Icon icon="mobile" type="solid"/> Segmentação de webhooks
 
 <Card title="Ambientes e webhooks" icon="book" horizontal>
@@ -76,13 +72,6 @@ Aceitamos três tipos de autenticação para os webhooks (`tipo_autenticacao`). 
 
 ## <Icon icon="code" type="solid"/> Payload
 
-O conteúdo da notificação depende da versão em que a proposta foi criada:
-
-<CardGroup cols={2}>
-  <Card title="Proposta v2" icon="rocket" href="/pages/v2/webhooks">
-    Retrato completo da proposta: status, etapas, biometria e documentos do comprador e da loja.
-  </Card>
-  <Card title="Proposta v1 (legado)" icon="clock-rotate-left" href="/pages/v1/webhooks">
-    Apenas o identificador e o status da proposta.
-  </Card>
-</CardGroup>
+<Card title="Webhook de proposta" icon="code" href="/pages/v2/webhooks" horizontal>
+  Retrato completo da proposta: status, etapas, biometria e documentos do comprador e da loja.
+</Card>

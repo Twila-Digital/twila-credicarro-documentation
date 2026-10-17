@@ -1281,7 +1281,7 @@ paths:
       description: |
         Cria uma nova simulação de financiamento selecionando a loja de integração pelo CNPJ (`cnpjLoja`).
         A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de intermediação.
-        O cliente precisa estar cadastrado antes da simulação, pelas rotas de Cliente da v1.
+        O cliente precisa estar cadastrado antes da simulação, pelas rotas de Cliente.
       security:
         - bearerAuth: []
       parameters:
@@ -1410,7 +1410,7 @@ paths:
         - Proposta
       summary: Criar uma nova proposta
       description: |
-        Cria uma proposta a partir de uma simulação criada pela v2. A simulação precisa pertencer ao parceiro e ter
+        Cria uma proposta a partir de uma simulação feita com `cnpjLoja`. A simulação precisa pertencer ao parceiro e ter
         sido feita em uma loja de integração vinculada a ele. O cliente precisa estar com o cadastro completo
         (endereço, tipo de ocupação e renda).
       security:
@@ -1473,9 +1473,8 @@ paths:
         - Proposta
       summary: Consultar proposta pelo ID.
       description: |
-        Consulta o retrato atual de uma proposta criada pela v2, com status, link de biometria e as etapas do
-        comprador e da loja. Propostas criadas pela v1 retornam `422` com `Proposal.Access.NotIntegrationV2`;
-        consulte-as por `GET /v1/proposal/{propostaId}`.
+        Consulta o retrato atual de uma proposta, com status, link de biometria e as etapas do
+        comprador e da loja.
       security:
         - bearerAuth: []
       parameters:
@@ -1500,7 +1499,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Proposta criada pela v1 (`Proposal.Access.NotIntegrationV2`)
+          description: Proposta não disponível nesta rota (`Proposal.Access.NotIntegrationV2`)
           content:
             application/json:
               schema:
@@ -1511,7 +1510,7 @@ paths:
         - Proposta
       summary: Incluir os dados do veículo
       description: |
-        Inclui ou atualiza placa, Renavam, chassi e cor do veículo de uma proposta criada pela v2. Aceito somente
+        Inclui ou atualiza placa, Renavam, chassi e cor do veículo de uma proposta. Aceito somente
         enquanto a etapa ativa for `DADOS_VEICULO` (8).
       security:
         - bearerAuth: []
@@ -1563,7 +1562,7 @@ paths:
         - Proposta
       summary: Incluir a conta de recebimento
       description: |
-        Inclui ou substitui a conta de recebimento de uma proposta de **refinanciamento** criada pela v2, enquanto a
+        Inclui ou substitui a conta de recebimento de uma proposta de **refinanciamento**, enquanto a
         etapa ativa for `CONTA_RECEBIMENTO` (5). O titular deve ser o cliente da proposta. Propostas de financiamento
         não são aceitas. Enviar novamente substitui a conta anterior.
       security:
@@ -1815,7 +1814,7 @@ components:
                 example: null
     ProposalV2Response:
       type: object
-      description: Retrato atual da proposta v2
+      description: Retrato atual da proposta
       properties:
         id_proposta:
           type: string
