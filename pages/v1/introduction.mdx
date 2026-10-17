@@ -1,0 +1,76 @@
+---
+title: 'Introdução (API v1)'
+description: 'O que é a v1, como ela se relaciona com a v2 e como migrar'
+icon: 'clock-rotate-left'
+---
+
+<Warning>
+  Esta seção documenta a **API v1**. Para novas integrações, use a **v2** — troque de versão pelo seletor no topo da documentação.
+</Warning>
+
+## O que é a API v1?
+
+A v1 foi a primeira versão da API de integração da Credicarro. Ela continua disponível para integrações existentes, mas a evolução da plataforma acontece na **v2**.
+
+Com a v1 você:
+
+- Simula financiamento e refinanciamento
+- Cria a proposta a partir de uma simulação
+- Consulta o status da proposta
+- Recebe um webhook com o status a cada atualização
+
+O acompanhamento das etapas e o envio de documentos, dados do veículo e conta de recebimento **não** fazem parte da v1.
+
+## O que é compartilhado entre as versões
+
+Algumas rotas ficam em `/v1` e são usadas pelas duas versões:
+
+| Recurso | Rotas |
+| --- | --- |
+| Autenticação | `POST /v1/authentication/accesstoken` — o mesmo token vale para `/v1` e `/v2` |
+| Cliente | `POST /v1/customer`, `/unified`, `/address`, `/professional` |
+| Consultas | `GET /v1/proposal/simulation/{simulacaoId}`, `GET /v1/proposal/simulation`, `GET /v1/proposal` |
+| Webhooks | `POST`, `GET`, `PUT` e `DELETE /v1/webhook` |
+
+Formato de erro, `Idempotency-Key` e assinatura dos webhooks também são os mesmos.
+
+## Diferenças em relação à v2
+
+| | v1 | v2 |
+| --- | --- | --- |
+| Loja | Não informada | Obrigatória (`cnpjLoja`) nas faixas e simulações |
+| Consulta da proposta | Status geral | Status, etapa ativa, situação e responsável por participante |
+| Status | Nomes em inglês (`Approved`) | Código e nome em português (`2`, `APROVADA`) |
+| Documentos, veículo e conta | Fora da API | `POST /v2/proposal/{id}/document`, `/vehicle-detail`, `/deposit-account` |
+| Webhook de proposta | `id_proposta` e status | Retrato completo da proposta |
+
+<Note>
+  Uma proposta criada pela v1 continua sendo consultada pela v1. As rotas `/v2/proposal/{propostaId}` retornam `422` com `Proposal.Access.NotIntegrationV2` para propostas v1.
+</Note>
+
+## Migrar para a v2
+
+<Steps>
+  <Step title="Peça o vínculo das lojas">
+    Na v2, cada simulação é feita em nome de uma loja. Peça ao time Credicarro o vínculo dos CNPJs das lojas ao seu cadastro.
+  </Step>
+  <Step title="Troque as rotas de faixa e simulação">
+    Use `/v2/proposal/simulation/...` e envie `cnpjLoja`. O cadastro do cliente continua igual.
+  </Step>
+  <Step title="Troque a criação e a consulta da proposta">
+    Use `POST /v2/proposal` com um `id_simulacao` da v2 e `GET /v2/proposal/{propostaId}`.
+  </Step>
+  <Step title="Trate o novo webhook">
+    Propostas v2 enviam o [retrato completo](/pages/v2/webhooks). Mantenha o tratamento do payload v1 enquanto existirem propostas v1 em andamento.
+  </Step>
+  <Step title="Implemente as etapas">
+    Envie documentos, dados do veículo e conta de recebimento quando a etapa pedir. Veja o [fluxo de integração v2](/pages/v2/overview).
+  </Step>
+</Steps>
+
+## Estrutura desta seção
+
+- **Introdução (esta página)**: contexto, diferenças e migração
+- **Fluxo v1**: a ordem das chamadas na v1
+- **Webhooks**: o payload de status da v1
+- **Referência**: os endpoints da v1 e os compartilhados com a v2

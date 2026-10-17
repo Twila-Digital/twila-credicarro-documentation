@@ -1,0 +1,82 @@
+---
+title: 'Introdução à referência'
+description: 'Convenções da API: base URL, autenticação, formato dos campos, paginação e erros'
+icon: 'book-open'
+---
+
+Esta aba documenta cada endpoint da API de integração. Cada grupo começa com uma página de **referência** que explica o recurso e segue com os endpoints, que você pode testar direto no playground.
+
+## Base URL
+
+| Ambiente | Base URL |
+| --- | --- |
+| Staging | `https://api.staging.credicarro.com.br/integration` |
+| Produção | `https://api.credicarro.com.br/integration` |
+
+## Autenticação
+
+Envie `Authorization: Bearer {token_de_acesso}` em todas as requisições, exceto na geração do token. Veja [Autenticação](/pages/authentication).
+
+## Convenções
+
+<AccordionGroup>
+  <Accordion title="Nomes dos campos" icon="font">
+    Os campos são em português. No **corpo das requisições**, os nomes usam `camelCase` (`simulacaoId`, `cnpjLoja`). Nas **respostas**, usam `snake_case` (`id_simulacao`, `valor_parcela`).
+  </Accordion>
+  <Accordion title="CPF e CNPJ" icon="id-card">
+    CPF com 11 dígitos, só números. O `cnpjLoja` aceita formatado (`11.222.333/0001-81`) ou só números.
+  </Accordion>
+  <Accordion title="Valores monetários" icon="brazilian-real-sign">
+    Em reais, como número com ponto decimal (`45000.50`). Não envie em centavos nem como texto.
+  </Accordion>
+  <Accordion title="Placas" icon="car">
+    Padrão antigo (`ABC-1234`) ou Mercosul (`ABC1D23`).
+  </Accordion>
+  <Accordion title="Datas" icon="calendar">
+    ISO-8601 com fuso horário (`2026-10-12T14:05:08-03:00`).
+  </Accordion>
+  <Accordion title="Enumerações" icon="list-ol">
+    Na v2, os códigos vêm em par: o número (`enum_status`) e o nome (`status`). Trate o número no seu sistema e use o nome em telas e logs. Veja [Etapas e status](/pages/v2/steps).
+  </Accordion>
+  <Accordion title="Campos desconhecidos" icon="ban">
+    O contrato não prevê campos adicionais. Envie só os campos documentados.
+  </Accordion>
+</AccordionGroup>
+
+## Paginação
+
+As rotas de listagem aceitam `pagina_inicial` (mínimo 1) e `limite` (1 a 100) e respondem sempre no mesmo formato:
+
+```json
+{
+  "itens": [],
+  "pagina": {
+    "numero": 1,
+    "tamanho": 10,
+    "total": 45,
+    "tem_proximo": true,
+    "tem_anterior": false
+  }
+}
+```
+
+## Erros
+
+Todo erro traz `tipo`, `titulo`, `status` e `detalhe`. Use `tipo` no seu tratamento. Veja [Erros e idempotência](/pages/errors).
+
+## Recursos
+
+<CardGroup cols={2}>
+  <Card title="Cliente" icon="user" href="/pages/customer/reference">
+    Cadastro do comprador: dados pessoais, endereço e renda.
+  </Card>
+  <Card title="Simulação" icon="calculator" href="/pages/v2/simulation/reference">
+    Faixas e condições de crédito por prazo.
+  </Card>
+  <Card title="Proposta" icon="file-signature" href="/pages/v2/proposal/reference">
+    Criação, acompanhamento e envio de dados da proposta.
+  </Card>
+  <Card title="Webhooks" icon="bell" href="/pages/webhook/reference">
+    Cadastro das URLs que recebem notificações.
+  </Card>
+</CardGroup>

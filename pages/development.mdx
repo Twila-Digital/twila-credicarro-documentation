@@ -1,50 +1,84 @@
 ---
-title: 'Ambiente de desenvolvimento'
-description: "Aprenda como utilizar o ambiente de desenvolvimento da melhor forma"
-icon: 'code'
+title: 'Ambiente de testes'
+description: 'Como usar o staging para validar a integração sem afetar produção'
+icon: 'flask'
 ---
 
-O ambiente de desenvolvimento é projetado para permitir que você teste todas as funcionalidades da plataforma de forma segura e controlada.
+Toda integração começa no **staging**: um ambiente isolado da produção, onde você testa o fluxo completo sem gerar propostas reais.
 
-## <Icon icon="flask" type="solid"/>  Como utilizar?
+| | Staging | Produção |
+| --- | --- | --- |
+| Base URL | `https://api.staging.credicarro.com.br/integration` | `https://api.credicarro.com.br/integration` |
+| Credenciais | Próprias do staging | Próprias da produção |
+| Propostas | Simuladas — nenhuma operação real | Reais |
+| Webhooks | Recebem só eventos do staging | Recebem só eventos reais |
 
-Quando criamos sua integração na Credicarro, ela é automaticamente configurada em STAGING. Neste ambiente:
+<Warning>
+  As credenciais e os webhooks de um ambiente **não funcionam** no outro. Um token de staging retorna `401` em produção.
+</Warning>
 
-- Todas as operações são simuladas
-- Nenhuma transação real é processada
-- Você pode testar todas as funcionalidades sem riscos
-- Os dados são isolados do ambiente de produção
+---
 
-<Card title="Benefícios do ambiente de desenvolvimento" icon="star" horizontal>
-  * Teste suas integrações com segurança
-  * Experimente diferentes cenários de propostas
-  * Configure webhooks e receba notificações do andamento de sua proposta
-  * Valide o fluxo completo da sua aplicação
+## <Icon icon="key" type="solid"/> Primeiros passos
+
+<Steps>
+  <Step title="Peça as credenciais de staging">
+    Solicite o `clientId` e o `clientSecret` de staging em atendimento@credicarro.com.br. Peça também o cadastro da(s) loja(s) que você vai usar nos testes (`cnpjLoja`).
+  </Step>
+  <Step title="Gere um token">
+    Use as credenciais em [Gerar token de acesso](/pages/authentication).
+  </Step>
+  <Step title="Cadastre um webhook">
+    Cadastre uma URL do tipo Proposta (`tipo` = 3) em [Cadastrar webhook](/pages/webhook/create). Guarde o `segredo_assinatura`.
+  </Step>
+  <Step title="Rode o fluxo completo">
+    Siga o [guia de financiamento](/pages/guides/financing-integration) ou o [de refinanciamento](/pages/guides/refinancing-integration).
+  </Step>
+</Steps>
+
+<Tip title="Recebendo webhooks na sua máquina" horizontal>
+  Para receber webhooks durante o desenvolvimento, exponha seu servidor local com uma ferramenta de túnel (como ngrok ou Cloudflare Tunnel) e cadastre a URL pública gerada.
+</Tip>
+
+---
+
+## <Icon icon="list-check" type="solid"/> O que testar
+
+<AccordionGroup>
+  <Accordion title="Caminho feliz" icon="circle-check">
+    - Token gerado e reaproveitado até perto de expirar
+    - Cliente cadastrado com dados completos
+    - Faixa e simulação com `cnpjLoja`
+    - Proposta criada a partir de um `id_simulacao`
+    - Documentos, dados do veículo e conta de recebimento enviados quando a etapa pedir
+  </Accordion>
+  <Accordion title="Erros esperados" icon="triangle-exclamation">
+    - `400` com a lista `erros` (CPF ou placa inválidos)
+    - `404` com `Store.Integration.NotFound` (CNPJ não vinculado)
+    - `422` com `Customer.Account.Incomplete` (cadastro incompleto)
+    - `409` reutilizando uma `Idempotency-Key` com outro corpo
+    - `401` com um token expirado
+  </Accordion>
+  <Accordion title="Webhooks" icon="bell">
+    - Assinatura `X-CrediCarro-Signature` validada contra o corpo bruto
+    - Resposta `2xx` em menos de 15 segundos
+    - Deduplicação pelo header `Idempotency-Key`
+    - Notificações fora de ordem tratadas por `data_evento`
+  </Accordion>
+  <Accordion title="Resiliência" icon="repeat">
+    - Retentativa com a mesma `Idempotency-Key` após timeout
+    - Espera crescente em `502` e `503`
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## <Icon icon="arrow-right" type="solid"/> Próximo passo
+
+<Card title="Ir para produção" icon="rocket" href="/pages/production" horizontal>
+  Quando o fluxo estiver validado, siga o checklist para processar propostas reais.
 </Card>
 
-## <Icon icon="key" type="solid"/>  Usando o ambiente de desenvolvimento
-
-Para começar a testar:
-
-1. Solicite a criação de uma chave/segredo de API para o Ambiente de desenvolvimento
-2. Utilize estas credenciais para gerar seu token de autenticação e o utilize em suas requisições de teste
-3. Cadastre um [webhook](/pages/webhook/create) para receber notificações de teste
-4. Valide todos os fluxos da sua aplicação
-
-<Card title="Dicas para testes efetivos" icon="lightbulb" horizontal>
-  * Teste todos os cenários possíveis
-  * Valide o tratamento de erros
-  * Verifique as notificações de webhook
-  * Confirme a integração com seu sistema
-</Card>
-
-## <Icon icon="arrow-right" type="solid"/>  Próximos passos
-
-Quando estiver confiante com sua integração:
-1. Solicite a criação de uma chave/segredo de API para o Ambiente de produção
-2. Aguarde a aprovação para produção
-3. Comece a processar propostas reais
-
-<Card title="Precisa de ajuda?" icon="headset" color="#25c2a0">
-  Nossa equipe está disponível para auxiliar no processo de desenvolvimento. Entre em contato pelo e-mail <Icon icon="envelope" type="solid"/> atendimento@credicarro.com.br
+<Card title="Precisa de ajuda?" icon="headset" horizontal>
+  Nossa equipe está disponível para ajudar no desenvolvimento. Escreva para atendimento@credicarro.com.br.
 </Card>

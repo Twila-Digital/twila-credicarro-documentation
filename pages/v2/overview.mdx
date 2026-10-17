@@ -6,8 +6,8 @@ description: 'Ordem de chamadas para levar uma proposta v2 do início ao fim'
 
 A v2 da API leva a proposta até o fim pelo seu sistema. Depois de criada, você acompanha as etapas de cada participante e envia documentos, dados do veículo e conta de recebimento sem precisar de outro canal.
 
-<Card title="A v1 continua disponível" icon="circle-info" horizontal>
-  As rotas `/v1` seguem funcionando. Uma proposta criada pela v1 continua sendo consultada pela v1. Uma proposta criada pela v2 só aceita os endpoints `/v2` de acompanhamento e envio.
+<Card title="A v1 continua disponível" icon="circle-info" href="/pages/v1/introduction" horizontal>
+  As rotas `/v1` seguem funcionando. Uma proposta criada pela v1 continua sendo consultada pela v1. Uma proposta criada pela v2 só aceita os endpoints `/v2` de acompanhamento e envio. Veja a documentação da v1 no seletor de versão.
 </Card>
 
 ## <Icon icon="code-compare" type="solid"/> O que muda em relação à v1
@@ -29,7 +29,7 @@ A v2 da API leva a proposta até o fim pelo seu sistema. Depois de criada, você
 
 ## <Icon icon="list-ol" type="solid"/> Passo a passo
 
-Os endpoints devem ser chamados na seguinte ordem. Autenticação, cliente, faixas e webhooks continuam em `/v1`.
+Os endpoints devem ser chamados na seguinte ordem. Autenticação, cliente e webhooks continuam em `/v1`.
 
 <Steps>
   <Step title="Gerar token de acesso" icon="key">
@@ -118,3 +118,17 @@ Os endpoints devem ser chamados na seguinte ordem. Autenticação, cliente, faix
 <Info>
   Os significados de cada etapa, situação e status estão em [Etapas e status](/pages/v2/steps).
 </Info>
+
+## <Icon icon="book" type="solid"/> Guias com exemplos
+
+<CardGroup cols={3}>
+  <Card title="Financiamento ponta a ponta" icon="car" href="/pages/guides/financing-integration">
+    Todas as chamadas, com requisição e resposta.
+  </Card>
+  <Card title="Refinanciamento ponta a ponta" icon="money-bill-transfer" href="/pages/guides/refinancing-integration">
+    Inclui a conta de recebimento.
+  </Card>
+  <Card title="Envio de documentos" icon="file-arrow-up" href="/pages/guides/document-upload">
+    Base64, idempotência e correção.
+  </Card>
+</CardGroup>

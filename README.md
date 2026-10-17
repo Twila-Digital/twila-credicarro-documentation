@@ -27,13 +27,24 @@ mintlify dev
 
 ```
 .
-├── images/         # Store all documentation images and screenshots
-├── logo/           # Brand logos for light and dark themes
-├── pages/          # Main documentation content
-├── docs.json       # Mintlify configuration file for documentation settings
-├── favicon.ico     # Website favicon
-├── openapi.yaml    # OpenAPI/Swagger specification file
-└── README.md       # Project overview and setup instructions
+├── images/              # Imagens e capturas de tela
+├── logo/                # Logos para os temas claro e escuro
+├── pages/
+│   ├── introduction.mdx # Página inicial (lojista x desenvolvedor)
+│   ├── concepts/        # Para lojistas: produto, jornada, documentos, custos
+│   ├── guides/          # Guias (lojista e desenvolvedor)
+│   ├── reference/       # Introdução da aba Referência
+│   ├── customer/        # Endpoints de cliente (v1, compartilhados)
+│   ├── simulation/      # Endpoints de simulação v1 e consultas
+│   ├── proposal/        # Endpoints de proposta v1 e listagem
+│   ├── webhook/         # Endpoints de webhook (compartilhados)
+│   ├── webhooks/        # Segurança dos webhooks
+│   ├── v1/              # Páginas exclusivas da versão v1 (legado)
+│   └── v2/              # Fluxo, etapas, webhook e endpoints v2
+├── docs.json            # Navegação (versões v2 e v1) e configuração do Mintlify
+├── favicon.ico
+├── openapi.yaml         # Especificação OpenAPI usada nas páginas de endpoint
+└── README.md
 ```
 
 ## 🔧 Local Development

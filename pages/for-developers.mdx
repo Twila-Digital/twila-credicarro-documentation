@@ -5,7 +5,7 @@ icon: 'code'
 ---
 
 <Tip>
-  Esta seção é para quem vai **integrar tecnicamente**. Se você quer ver a ordem das chamadas de uma proposta, vá direto para o [fluxo de integração](/pages/v2/overview).
+  Esta seção é para quem vai **integrar tecnicamente**. Se você quer entender o produto antes, veja [Para lojistas](/pages/concepts/overview). Se quer ver a ordem das chamadas, vá direto para o [fluxo de integração](/pages/v2/overview).
 </Tip>
 
 ## Em uma frase
@@ -13,7 +13,7 @@ icon: 'code'
 A API da Credicarro é REST, autenticada por Bearer token, com campos JSON em português e o mesmo formato de resposta em toda a superfície — um cliente HTTP e um token já bastam para integrar.
 
 <Card title="Não é a página de referência de endpoints" icon="circle-info" horizontal>
-  Esta página explica os conceitos que atravessam toda a API. Para o contrato de cada endpoint, use as abas **Proposta** e **Webhooks** ou a [referência OpenAPI](/openapi.yaml).
+  Esta página explica os conceitos que atravessam toda a API. Para o contrato de cada endpoint, use a aba [Referência](/pages/reference/introduction) ou o arquivo [OpenAPI](/openapi.yaml).
 </Card>
 
 ## Ambientes
@@ -32,7 +32,7 @@ Os endpoints ficam em `/v1` e `/v2`. O mesmo token vale para as duas versões.
 | Versão | Uso |
 | --- | --- |
 | `/v2` | Simulação por loja, criação e acompanhamento da proposta, envio de documentos, dados do veículo e conta de recebimento. Recomendada para novas integrações. |
-| `/v1` | Autenticação, cliente, faixas, paginações e webhooks — usados também no fluxo v2. Simulação e proposta v1 continuam disponíveis como legado. |
+| `/v1` | Autenticação, cliente, consultas e paginações de simulação e proposta, e webhooks — usados também no fluxo v2. Simulação e proposta v1 continuam disponíveis como legado. |
 
 <Note>
   Uma proposta criada pela v1 é consultada pela v1. Uma proposta criada pela v2 só aceita os endpoints `/v2` de acompanhamento e envio.
@@ -71,7 +71,7 @@ Os campos JSON são em português. Listas paginadas seguem sempre o mesmo format
 
 ## Erros
 
-Toda resposta de erro traz os campos `tipo`, `titulo`, `status` e `detalhe`. Erros de validação trazem também a lista `erros`.
+Toda resposta de erro traz os campos `tipo` (código estável do erro), `titulo`, `status` e `detalhe`. Quando o erro é de um campo, vem também `campo`. Erros de validação trazem a lista `erros`.
 
 <Card title="Formato completo de erro e Idempotency-Key" icon="triangle-exclamation" href="/pages/errors" horizontal>
   Veja o formato de erro, os status HTTP e o reenvio seguro de operações.
@@ -88,13 +88,16 @@ Rotas que criam ou alteram dados aceitam o cabeçalho `Idempotency-Key`: reenvia
     O token não foi enviado, é inválido ou expirou. Gere um novo token — veja [Autenticação](/pages/authentication).
   </Accordion>
   <Accordion title="404 em uma proposta que existe" icon="magnifying-glass">
-    A proposta pode ser de outra versão. Propostas criadas pela v1 não são encontradas em `/v2/proposal/{propostaId}`, e vice-versa.
+    A proposta pode pertencer a outro parceiro, ou o token pode ser de outro ambiente (staging x produção).
   </Accordion>
   <Accordion title="409 Conflict em POST" icon="ban">
     Uma `Idempotency-Key` já usada com um corpo diferente. Gere uma nova chave para uma nova operação — veja [Erros e idempotência](/pages/errors).
   </Accordion>
-  <Accordion title="Simulação v2 recusada pela loja" icon="store">
-    O `cnpjLoja` precisa estar vinculado ao seu cadastro de parceiro e a loja não pode ter contrato de intermediação.
+  <Accordion title="404 ou 422 na simulação v2" icon="store">
+    `404` (`Store.Integration.NotFound`): o `cnpjLoja` não existe ou não está vinculado ao seu cadastro de parceiro. `422` (`Store.Integration.Intermediation`): a loja tem contrato de intermediação e não pode ser usada na integração.
+  </Accordion>
+  <Accordion title="422 Proposal.Access.NotIntegrationV2" icon="code-branch">
+    Você chamou uma rota `/v2` com uma proposta criada pela v1. Consulte-a por `GET /v1/proposal/{propostaId}`.
   </Accordion>
 </AccordionGroup>
 
@@ -111,6 +114,15 @@ Rotas que criam ou alteram dados aceitam o cabeçalho `Idempotency-Key`: reenvia
 <CardGroup cols={3}>
   <Card title="Fluxo da proposta" icon="arrow-right-arrow-left" href="/pages/v2/overview">
     A ordem de chamadas do início ao fim.
+  </Card>
+  <Card title="Guia de financiamento" icon="car" href="/pages/guides/financing-integration">
+    Todas as chamadas de um financiamento, com exemplos.
+  </Card>
+  <Card title="Guia de refinanciamento" icon="money-bill-transfer" href="/pages/guides/refinancing-integration">
+    Inclui a conta de recebimento.
+  </Card>
+  <Card title="Envio de documentos" icon="file-arrow-up" href="/pages/guides/document-upload">
+    Base64, idempotência e correção.
   </Card>
   <Card title="Etapas e status" icon="list-check" href="/pages/v2/steps">
     O significado de cada código da proposta.

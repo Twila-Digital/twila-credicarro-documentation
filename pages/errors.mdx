@@ -1,6 +1,6 @@
 ---
 title: 'Erros e idempotência'
-description: 'Formato de erros, status HTTP e reenvio seguro'
+description: 'Formato de erros, status HTTP, códigos de erro e reenvio seguro'
 icon: 'triangle-exclamation'
 ---
 
@@ -15,39 +15,114 @@ Os erros retornados pela API seguem o formato abaixo, com campos em português:
   "status": 400,
   "detalhe": "A validation problem occurred.",
   "erros": [
-    { "codigo": "Proposal.InvalidCpf", "mensagem": "O CPF informado é inválido." },
-    { "codigo": "Proposal.PlateIsInvalid", "mensagem": "A placa informada é inválida. Use o formato ABC-1234 ou ABC1D23." }
+    { "codigo": "Proposal.InvalidCpf", "mensagem": "O CPF informado é inválido.", "campo": "cpf" },
+    { "codigo": "Proposal.PlateIsInvalid", "mensagem": "A placa informada é inválida. Use o formato ABC-1234 ou ABC1D23.", "campo": "placa" }
   ]
+}
+```
+
+Um erro de regra de negócio vem sem a lista `erros`:
+
+```json
+{
+  "tipo": "Store.Integration.Intermediation",
+  "titulo": "Regra de negócio não atendida",
+  "status": 422,
+  "detalhe": "A loja possui contrato de intermediação e não é elegível para a integração."
 }
 ```
 
 | Campo | Descrição |
 | --- | --- |
-| `tipo` | Código estável do erro (por exemplo, `Partner.AccountIsIncompleted`). Use este campo no seu tratamento. |
+| `tipo` | Código estável do erro (por exemplo, `Store.Integration.NotFound`). **Use este campo no seu tratamento.** |
 | `titulo` | Categoria do erro. |
 | `status` | Status HTTP. |
-| `detalhe` | Mensagem do erro. |
-| `erros` | Lista com `codigo` e `mensagem` de cada campo inválido. |
+| `detalhe` | Mensagem do erro, para logs e suporte. Pode mudar sem aviso. |
+| `campo` | Campo da requisição relacionado ao erro, quando houver. |
+| `erros` | Lista com `codigo`, `mensagem` e `campo` de cada campo inválido. |
 
 <Card title="erros vs. detalhe" icon="list-check" horizontal>
-  O campo `erros` aparece apenas em erros de **validação de payload** (`tipo` igual a `ValidationError`). Erros de **regra de negócio** não preenchem `erros` — a explicação vem em `tipo` e `detalhe`.
+  O campo `erros` aparece apenas em erros de **validação de payload**. Erros de **regra de negócio** não preenchem `erros` — a explicação vem em `tipo` e `detalhe`.
 </Card>
 
 ## <Icon icon="list" type="solid"/> Status HTTP
 
-| Status | Quando ocorre |
-| --- | --- |
-| `400` | Dados inválidos ou regra de negócio não atendida. |
-| `401` | Token ausente, inválido ou expirado. |
-| `404` | Recurso não encontrado ou de outro parceiro (proposta, simulação, loja ou webhook). |
-| `409` | `Idempotency-Key` reutilizada com outro conteúdo. |
-| `500` | Erro inesperado. |
-| `502` | Falha ao comunicar com um serviço interno ou externo. Tente novamente mais tarde. |
-| `503` | Serviço temporariamente indisponível. Tente novamente mais tarde. |
+| Status | Quando ocorre | Repetir? |
+| --- | --- | --- |
+| `400` | Dados inválidos (formato, campo obrigatório ausente). | Não — corrija o corpo |
+| `401` | Token ausente, inválido ou expirado. | Gere um novo token e repita |
+| `403` | Integração inativa ou sem acesso. | Não — fale com o time Credicarro |
+| `404` | Recurso não encontrado ou de outro parceiro (proposta, simulação, cliente, loja ou webhook). | Não |
+| `409` | `Idempotency-Key` reutilizada com outro conteúdo. | Não — use uma nova chave |
+| `422` | Regra de negócio não atendida (por exemplo, loja com intermediação ou cadastro do cliente incompleto). | Não — trate pelo `tipo` |
+| `500` | Erro inesperado. | Sim, com a mesma `Idempotency-Key` |
+| `502` | Falha ao comunicar com um serviço interno ou externo. | Sim, com espera crescente |
+| `503` | Serviço temporariamente indisponível. | Sim, com espera crescente |
 
 <Note>
-  Respostas `401` são devolvidas sem corpo. Falhas inesperadas (`500`, e alguns `502`) podem vir no formato padrão Problem Details, com os campos `type`, `title`, `status` e `detail`.
+  Respostas `401` de token ausente ou inválido são devolvidas sem corpo. Falhas inesperadas (`500`, e alguns `502`) podem vir no formato padrão Problem Details, com os campos `type`, `title`, `status` e `detail`.
 </Note>
+
+## <Icon icon="hashtag" type="solid"/> Códigos de erro
+
+Os códigos abaixo chegam em `tipo` (regra de negócio) ou em `erros[].codigo` (validação).
+
+### Acesso e autenticação
+
+| Código | Status | Quando ocorre |
+| --- | --- | --- |
+| `Integration.Authentication.InvalidCredentials` | `401` | `clientId` ou `clientSecret` inválidos. |
+| `Integration.Access.Inactive` | `403` | A integração do parceiro está inativa. |
+| `Integration.Access.OrganizationNotFound` | `403` | O parceiro do token não foi encontrado. |
+
+### Cliente, loja e simulação
+
+| Código | Status | Quando ocorre |
+| --- | --- | --- |
+| `Customer.Account.NotFound` | `404` | O CPF não tem cadastro. Cadastre o cliente antes de simular. |
+| `Customer.Account.Incomplete` | `422` | O cadastro do cliente está incompleto (endereço, ocupação ou renda). |
+| `Store.Integration.NotFound` | `404` | O `cnpjLoja` não existe ou não está vinculado ao parceiro. |
+| `Store.Integration.Intermediation` | `422` | A loja tem contrato de intermediação e não pode ser usada na integração. |
+| `Simulation.Access.NotFound` | `404` | A simulação não existe ou é de outro parceiro. |
+| `Simulation.Access.NotFromStore` | `422` | A simulação não foi feita em uma loja de integração do parceiro. |
+| `Simulation.Terms.Unavailable` | `422` | Não há prazos disponíveis para o veículo. |
+| `Simulation.Refinancing.AmountOutOfRange` | `422` | O `valorSolicitado` está fora da faixa refinanciável da placa. O `detalhe` informa o mínimo e o máximo. |
+| `Simulation.Refinancing.UfUnavailable` | `422` | Não foi possível identificar a UF do veículo nem do endereço do cliente. |
+
+### Proposta
+
+| Código | Status | Quando ocorre |
+| --- | --- | --- |
+| `Proposal.Access.NotFound` | `404` | A proposta não existe ou é de outro parceiro. |
+| `Proposal.Access.NotIntegrationV2` | `422` | Rota `/v2` chamada com uma proposta criada pela v1. |
+| `Proposal.Customer.ProfileNotFound` | `404` | O cliente da proposta não foi encontrado. |
+| `Proposal.DepositAccount.OnlyRefinancing` | `422` | Conta de recebimento enviada para uma proposta de financiamento. |
+| `Proposal.DepositAccount.HolderNotBuyer` | `422` | O `cpfTitular` da conta não é o CPF do cliente da proposta. |
+
+### Envio de documentos
+
+| Código | Quando ocorre |
+| --- | --- |
+| `Document.InvalidParticipant` | `participante` diferente de `COMPRADOR` ou `LOJA`. |
+| `Document.InvalidType` | Tipo de documento não aceito para o participante. |
+| `Document.InvalidName` | Nome de arquivo vazio, com caminho, com mais de 255 caracteres ou com extensão não aceita. |
+| `Document.InvalidBase64` | Conteúdo Base64 inválido. |
+| `Document.Empty` | Arquivo vazio. |
+| `Document.TooLarge` | Arquivo maior que 10 MiB depois de decodificado. |
+| `Document.InvalidContent` | O conteúdo não corresponde à extensão informada. |
+| `Document.InvalidProposalStage` | A etapa ativa não permite o envio de documentos. |
+| `Document.NotPendingCorrection` | Em correção, o tipo enviado não está recusado. |
+| `Idempotency.KeyConflict` | A `Idempotency-Key` já foi usada com outro conteúdo. |
+
+### Webhooks
+
+| Código | Status | Quando ocorre |
+| --- | --- | --- |
+| `Webhook.Registration.NotFound` | `404` | O webhook não existe ou é de outro parceiro. |
+
+<Tip>
+  Trate os códigos que fazem sentido para o seu fluxo e tenha um tratamento genérico por status para os demais. Novos códigos podem ser adicionados.
+</Tip>
 
 ## <Icon icon="repeat" type="solid"/> Reenvio seguro com Idempotency-Key
 
@@ -76,6 +151,23 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
 <Card title="Chave reutilizada com corpo diferente" icon="ban" color="#f44336" horizontal>
   Retorna `409 Conflict`. Uma mesma `Idempotency-Key` está atrelada ao corpo exato da primeira requisição.
 </Card>
+
+### Estratégia de retentativa
+
+```javascript
+async function chamarComRetentativa(fazerChamada, tentativas = 4) {
+  for (let tentativa = 0; tentativa < tentativas; tentativa++) {
+    const resposta = await fazerChamada();
+    if (![500, 502, 503].includes(resposta.status)) return resposta;
+    await new Promise((r) => setTimeout(r, 2 ** tentativa * 500));
+  }
+  throw new Error("Credicarro indisponível após retentativas");
+}
+```
+
+<Warning>
+  Gere a `Idempotency-Key` **fora** da função de retentativa. Todas as tentativas precisam usar a mesma chave.
+</Warning>
 
 ### Rotas que aceitam Idempotency-Key
 

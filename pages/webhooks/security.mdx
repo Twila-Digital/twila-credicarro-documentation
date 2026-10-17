@@ -46,22 +46,92 @@ Para validar uma notificação:
   </Step>
 </Steps>
 
-```javascript
+<CodeGroup>
+
+```javascript Node.js
 import crypto from "node:crypto";
+
+const TOLERANCIA_SEGUNDOS = 300;
 
 function assinaturaValida(rawBody, header, segredo) {
   const partes = Object.fromEntries(header.split(",").map((p) => p.split("=")));
-  const esperado = crypto
-    .createHmac("sha256", segredo)
-    .update(`${partes.t}.${rawBody}`)
-    .digest("hex");
-  return crypto.timingSafeEqual(Buffer.from(esperado), Buffer.from(partes.v1));
+  if (Math.abs(Date.now() / 1000 - Number(partes.t)) > TOLERANCIA_SEGUNDOS) return false;
+
+  const esperado = Buffer.from(
+    crypto.createHmac("sha256", segredo).update(`${partes.t}.${rawBody}`).digest("hex")
+  );
+  const recebido = Buffer.from(partes.v1 ?? "");
+  return esperado.length === recebido.length && crypto.timingSafeEqual(esperado, recebido);
 }
 ```
+
+```python Python
+import hashlib
+import hmac
+import time
+
+TOLERANCIA_SEGUNDOS = 300
+
+def assinatura_valida(raw_body: bytes, header: str, segredo: str) -> bool:
+    partes = dict(p.split("=", 1) for p in header.split(","))
+    if abs(time.time() - int(partes["t"])) > TOLERANCIA_SEGUNDOS:
+        return False
+
+    conteudo = partes["t"].encode() + b"." + raw_body
+    esperado = hmac.new(segredo.encode(), conteudo, hashlib.sha256).hexdigest()
+    return hmac.compare_digest(esperado, partes.get("v1", ""))
+```
+
+```csharp C#
+using System.Security.Cryptography;
+using System.Text;
+
+static bool AssinaturaValida(string rawBody, string header, string segredo)
+{
+    var partes = header.Split(',').Select(p => p.Split('=', 2)).ToDictionary(p => p[0], p => p[1]);
+    if (Math.Abs(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - long.Parse(partes["t"])) > 300)
+        return false;
+
+    var hash = HMACSHA256.HashData(Encoding.UTF8.GetBytes(segredo), Encoding.UTF8.GetBytes($"{partes["t"]}.{rawBody}"));
+    var esperado = Encoding.ASCII.GetBytes(Convert.ToHexStringLower(hash));
+    var recebido = Encoding.ASCII.GetBytes(partes.GetValueOrDefault("v1", ""));
+    return CryptographicOperations.FixedTimeEquals(esperado, recebido);
+}
+```
+
+</CodeGroup>
+
+<Note>
+  A tolerância de 5 minutos é uma sugestão. Ajuste conforme a sua necessidade.
+</Note>
 
 <Warning>
   Sempre valide a assinatura contra o **corpo bruto** da requisição, antes de desserializar. Reformatar o JSON altera o hash calculado e invalida a comparação.
 </Warning>
+
+## Exemplo de endpoint
+
+O endpoint precisa ler o **corpo bruto** antes de desserializar. Em Express:
+
+```javascript
+import express from "express";
+
+const app = express();
+
+app.post("/webhooks/credicarro", express.raw({ type: "application/json" }), (req, res) => {
+  const rawBody = req.body.toString("utf8");
+  if (!assinaturaValida(rawBody, req.get("X-CrediCarro-Signature") ?? "", process.env.CREDICARRO_SEGREDO)) {
+    return res.sendStatus(401);
+  }
+
+  res.sendStatus(200);
+  fila.publicar({ chave: req.get("Idempotency-Key"), evento: JSON.parse(rawBody) });
+});
+```
+
+<Tip>
+  Responda `2xx` assim que validar a assinatura e processe o evento de forma assíncrona (fila, job). O tempo limite de cada entrega é de 15 segundos.
+</Tip>
 
 ## Respostas e retentativas
 

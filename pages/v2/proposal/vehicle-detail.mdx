@@ -2,3 +2,23 @@
 title: 'Incluir dados do veículo'
 openapi: "POST /v2/proposal/{propostaId}/vehicle-detail"
 ---
+
+Inclui ou atualiza placa, Renavam, chassi e cor do veículo. Aceito enquanto a etapa ativa for `DADOS_VEICULO`.
+
+**Exemplo:**
+```json
+{
+  "renavam": "12345678901",
+  "chassi": "9BWZZZ377VT004251",
+  "placa": "ABC1D23",
+  "cor": "PRATA"
+}
+```
+
+<Tip title="Regras" horizontal>
+  Renavam com 11 dígitos. A cor não pode conter números.
+</Tip>
+
+<Note>
+  Retorna `202 Accepted`, sem corpo.
+</Note>

@@ -2,3 +2,17 @@
 title: 'Buscar proposta'
 openapi: "GET /v2/proposal/{propostaId}"
 ---
+
+Retorna o retrato atual da proposta: status, `link_biometria` e, para o comprador e a loja, a etapa ativa, a situação, quem precisa agir, as etapas concluídas e os documentos.
+
+<Tip title="Quem precisa agir?" horizontal>
+  Leia `status_ativo.responsavel_acao` de cada participante. Quando for `INTEGRADOR`, a `etapa` diz o que enviar. Veja a [referência de proposta](/pages/v2/proposal/reference#como-decidir-o-proximo-passo).
+</Tip>
+
+<Tip title="Biometria" horizontal>
+  Quando a biometria do comprador estiver em `SESSAO_CRIADA`, envie o `link_biometria` ao cliente.
+</Tip>
+
+<Note>
+  Propostas criadas pela v1 retornam `422` com `Proposal.Access.NotIntegrationV2`. Consulte-as por [`GET /v1/proposal/{propostaId}`](/pages/proposal/get).
+</Note>

@@ -2,3 +2,9 @@
 title: 'Editar webhook'
 openapi: "PUT /v1/webhook/{webhookId}"
 ---
+
+Altera o tipo, a URL e o status de um webhook. Use `status` = 2 para pausar sem excluir.
+
+<Warning>
+  A autenticação (tipo e credencial) não pode ser alterada. Para trocá-la, exclua o webhook e cadastre outro.
+</Warning>

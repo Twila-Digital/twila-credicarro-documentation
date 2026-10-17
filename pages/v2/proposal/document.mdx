@@ -2,3 +2,27 @@
 title: 'Enviar documento'
 openapi: "POST /v2/proposal/{propostaId}/document"
 ---
+
+Envia **um** documento do comprador ou da loja, em Base64. Aceito quando a etapa ativa do participante for `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`.
+
+**Exemplo:**
+```json
+{
+  "participante": "COMPRADOR",
+  "tipoDocumento": 1,
+  "nomeArquivo": "cnh-comprador.pdf",
+  "conteudoBase64": "JVBERi0xLjcKJcOkw7zDtsOfCjIgMCBvYmoK..."
+}
+```
+
+<Warning>
+  O header `Idempotency-Key` é **obrigatório**. Use a mesma chave nas retentativas do mesmo envio.
+</Warning>
+
+<Tip title="Arquivo" horizontal>
+  PDF, JPG/JPEG ou PNG, até 10 MiB decodificado, Base64 puro (sem prefixo `data:`).
+</Tip>
+
+<Card title="Guia de envio de documentos" icon="file-arrow-up" href="/pages/guides/document-upload" horizontal>
+  Tipos por participante, exemplos em Node.js, Python e C#, e o fluxo de correção.
+</Card>

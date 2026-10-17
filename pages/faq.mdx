@@ -1,0 +1,83 @@
+---
+title: 'Perguntas frequentes'
+description: 'Dúvidas comuns de lojistas e desenvolvedores sobre a Credicarro'
+icon: 'circle-question'
+---
+
+## Para lojistas
+
+<AccordionGroup>
+  <Accordion title="Qual a diferença entre financiamento e refinanciamento?" icon="scale-balanced">
+    **Financiamento** é para o cliente comprar um veículo na sua loja. **Refinanciamento** é para o cliente conseguir crédito usando um veículo que já é dele como garantia. Veja [Financiamento](/pages/concepts/financing) e [Refinanciamento](/pages/concepts/refinancing).
+  </Accordion>
+
+  <Accordion title="O cliente precisa dar entrada no financiamento?" icon="hand-holding-dollar">
+    Não é obrigatório — a entrada pode ser zero. Mas cada prazo tem uma **entrada mínima**, que pode ser consultada antes da simulação.
+  </Accordion>
+
+  <Accordion title="Quanto o cliente consegue no refinanciamento?" icon="sack-dollar">
+    Depende do veículo. A **faixa refinanciável** mostra, para cada prazo, o valor mínimo e o máximo que a placa permite.
+  </Accordion>
+
+  <Accordion title="Por que a simulação foi recusada para a minha loja?" icon="store">
+    A loja precisa estar vinculada ao integrador que está fazendo a simulação. Lojas com contrato de intermediação também não simulam pela integração. Fale com o time Credicarro para revisar o cadastro.
+  </Accordion>
+
+  <Accordion title="Um documento foi recusado. E agora?" icon="file-circle-xmark">
+    Veja o motivo da recusa, corrija com o cliente e reenvie **só aquele documento**. Veja [Documentos](/pages/concepts/documents).
+  </Accordion>
+
+  <Accordion title="O cliente não fez a biometria. O que acontece?" icon="fingerprint">
+    A proposta fica parada aguardando o cliente. Lembre o cliente de acessar o link da biometria. Se a biometria for reprovada, a etapa fica bloqueada — fale com o time Credicarro.
+  </Accordion>
+
+  <Accordion title="Posso usar a conta bancária de outra pessoa no refinanciamento?" icon="building-columns">
+    Não. A conta de recebimento precisa estar no CPF do próprio cliente da proposta.
+  </Accordion>
+
+  <Accordion title="A proposta expirou. Dá para retomar?" icon="clock">
+    Uma proposta expirada não continua. Faça uma nova simulação e crie uma nova proposta.
+  </Accordion>
+</AccordionGroup>
+
+---
+
+## Para desenvolvedores
+
+<AccordionGroup>
+  <Accordion title="Devo usar a v1 ou a v2?" icon="code-branch">
+    Use a **v2** em novas integrações. Ela traz a simulação por loja, o acompanhamento das etapas e o envio de documentos, dados do veículo e conta de recebimento pela API. A v1 continua disponível como legado.
+  </Accordion>
+
+  <Accordion title="O mesmo token serve para v1 e v2?" icon="key">
+    Sim. O token gerado em `POST /v1/authentication/accesstoken` vale para as rotas `/v1` e `/v2`.
+  </Accordion>
+
+  <Accordion title="Recebo 404 em uma proposta que existe" icon="magnifying-glass">
+    Confira se o token é do mesmo ambiente (staging ou produção) em que a proposta foi criada. A API também retorna 404 para recursos de outro parceiro. Uma proposta v1 consultada em `/v2` retorna `422` com `Proposal.Access.NotIntegrationV2`.
+  </Accordion>
+
+  <Accordion title="Como sei o que enviar em cada etapa?" icon="list-check">
+    Consulte a proposta (ou use o webhook v2) e olhe o `status_ativo` do comprador e da loja. Quando `responsavel_acao` for `INTEGRADOR`, a `etapa` diz qual endpoint chamar. Veja [Etapas e status](/pages/v2/steps).
+  </Accordion>
+
+  <Accordion title="Preciso consultar a proposta o tempo todo?" icon="arrows-rotate">
+    Não. Cadastre um webhook do tipo Proposta (`tipo` = 3) e reaja às notificações. Use a consulta só para reconciliar ou quando precisar do estado mais recente.
+  </Accordion>
+
+  <Accordion title="Posso repetir uma requisição que deu timeout?" icon="repeat">
+    Sim, com segurança, se você enviar o header `Idempotency-Key`. Repetir a mesma chave com o mesmo corpo devolve o resultado original. Veja [Erros e idempotência](/pages/errors).
+  </Accordion>
+
+  <Accordion title="Perdi o segredo de assinatura do webhook" icon="lock">
+    O `segredo_assinatura` só aparece na resposta do cadastro. Exclua o webhook e cadastre outro para gerar um novo segredo.
+  </Accordion>
+
+  <Accordion title="As credenciais de staging funcionam em produção?" icon="server">
+    Não. Cada ambiente tem o seu `clientId` e `clientSecret`. Veja [Ir para produção](/pages/production).
+  </Accordion>
+</AccordionGroup>
+
+<Card title="Não achou a resposta?" icon="headset" href="mailto:atendimento@credicarro.com.br" horizontal>
+  Fale com o time Credicarro em atendimento@credicarro.com.br.
+</Card>

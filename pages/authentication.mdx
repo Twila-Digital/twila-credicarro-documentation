@@ -1,39 +1,73 @@
 ---
 title: 'Autenticação'
-description: 'Como enviar requisições para a nossa API'
+description: 'Como gerar o token de acesso e autenticar as requisições'
 icon: 'lock'
 ---
 
+A API usa **Bearer token**. Você troca seu `clientId` e `clientSecret` por um token de acesso e envia esse token em todas as demais requisições.
+
 <Tip>
-  Para utilizar a API de integração você precisa ter em mãos o **ClientId** e o **ClientSecret** gerados através de uma solicitação para o nosso suporte. **IMPORTANTE**: Sem o Bearer Token, as requisições serão recusadas.
-</Tip> 
+  As credenciais (`clientId` e `clientSecret`) são geradas pelo time Credicarro. Peça as suas em atendimento@credicarro.com.br. Cada ambiente — staging e produção — tem as suas credenciais.
+</Tip>
 
-<Card title="Erro de autenticação" icon="warning" horizontal>
-  A API retornará o código HTTP `401` quando:
-  - O token não for fornecido no header
-  - O token for inválido
-  - O token tiver sido revogado
-</Card>
+---
 
-## <Icon icon="key" type="solid"/>  Boas práticas de segurança
+## Gerar o token
 
-<Card icon="light-emergency-on" horizontal>
-  * Armazene suas credenciais em variáveis de ambiente ou gerenciadores de segredos
-  * Nunca compartilhe seus tokens
-  * A Credicarro nunca solicitará suas credenciais
-</Card>
+<CodeGroup>
 
-## Como criar seu Bearer token
-
-Após solicitar suas credenciais ao nosso suporte, você pode começar a integrar com nossa API.
-
-```bash
+```bash cURL
 curl -X POST https://api.staging.credicarro.com.br/integration/v1/authentication/accesstoken \
   -H "Content-Type: application/json" \
-  -d '{ "clientId": "clientId", "clientSecret": "clientSecret" }'
+  -d '{ "clientId": "<client-id>", "clientSecret": "<client-secret>" }'
 ```
 
-Resposta (200)
+```javascript Node.js
+const resposta = await fetch(
+  "https://api.staging.credicarro.com.br/integration/v1/authentication/accesstoken",
+  {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      clientId: process.env.CREDICARRO_CLIENT_ID,
+      clientSecret: process.env.CREDICARRO_CLIENT_SECRET,
+    }),
+  }
+);
+const { token_de_acesso, expira_em } = await resposta.json();
+```
+
+```python Python
+import os
+import requests
+
+resposta = requests.post(
+    "https://api.staging.credicarro.com.br/integration/v1/authentication/accesstoken",
+    json={
+        "clientId": os.environ["CREDICARRO_CLIENT_ID"],
+        "clientSecret": os.environ["CREDICARRO_CLIENT_SECRET"],
+    },
+    timeout=15,
+)
+resposta.raise_for_status()
+token = resposta.json()["token_de_acesso"]
+```
+
+```csharp C#
+using var http = new HttpClient { BaseAddress = new Uri("https://api.staging.credicarro.com.br/integration/") };
+
+var resposta = await http.PostAsJsonAsync("v1/authentication/accesstoken", new
+{
+    clientId = Environment.GetEnvironmentVariable("CREDICARRO_CLIENT_ID"),
+    clientSecret = Environment.GetEnvironmentVariable("CREDICARRO_CLIENT_SECRET")
+});
+resposta.EnsureSuccessStatusCode();
+var token = await resposta.Content.ReadFromJsonAsync<JsonElement>();
+```
+
+</CodeGroup>
+
+**Resposta (200)**
 
 ```json
 {
@@ -45,8 +79,76 @@ Resposta (200)
 }
 ```
 
-Envie o token em todas as demais requisições, no header `Authorization: Bearer {token_de_acesso}`. O mesmo token vale para as rotas `/v1` e `/v2`. Gere um novo token antes de `expira_em`; um token expirado retorna `401`.
+| Campo | Descrição |
+| --- | --- |
+| `token_de_acesso` | O token a enviar no header `Authorization`. |
+| `expira_em_segundos` | Validade do token, em segundos. |
+| `expira_em` | Data e hora (UTC) em que o token expira. |
+| `tipo_de_token` | Sempre `Bearer`. |
+| `escopo` | Escopo concedido ao token. |
 
-<Card title="Nota importante" icon="info" horizontal>
-  O endpoint (`https://api.staging.credicarro.com.br/integration`) é utilizado para o ambiente de desenvolvimento caso queira utilizar em produção utilize (`https://api.credicarro.com.br/integration`).
+---
+
+## Usar o token
+
+Envie o token em todas as requisições, no header `Authorization`. O mesmo token vale para as rotas `/v1` e `/v2`.
+
+```bash
+curl https://api.staging.credicarro.com.br/integration/v2/proposal/{propostaId} \
+  -H "Authorization: Bearer {token_de_acesso}"
+```
+
+---
+
+## Reaproveite o token
+
+Não gere um token por requisição. Guarde o token em cache e gere outro só quando ele estiver perto de expirar.
+
+```javascript
+let cache = { token: null, expiraEm: 0 };
+
+async function obterToken() {
+  const margem = 60_000;
+  if (cache.token && Date.now() < cache.expiraEm - margem) return cache.token;
+
+  const resposta = await fetch(`${BASE_URL}/v1/authentication/accesstoken`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ clientId: CLIENT_ID, clientSecret: CLIENT_SECRET }),
+  });
+  const dados = await resposta.json();
+  cache = { token: dados.token_de_acesso, expiraEm: Date.parse(dados.expira_em) };
+  return cache.token;
+}
+```
+
+<Note>
+  Se uma chamada retornar `401`, gere um novo token e repita a chamada uma vez.
+</Note>
+
+---
+
+## Erros de autenticação
+
+A API retorna `401 Unauthorized` (sem corpo) quando:
+
+- O header `Authorization` não foi enviado
+- O token é inválido ou foi revogado
+- O token expirou
+
+Em `POST /v1/authentication/accesstoken`, credenciais erradas retornam `401` e campos ausentes retornam `400`.
+
+---
+
+## Boas práticas de segurança
+
+<Card icon="shield-halved" horizontal>
+  * Guarde `clientId` e `clientSecret` em variáveis de ambiente ou em um gerenciador de segredos — nunca no código-fonte
+  * Gere o token só no seu backend. Nunca exponha o `clientSecret` em apps mobile ou páginas web
+  * Não registre o token nem o `clientSecret` em logs
+  * A Credicarro nunca pede suas credenciais por e-mail ou telefone
+</Card>
+
+<Card title="Ambientes" icon="server" horizontal>
+  Staging: `https://api.staging.credicarro.com.br/integration` · Produção: `https://api.credicarro.com.br/integration`. Veja [Ambiente de testes](/pages/development) e [Ir para produção](/pages/production).
 </Card>

@@ -1,0 +1,81 @@
+---
+title: 'Referência'
+description: 'O cadastro do cliente (comprador) e quando usar cada endpoint'
+icon: 'book-open-cover'
+---
+
+O **cliente** é a pessoa que pede o crédito. Ele é identificado pelo **CPF** em todas as chamadas — não é preciso guardar o `id_cliente`.
+
+## O que a proposta exige
+
+| Parte do cadastro | Simulação de financiamento | Simulação de refinanciamento | Proposta |
+| --- | :---: | :---: | :---: |
+| Dados pessoais | ✓ | ✓ | ✓ |
+| Endereço | | ✓ | ✓ |
+| Ocupação e renda | | | ✓ |
+
+<Tip title="Use o endpoint unificado" horizontal>
+  `POST /v1/customer/unified` envia dados pessoais, endereço e dados profissionais de uma vez — e já deixa o cliente pronto para a proposta. Chamá-lo de novo atualiza o cadastro.
+</Tip>
+
+## Endpoints
+
+| Endpoint | Quando usar |
+| --- | --- |
+| [`POST /v1/customer/unified`](/pages/customer/unified) | Cadastro completo em uma chamada. **Recomendado.** |
+| [`POST /v1/customer`](/pages/customer/create) | Só os dados pessoais. |
+| [`POST /v1/customer/address`](/pages/customer/address) | Criar ou atualizar o endereço de um cliente existente. |
+| [`POST /v1/customer/professional`](/pages/customer/professional) | Criar ou atualizar ocupação e renda de um cliente existente. |
+
+## Exemplo completo
+
+```json POST /v1/customer/unified
+{
+  "cpf": "12345678901",
+  "nome": "Maria",
+  "sobrenome": "Souza",
+  "email": "maria.souza@exemplo.com.br",
+  "celular": "+5511998765432",
+  "dataDeNascimento": "1990-05-20T00:00:00-03:00",
+  "endereco": {
+    "rua": "Av. Paulista",
+    "numero": "1578",
+    "complemento": "Bloco B, Apto 1203",
+    "bairro": "Bela Vista",
+    "cidade": "São Paulo",
+    "estado": "SP",
+    "cep": "01311000"
+  },
+  "dadosProfissionais": {
+    "tipoOcupacao": 3,
+    "renda": 6500.00
+  }
+}
+```
+
+## Tipos de ocupação (`tipoOcupacao`)
+
+| Código | Ocupação |
+| --- | --- |
+| 1 | Aposentado |
+| 2 | Pensionista |
+| 3 | Assalariado |
+| 4 | Autônomo |
+| 6 | Freelancer |
+| 7 | Proprietário |
+
+## Regras dos campos
+
+| Campo | Regra |
+| --- | --- |
+| `cpf` | 11 dígitos, só números. |
+| `celular` | Formato E.164: código do país, DDD e número (`+5511998765432`). |
+| `dataDeNascimento` | ISO-8601 com fuso horário. |
+| `endereco.cep` | Só números. |
+| `endereco.estado` | Sigla com 2 letras (`SP`). |
+| `endereco.numero`, `endereco.complemento` | Opcionais. |
+| `dadosProfissionais.renda` | Renda mensal em reais, com ponto decimal. |
+
+<Note>
+  Os dados do cliente precisam bater com os documentos enviados depois. Divergências de nome, CPF ou endereço podem causar a recusa de documentos.
+</Note>

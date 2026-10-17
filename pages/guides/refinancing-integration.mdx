@@ -1,0 +1,138 @@
+---
+title: 'Integrar um refinanciamento'
+description: 'Chamadas de um refinanciamento v2, da faixa refinanciável à conta de recebimento'
+icon: 'money-bill-transfer'
+---
+
+O refinanciamento segue o mesmo fluxo do [financiamento](/pages/guides/financing-integration), com três diferenças:
+
+<CardGroup cols={3}>
+  <Card title="Faixa refinanciável" icon="sliders">
+    O valor pedido precisa estar entre o mínimo e o máximo da placa.
+  </Card>
+  <Card title="Simulação mais simples" icon="calculator">
+    Só CPF, placa, valor solicitado e `cnpjLoja`.
+  </Card>
+  <Card title="Conta de recebimento" icon="building-columns">
+    Uma etapa a mais, para informar onde o cliente recebe o crédito.
+  </Card>
+</CardGroup>
+
+<Info>
+  Os passos de token, webhook e cadastro do cliente são iguais aos do [guia de financiamento](/pages/guides/financing-integration). O cliente precisa estar cadastrado **com endereço** antes de simular. Os valores dos exemplos são ilustrativos.
+</Info>
+
+Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `$TOKEN` é o token de acesso.
+
+---
+
+<Steps>
+  <Step title="Consulte a faixa refinanciável">
+    ```bash
+    curl "$BASE/v2/proposal/simulation/range/refinancing?placa=ABC1D23&cnpjLoja=11222333000181" \
+      -H "Authorization: Bearer $TOKEN"
+    ```
+
+    ```json Resposta (200)
+    {
+      "opcoes_por_prazo": [
+        { "prazo": 12, "valor_minimo_refinanciavel": 5000, "valor_maximo_refinanciavel": 30000 },
+        { "prazo": 24, "valor_minimo_refinanciavel": 5000, "valor_maximo_refinanciavel": 32500 },
+        { "prazo": 36, "valor_minimo_refinanciavel": 5000, "valor_maximo_refinanciavel": 35720 }
+      ]
+    }
+    ```
+
+    <Tip>
+      Valide o valor pedido pelo cliente contra esta faixa antes de simular. Fora dela, a simulação retorna `Simulation.Refinancing.AmountOutOfRange`.
+    </Tip>
+  </Step>
+
+  <Step title="Simule">
+    ```bash
+    curl -X POST $BASE/v2/proposal/simulation/refinancing \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -H "Idempotency-Key: $(uuidgen)" \
+      -d '{
+        "cpf": "12345678901",
+        "placa": "ABC1D23",
+        "valorSolicitado": 25000,
+        "cnpjLoja": "11.222.333/0001-81"
+      }'
+    ```
+
+    A resposta tem o mesmo formato da simulação de financiamento: uma opção por prazo, cada uma com `id_simulacao`. Veja [Simulação](/pages/v2/simulation/reference).
+  </Step>
+
+  <Step title="Crie a proposta">
+    ```bash
+    curl -X POST $BASE/v2/proposal \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -H "Idempotency-Key: $(uuidgen)" \
+      -d '{ "cpf": "12345678901", "simulacaoId": "<id_simulacao escolhido>" }'
+    ```
+  </Step>
+
+  <Step title="Acompanhe as etapas">
+    Pelo [webhook v2](/pages/v2/webhooks) ou pela [consulta da proposta](/pages/v2/proposal/get). Quando `responsavel_acao` for `INTEGRADOR`, chame o endpoint da etapa:
+
+    | `etapa` | Endpoint |
+    | --- | --- |
+    | `ENVIO_DOCUMENTOS` / `CORRECAO_DOCUMENTOS` | [`POST /v2/proposal/{id}/document`](/pages/v2/proposal/document) |
+    | `DADOS_VEICULO` | [`POST /v2/proposal/{id}/vehicle-detail`](/pages/v2/proposal/vehicle-detail) |
+    | `CONTA_RECEBIMENTO` | [`POST /v2/proposal/{id}/deposit-account`](/pages/v2/proposal/deposit-account) |
+  </Step>
+
+  <Step title="Informe a conta de recebimento">
+    Quando a etapa ativa for `CONTA_RECEBIMENTO`:
+
+    ```bash
+    curl -X POST $BASE/v2/proposal/bea8d060-f93d-48eb-b6c4-45f64483cdd9/deposit-account \
+      -H "Authorization: Bearer $TOKEN" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "cpfTitular": "12345678901",
+        "codigoBanco": "001",
+        "agencia": "1234",
+        "digitoAgencia": "5",
+        "conta": "123456",
+        "digitoConta": "7",
+        "tipoConta": "CORRENTE"
+      }'
+    ```
+
+    Resposta: `200 OK`.
+
+    | Regra | Erro |
+    | --- | --- |
+    | `cpfTitular` precisa ser o CPF do cliente da proposta | `Proposal.DepositAccount.HolderNotBuyer` |
+    | Só propostas de refinanciamento | `Proposal.DepositAccount.OnlyRefinancing` |
+    | `codigoBanco` com 3 dígitos, `agencia` com 4, `conta` de 4 a 13 | `400` com a lista `erros` |
+    | `tipoConta`: `CORRENTE`, `POUPANCA` ou `PAGAMENTO` | `400` com a lista `erros` |
+
+    <Note>
+      Enviar de novo **substitui** a conta anterior, enquanto a etapa estiver ativa.
+    </Note>
+  </Step>
+
+  <Step title="Documentos e dados do veículo">
+    Iguais ao financiamento. Veja o [guia de envio de documentos](/pages/guides/document-upload) e [Incluir dados do veículo](/pages/v2/proposal/vehicle-detail).
+  </Step>
+
+  <Step title="Vistoria, assinatura e pagamento">
+    O cliente faz a vistoria e assina o contrato. A Credicarro deposita o crédito na conta de recebimento e a proposta chega a `FINALIZADA`.
+  </Step>
+</Steps>
+
+---
+
+## Erros comuns neste fluxo
+
+| `tipo` | Passo | Como resolver |
+| --- | --- | --- |
+| `Simulation.Refinancing.AmountOutOfRange` | Simulação | Ajuste o `valorSolicitado` para dentro da faixa — o `detalhe` traz o mínimo e o máximo. |
+| `Simulation.Refinancing.UfUnavailable` | Simulação | Não foi possível identificar a UF do veículo nem do endereço do cliente. Confira o endereço cadastrado. |
+| `Customer.Account.Incomplete` | Simulação ou proposta | Complete o cadastro do cliente (endereço, ocupação e renda). |
+| `Proposal.DepositAccount.HolderNotBuyer` | Conta de recebimento | Use uma conta no CPF do cliente. |
