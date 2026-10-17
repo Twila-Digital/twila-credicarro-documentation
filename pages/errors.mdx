@@ -1,0 +1,88 @@
+---
+title: 'Erros e idempotência'
+description: 'Formato de erros, status HTTP e reenvio seguro'
+icon: 'triangle-exclamation'
+---
+
+## <Icon icon="triangle-exclamation" type="solid"/> Formato de erro
+
+Os erros retornados pela API seguem o formato abaixo, com campos em português:
+
+```json
+{
+  "tipo": "ValidationError",
+  "titulo": "Validation Error",
+  "status": 400,
+  "detalhe": "A validation problem occurred.",
+  "erros": [
+    { "codigo": "Proposal.InvalidCpf", "mensagem": "O CPF informado é inválido." },
+    { "codigo": "Proposal.PlateIsInvalid", "mensagem": "A placa informada é inválida. Use o formato ABC-1234 ou ABC1D23." }
+  ]
+}
+```
+
+| Campo | Descrição |
+| --- | --- |
+| `tipo` | Código estável do erro (por exemplo, `Partner.AccountIsIncompleted`). Use este campo no seu tratamento. |
+| `titulo` | Categoria do erro. |
+| `status` | Status HTTP. |
+| `detalhe` | Mensagem do erro. |
+| `erros` | Lista com `codigo` e `mensagem` de cada campo inválido. |
+
+<Card title="erros vs. detalhe" icon="list-check" horizontal>
+  O campo `erros` aparece apenas em erros de **validação de payload** (`tipo` igual a `ValidationError`). Erros de **regra de negócio** não preenchem `erros` — a explicação vem em `tipo` e `detalhe`.
+</Card>
+
+## <Icon icon="list" type="solid"/> Status HTTP
+
+| Status | Quando ocorre |
+| --- | --- |
+| `400` | Dados inválidos ou regra de negócio não atendida. |
+| `401` | Token ausente, inválido ou expirado. |
+| `404` | Recurso não encontrado ou de outro parceiro (proposta, simulação, loja ou webhook). |
+| `409` | `Idempotency-Key` reutilizada com outro conteúdo. |
+| `500` | Erro inesperado. |
+| `502` | Falha ao comunicar com um serviço interno ou externo. Tente novamente mais tarde. |
+| `503` | Serviço temporariamente indisponível. Tente novamente mais tarde. |
+
+<Note>
+  Respostas `401` são devolvidas sem corpo. Falhas inesperadas (`500`, e alguns `502`) podem vir no formato padrão Problem Details, com os campos `type`, `title`, `status` e `detail`.
+</Note>
+
+## <Icon icon="repeat" type="solid"/> Reenvio seguro com Idempotency-Key
+
+As rotas que criam ou alteram dados aceitam o cabeçalho `Idempotency-Key`. Ele permite repetir uma requisição com segurança após um timeout ou erro de rede, sem criar registros duplicados.
+
+<Steps>
+  <Step title="Gere uma chave única por operação">
+    Antes de chamar a API, gere um identificador único para aquela operação. A chave deve ter de 1 a 200 caracteres — recomendamos um UUID.
+  </Step>
+  <Step title="Envie a chave no cabeçalho">
+    Inclua `Idempotency-Key: <sua-chave>` na requisição.
+  </Step>
+  <Step title="Reenvie com a mesma chave se precisar tentar novamente">
+    Se a chamada falhar por timeout ou erro de rede, repita a requisição com **a mesma chave e o mesmo corpo**. A API devolve o resultado original, sem repetir a operação.
+  </Step>
+</Steps>
+
+```bash
+curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
+  -H "Authorization: Bearer {token}" \
+  -H "Content-Type: application/json" \
+  -H "Idempotency-Key: 6f1c9a2e-3b7d-4e2a-9c51-0d8f3a7b2e10" \
+  -d '{ "cpf": "12345678901", "simulacaoId": "bea8d060-f93d-48eb-b6c4-45f64483cdd9" }'
+```
+
+<Card title="Chave reutilizada com corpo diferente" icon="ban" color="#f44336" horizontal>
+  Retorna `409 Conflict`. Uma mesma `Idempotency-Key` está atrelada ao corpo exato da primeira requisição.
+</Card>
+
+### Rotas que aceitam Idempotency-Key
+
+| Rota | Header |
+| --- | --- |
+| `POST /v1/customer`, `/v1/customer/unified`, `/v1/customer/address`, `/v1/customer/professional` | Opcional |
+| `POST /v1/proposal/simulation/financing`, `/v1/proposal/simulation/refinancing` | Opcional |
+| `POST /v2/proposal/simulation/financing`, `/v2/proposal/simulation/refinancing` | Opcional |
+| `POST /v1/proposal`, `POST /v2/proposal` | Opcional |
+| `POST /v2/proposal/{propostaId}/document` | **Obrigatório** |

@@ -1,0 +1,89 @@
+---
+title: 'Verificação e segurança'
+description: 'Como validar a autenticidade de um webhook e lidar com entregas'
+icon: 'shield-halved'
+---
+
+## Como a notificação é enviada
+
+Cada notificação é um `POST` com corpo JSON (`Content-Type: application/json`) e os headers:
+
+| Header | Conteúdo |
+| --- | --- |
+| `Authorization` | Conforme o [tipo de autenticação](/pages/webhooks#tipos-de-autenticacao) do webhook (ausente quando for 1 - Sem autenticação). |
+| `X-CrediCarro-Signature` | Assinatura HMAC do corpo, no formato `t={timestamp},v1={assinatura}`. |
+| `Idempotency-Key` | Identificador da notificação. Retentativas da mesma notificação repetem a chave. |
+
+## Assinatura HMAC-SHA256
+
+Toda notificação de webhook é assinada com **HMAC-SHA256**, enviada no cabeçalho `X-CrediCarro-Signature`, para confirmar que a requisição veio da Credicarro e não foi forjada por terceiros.
+
+```
+X-CrediCarro-Signature: t=1715792400,v1=5f2b3c8e1a9d7c6b4e2f1a0d9c8b7e6f5a4b3c2d1e0f9a8b7c6d5e4f3a2b1c0d
+```
+
+- `t` — timestamp Unix (segundos) de quando a notificação foi enviada.
+- `v1` — HMAC-SHA256 em hexadecimal minúsculo, calculado sobre a string `{t}.{corpo_bruto_da_requisição}`, usando o `segredo_assinatura` do webhook.
+
+<Card title="Quando o segredo é gerado" icon="key" horizontal color="#25c2a0">
+  O `segredo_assinatura` é gerado ao [cadastrar](/pages/webhook/create) o webhook e retornado **apenas nessa resposta** — ele não é devolvido por nenhuma outra consulta. Guarde-o com segurança.
+</Card>
+
+Para validar uma notificação:
+
+<Steps>
+  <Step title="Leia o header">
+    Separe `t` e `v1` do header `X-CrediCarro-Signature`.
+  </Step>
+  <Step title="Monte o conteúdo assinado">
+    Concatene o valor de `t`, um ponto (`.`) e o corpo da requisição exatamente como recebido, sem reformatar o JSON.
+  </Step>
+  <Step title="Calcule e compare">
+    Calcule o HMAC-SHA256 desse conteúdo usando o `segredo_assinatura` como chave e compare com `v1` usando uma comparação de tempo constante (`timingSafeEqual`/`CryptographicOperations.FixedTimeEquals` — nunca `==` ou `Equals`).
+  </Step>
+  <Step title="Verifique o timestamp">
+    Recuse timestamps (`t`) muito antigos para evitar reenvios maliciosos.
+  </Step>
+</Steps>
+
+```javascript
+import crypto from "node:crypto";
+
+function assinaturaValida(rawBody, header, segredo) {
+  const partes = Object.fromEntries(header.split(",").map((p) => p.split("=")));
+  const esperado = crypto
+    .createHmac("sha256", segredo)
+    .update(`${partes.t}.${rawBody}`)
+    .digest("hex");
+  return crypto.timingSafeEqual(Buffer.from(esperado), Buffer.from(partes.v1));
+}
+```
+
+<Warning>
+  Sempre valide a assinatura contra o **corpo bruto** da requisição, antes de desserializar. Reformatar o JSON altera o hash calculado e invalida a comparação.
+</Warning>
+
+## Respostas e retentativas
+
+<Card title="Responda com 2xx" icon="check" horizontal>
+  - Qualquer resposta `2xx` confirma o recebimento.
+  - Respostas `408`, `425`, `429` e `5xx`, falhas de rede e tempo esgotado (15 segundos) são retentadas automaticamente.
+  - As demais respostas `4xx` não são retentadas.
+</Card>
+
+## Deduplicação
+
+<Card title="Trate o webhook como idempotente" icon="clone" horizontal>
+  - Use o header `Idempotency-Key` como chave de deduplicação — uma retentativa da mesma notificação repete a chave.
+  - As notificações podem chegar fora de ordem. Em propostas v2, use `data_evento` ou consulte a proposta para obter o estado mais recente.
+</Card>
+
+## Checklist de segurança
+
+<Card icon="list-check" horizontal>
+  * Valide a assinatura HMAC contra o corpo bruto, com comparação de tempo constante
+  * Rejeite timestamps (`t`) muito antigos
+  * Configure autenticação (Basic ou JWT) no cadastro do webhook, além da assinatura
+  * Responda 2xx rápido e processe de forma assíncrona
+  * Deduplique pelo `Idempotency-Key`
+</Card>

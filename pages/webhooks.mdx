@@ -6,86 +6,124 @@ icon: 'webhook'
 
 Webhooks permitem que sua aplicação receba notificações em tempo real sobre eventos importantes da Credicarro.
 
-<Card title="Atenção — Webhook disponível" icon="triangle-exclamation" horizontal color="#ef4444">
-  Atualmente, **o único webhook disponível** é o de **atualização de status da Proposta**.
+<Card title="Gerenciamento pela API" icon="gear" horizontal color="#25c2a0">
+  Os webhooks podem ser cadastrados, consultados, editados e excluídos diretamente pela API de integração.
+</Card>
+
+## Disponibilidade dos webhooks
+
+**Legenda:** 🟢 **Disponível** · ⚪ **Sem envio no momento**
+
+<CardGroup cols={3}>
+  <Card title="Cliente (1)" icon="user" color="#9e9e9e" style={{ borderColor: "#9e9e9e", borderWidth: "2px", backgroundColor: "rgba(158, 158, 158, 0.08)" }}>
+    **⚪ Sem envio no momento**
+
+    A configuração pode ser cadastrada, mas **nenhum evento de cliente é enviado atualmente**.
+  </Card>
+
+  <Card title="Simulação (2)" icon="calculator" color="#9e9e9e" style={{ borderColor: "#9e9e9e", borderWidth: "2px", backgroundColor: "rgba(158, 158, 158, 0.08)" }}>
+    **⚪ Sem envio no momento**
+
+    A configuração pode ser cadastrada, mas **nenhum evento de simulação é enviado atualmente**.
+  </Card>
+
+  <Card title="Proposta (3)" icon="file-signature" color="#4caf50" style={{ borderColor: "#4caf50", borderWidth: "2px", backgroundColor: "rgba(76, 175, 80, 0.08)" }}>
+    **🟢 Disponível**
+
+    Envia uma notificação a cada atualização da proposta.
+  </Card>
+</CardGroup>
+
+<Card title="Payload por versão da proposta" icon="code-branch" horizontal>
+  Propostas criadas pela v1 recebem o [payload de status](#payload-do-webhook-de-proposta-v1) abaixo. Propostas criadas pela v2 recebem o [webhook detalhado da v2](/pages/v2/webhooks).
 </Card>
 
 ## <Icon icon="mobile" type="solid"/> Segmentação de webhooks
 
-<Card title="Ambientes e Webhooks" icon="book" horizontal>
+<Card title="Ambientes e webhooks" icon="book" horizontal>
   Os webhooks são específicos para cada ambiente:
   - Webhooks criados em **desenvolvimento** recebem notificações apenas do ambiente de desenvolvimento
   - Webhooks criados em **produção** recebem notificações apenas de dados reais
-  
+
   Saiba mais sobre o ambiente de desenvolvimento <a href="./development">aqui</a>.
 </Card>
 
 ## <Icon icon="key" type="solid"/> Configurar webhooks
 
-<Card title="Fale com o atendimento" icon="headset" horizontal color="#25c2a0">
-  Para configurar os seus webhooks, entre em contato com o nosso atendimento pelo e-mail <Icon icon="envelope" type="solid"/> atendimento@credicarro.com.br
+Consulte os endpoints nesta aba **Webhooks** para gerenciar as configurações vinculadas ao seu parceiro.
+
+É permitido mais de um webhook por tipo; cada notificação é enviada para todos os webhooks ativos do tipo. Se preferir, o nosso atendimento também pode configurar os webhooks pelo e-mail <Icon icon="envelope" type="solid"/> atendimento@credicarro.com.br.
+
+## <Icon icon="shield-halved" type="solid"/> Tipos de autenticação
+
+Aceitamos três tipos de autenticação para os webhooks (`tipo_autenticacao`). O tipo e a credencial não podem ser alterados depois do cadastro; para trocá-los, exclua o webhook e cadastre outro.
+
+<Card title="1 - Sem autenticação (não recomendado)" icon="triangle-exclamation" horizontal color="#ef4444">
+  As notificações são enviadas para o seu endpoint sem nenhum cabeçalho de autenticação.
 </Card>
 
-## <Icon icon="shield-halved" type="solid"/> Tipos de Autenticação
-
-Aceitamos três tipos de autenticação para os webhooks:
-
-<Card title="Sem Autenticação (Não recomendado)" icon="triangle-exclamation" horizontal color="#ef4444">
-  Se o seu endpoint não requer autenticação, você pode optar por não usar nenhum método de autenticação. Nesse caso, as notificações serão enviadas para o seu endpoint sem nenhum cabeçalho de autenticação.
+<Card title="2 - Basic" icon="user-lock" color="#25c2a0" horizontal>
+  Informe em `credencial` o valor em Base64 de `usuario:senha`. Cada notificação é enviada com o header `Authorization: Basic {credencial}`.
 </Card>
 
-<Card title="Basic" icon="user-lock" color="#25c2a0" horizontal>
-  A autenticação Basic é um método de autenticação HTTP simples que envolve o envio de um nome de usuário e senha com cada requisição. Para usar a autenticação Basic, você precisará fornecer um nome de usuário e uma senha ao configurar o webhook.
+<Card title="3 - Bearer JWT" icon="id-card" color="#25c2a0" horizontal>
+  Informe em `credencial` o token. Cada notificação é enviada com o header `Authorization: Bearer {credencial}`.
 </Card>
 
-<Card title="Bearer JWT" icon="id-card" color="#25c2a0" horizontal>
-  A autenticação Bearer JWT é um método de autenticação que usa um token JSON Web Token (JWT) para autenticar as requisições. Para usar a autenticação Bearer JWT, você precisará fornecer um token JWT válido ao configurar o webhook.
+<Card title="Assinatura e retentativas" icon="signature" href="/pages/webhooks/security" horizontal>
+  Além da autenticação, toda notificação é assinada com HMAC-SHA256. Veja como validar a assinatura e como funcionam as retentativas.
 </Card>
 
-## <Icon icon="code" type="solid"/> Payload do Webhook
+## <Icon icon="code" type="solid"/> Payload do webhook de proposta (v1)
 
-O payload enviado para o endpoint do webhook é um JSON com a seguinte estrutura:
+Quando uma proposta criada pela v1 é atualizada, o payload enviado para o endpoint é um JSON com a seguinte estrutura:
 
 ```json
 {
   "id_proposta": "00000000-0000-0000-0000-000000000000",
-  "enum_status": 0,
-  "status": "Analysing",
+  "enum_status": 1,
+  "status": "Analysing"
 }
 ```
 
-### Legenda do EnumStatus
+### Status enviados pelo webhook
+
+Os valores abaixo são os status que podem ser enviados no campo `enum_status` do webhook de proposta v1.
 
 <CardGroup>
-  <Card title="0 - Analysing" icon="magnifying-glass-chart" color="#25c2a0" horizontal>
+  <Card title="1 - Analysing" icon="magnifying-glass-chart" color="#ff9800" horizontal>
     A proposta está sendo analisada automaticamente.
   </Card>
 
-  <Card title="1 - Approved" icon="check" color="#4caf50" horizontal>
+  <Card title="2 - Approved" icon="check" color="#4caf50" horizontal>
     A proposta foi aprovada.
   </Card>
 
-  <Card title="2 - Refused" icon="x" color="#f44336" horizontal>
+  <Card title="3 - Refused" icon="x" color="#f44336" horizontal>
     A proposta foi recusada.
   </Card>
 
-  <Card title="3 - Canceled" icon="ban" color="#9e9e9e" horizontal>
+  <Card title="4 - Canceled" icon="ban" color="#9e9e9e" horizontal>
     A proposta foi cancelada.
   </Card>
 
-  <Card title="4 - ManualAnalysis" icon="user-check" color="#ff9800" horizontal>
+  <Card title="5 - ManualAnalysis" icon="user-check" color="#ff9800" horizontal>
     A proposta está aguardando análise manual.
   </Card>
 
-  <Card title="5 - Completed" icon="check-double" color="#2196f3" horizontal>
+  <Card title="6 - Completed" icon="check-double" color="#2196f3" horizontal>
     A proposta foi concluída com sucesso.
   </Card>
 
-  <Card title="6 - InNegotiation" icon="handshake" color="#673ab7" horizontal>
+  <Card title="7 - InNegotiation" icon="handshake" color="#673ab7" horizontal>
     A proposta está em negociação.
   </Card>
 
-  <Card title="7 - Expired" icon="clock" color="#795548" horizontal>
+  <Card title="8 - Expired" icon="clock" color="#795548" horizontal>
     A proposta expirou.
+  </Card>
+
+  <Card title="9 - Pending" icon="hourglass-half" color="#607d8b" horizontal>
+    A proposta está pendente.
   </Card>
 </CardGroup>

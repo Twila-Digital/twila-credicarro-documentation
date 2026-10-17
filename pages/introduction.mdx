@@ -1,15 +1,200 @@
 ---
-title: Comece aqui
-icon: 'Car'
-description: "Pegue seu café e aprenda a integrar com a Credicarro!"
+title: "Comece aqui"
+mode: "custom"
 ---
-Nesta documentação você encontrará tudo o que precisa para integrar com a API da Credicarro.
-## <Icon icon="Car" type="solid"/>  O que é a Credicarro?
 
-Credicarro é uma fintech que oferece soluções de financiamento e refinanciamento de veículos, atuando principalmente no crédito entre pessoas físicas (C2C) e também oferecendo soluções para concessionárias. 
+<div style={{
+    position: "relative",
+    textAlign: "center",
+    padding: "80px 20px",
+    background: "linear-gradient(135deg, #1a1a1a 0%, #4a3600 60%, #c98d00 100%)",
+    borderBottom: "1px solid rgba(255,255,255,0.08)"
+}}>
+  <h1 style={{ fontSize: "40px", fontWeight: "600", marginBottom: "16px", color: "#fff" }}>
+    Bem-vindo à Credicarro
+  </h1>
+  <p style={{
+    maxWidth: "800px",
+    margin: "0 auto",
+    opacity: 0.85,
+    fontSize: "18px",
+    fontWeight: "300",
+    color: "#fff"
+  }}>
+    Ofereça financiamento e refinanciamento de veículos direto no seu sistema.<br />
+    Simule, crie a proposta e acompanhe cada etapa pela API.
+  </p>
+</div>
 
-Nossa solução? Uma plataforma que transforma a complexidade de um financiamento ou refinanciamento em uma API simples e intuitiva
+<div style={{
+  padding: "48px 20px 24px",
+  maxWidth: "900px",
+  margin: "0 auto",
+  borderBottom: "1px solid rgba(0,0,0,0.06)"
+}}>
+  <h2 style={{ fontSize: "20px", fontWeight: "600", marginBottom: "8px", textAlign: "center" }}>
+    Por onde você quer começar?
+  </h2>
+  <p style={{ opacity: 0.6, marginBottom: "28px", textAlign: "center", fontSize: "14px" }}>
+    Escolha o caminho que faz mais sentido para você agora.
+  </p>
 
-## <Icon icon="cloud" type="solid"/>  Dúvidas? 
+  <div style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "16px"
+  }}>
+    <a href="/pages/for-developers" style={{ textDecoration: "none", display: "flex", height: "100%" }}>
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        padding: "28px",
+        borderRadius: "12px",
+        border: "2px solid #feb916",
+        background: "rgba(254, 185, 22, 0.06)",
+        cursor: "pointer"
+      }}>
+        <div style={{ fontSize: "28px", marginBottom: "12px" }}>💻</div>
+        <div style={{ fontSize: "17px", fontWeight: "700", color: "#b07d00", marginBottom: "8px" }}>
+          Sou desenvolvedor
+        </div>
+        <div style={{ fontSize: "14px", opacity: 0.7, lineHeight: "1.6" }}>
+          Quero entender ambientes, autenticação, formato de respostas e erros antes de integrar.
+        </div>
+        <div style={{ marginTop: "auto", paddingTop: "16px", fontSize: "13px", color: "#b07d00", fontWeight: "600" }}>
+          Ver documentação técnica →
+        </div>
+      </div>
+    </a>
 
-Nossa equipe está sempre pronta para ajudar! Entre em contato pelo email <Icon icon="envelope" type="solid"/> atendimento@credicarro.com.br
+    <a href="/pages/v2/overview" style={{ textDecoration: "none", display: "flex", height: "100%" }}>
+      <div style={{
+        display: "flex",
+        flexDirection: "column",
+        width: "100%",
+        padding: "28px",
+        borderRadius: "12px",
+        border: "1px solid rgba(0,0,0,0.1)",
+        background: "rgba(254, 185, 22, 0.03)",
+        cursor: "pointer"
+      }}>
+        <div style={{ fontSize: "28px", marginBottom: "12px" }}>🚗</div>
+        <div style={{ fontSize: "17px", fontWeight: "700", marginBottom: "8px" }}>
+          Quero seguir o fluxo da proposta
+        </div>
+        <div style={{ fontSize: "14px", opacity: 0.7, lineHeight: "1.6" }}>
+          Veja a ordem das chamadas, do token de acesso até a conta de recebimento.
+        </div>
+        <div style={{ marginTop: "auto", paddingTop: "16px", fontSize: "13px", color: "#b07d00", fontWeight: "600" }}>
+          Ver fluxo de integração →
+        </div>
+      </div>
+    </a>
+  </div>
+</div>
+
+<div style={{
+  padding: "60px 20px",
+  maxWidth: "1100px",
+  margin: "0 auto",
+  borderBottom: "1px solid rgba(0,0,0,0.06)"
+}}>
+  <h2 style={{ fontSize: "22px", fontWeight: "600", marginBottom: "12px" }}>
+    O que é a Credicarro?
+  </h2>
+  <p style={{ opacity: 0.75, marginBottom: "24px", lineHeight: "1.7" }}>
+    A Credicarro é uma fintech de financiamento e refinanciamento de veículos. Atua principalmente no crédito entre pessoas físicas (C2C) e também oferece soluções para concessionárias. A API transforma a complexidade de um financiamento em chamadas simples: você simula, cria a proposta e envia o que cada etapa pedir.
+  </p>
+
+  <div style={{ marginTop: "32px" }}>
+    <h3 style={{ fontSize: "18px", fontWeight: "600", marginBottom: "16px" }}>
+      Versões da API
+    </h3>
+    <div style={{
+      display: "grid",
+      gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+      gap: "16px"
+    }}>
+      <Card title="v2 — recomendada" icon="rocket" href="/pages/v2/overview" horizontal>
+        Simulação por loja, acompanhamento das etapas e envio de documentos, dados do veículo e conta de recebimento pela API.
+      </Card>
+      <Card title="v1 — legado" icon="clock-rotate-left" href="/pages/proposal/create" horizontal>
+        Simulação e proposta sem acompanhamento de etapas. Continua disponível.
+      </Card>
+    </div>
+  </div>
+</div>
+
+<div style={{
+  padding: "60px 20px",
+  maxWidth: "1100px",
+  margin: "0 auto"
+}}>
+  <h2 style={{ fontSize: "22px", fontWeight: "600", marginBottom: "24px" }}>
+    O que você pode fazer
+  </h2>
+
+  <div style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gap: "24px",
+    marginBottom: "48px"
+  }}>
+    <Card icon="arrow-right-arrow-left" title="Fluxo da proposta" href="/pages/v2/overview">
+      Siga o fluxo completo de uma proposta, do token de acesso à conta de recebimento.
+    </Card>
+    <Card icon="calculator" title="Simular" href="/pages/v2/simulation/create-financing">
+      Calcule as condições de financiamento ou refinanciamento por prazo.
+    </Card>
+    <Card icon="file-signature" title="Criar proposta" href="/pages/v2/proposal/create">
+      Crie a proposta a partir da simulação escolhida.
+    </Card>
+    <Card icon="bell" title="Webhooks" href="/pages/webhooks">
+      Receba notificações em tempo real sobre o andamento da proposta.
+    </Card>
+  </div>
+
+  <h2 style={{ fontSize: "22px", fontWeight: "600", marginBottom: "24px" }}>
+    Primeiros passos
+  </h2>
+
+  <div style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+    gap: "24px"
+  }}>
+    <Card icon="key" title="Gerar token de acesso" href="/pages/authentication">
+      Autentique-se com seu Client ID e Client Secret.
+    </Card>
+    <Card icon="flask" title="Ambiente de desenvolvimento" href="/pages/development">
+      Teste sua integração em staging, sem afetar produção.
+    </Card>
+    <Card icon="list-check" title="Etapas e status" href="/pages/v2/steps">
+      Entenda os códigos de status, etapas e documentos da proposta.
+    </Card>
+  </div>
+</div>
+
+<div style={{
+  padding: "60px 20px",
+  maxWidth: "1100px",
+  margin: "0 auto"
+}}>
+  <h2 style={{ fontSize: "28px", fontWeight: "600", marginBottom: "32px" }}>
+    Precisa de ajuda?
+  </h2>
+
+  <div style={{
+    display: "grid",
+    gridTemplateColumns: "repeat(auto-fit, minmax(280px, 1fr))",
+    gap: "24px"
+  }}>
+    <Card icon="envelope" title="Fale com o time Credicarro" href="mailto:atendimento@credicarro.com.br">
+      atendimento@credicarro.com.br — para credenciais e dúvidas sobre o produto.
+    </Card>
+    <Card icon="robot" title="Você é um agente de IA?" href="/llms.txt">
+      Busque o índice completo desta documentação em `/llms.txt`, ou peça a versão em Markdown de qualquer página trocando a extensão para `.md`.
+    </Card>
+  </div>
+</div>

@@ -1,0 +1,103 @@
+---
+title: 'Etapas e status'
+description: 'Significado dos códigos usados na consulta e no webhook da proposta v2'
+icon: 'list-check'
+---
+
+A consulta `GET /v2/proposal/{propostaId}` e o webhook v2 usam os mesmos códigos. Todo valor vem em par: o número (`enum_...`) e o nome. Prefira tratar o número no seu sistema e usar o nome para exibição e logs.
+
+## <Icon icon="flag" type="solid"/> Status da proposta (`enum_status` / `status`)
+
+| Código | Nome | Significado |
+| --- | --- | --- |
+| 1 | `EM_ANALISE` | A proposta está sendo analisada automaticamente. |
+| 2 | `APROVADA` | A proposta foi aprovada e segue para as etapas de formalização. |
+| 3 | `RECUSADA` | A proposta foi recusada. O motivo vem em `motivo_recusa`, quando houver. |
+| 4 | `CANCELADA` | A proposta foi cancelada. |
+| 5 | `ANALISE_MANUAL` | A proposta aguarda análise manual da Credicarro. |
+| 6 | `FINALIZADA` | A proposta foi concluída. |
+| 7 | `EM_NEGOCIACAO` | A proposta está em negociação. |
+| 8 | `EXPIRADA` | A proposta expirou. |
+| 9 | `PENDENTE` | A proposta está pendente. |
+
+## <Icon icon="shoe-prints" type="solid"/> Etapas (`enum_etapa` / `etapa`)
+
+Cada participante (comprador e loja) tem a sua etapa ativa em `status_ativo` e o histórico em `etapas_concluidas`.
+
+| Código | Nome | O que acontece |
+| --- | --- | --- |
+| 0 | `INDEFINIDO` | Etapa ainda não definida para o participante. |
+| 1 | `PROPOSTA_CRIADA` | Proposta enviada para análise. |
+| 2 | `PROPOSTA_APROVADA` | Proposta aprovada. |
+| 3 | `NOTIFICACAO_VENDEDOR` | Etapa de notificação interna. Não exige ação do integrador. |
+| 4 | `ANALISE_BIOMETRIA` | Biometria do participante. |
+| 5 | `CONTA_RECEBIMENTO` | Aguardando a [conta de recebimento](/pages/v2/proposal/deposit-account) (refinanciamento). |
+| 6 | `ENVIO_DOCUMENTOS` | Aguardando o [envio de documentos](/pages/v2/proposal/document). |
+| 7 | `CORRECAO_DOCUMENTOS` | Algum documento foi recusado e precisa ser reenviado. |
+| 8 | `DADOS_VEICULO` | Aguardando os [dados do veículo](/pages/v2/proposal/vehicle-detail). |
+| 9 | `VISTORIA` | Vistoria do veículo pelo cliente. |
+| 10 | `ASSINATURA` | Assinatura do contrato pelo cliente. |
+| 11 | `PAGAMENTO` | Pagamento em andamento. |
+| 12 | `PROPOSTA_FINALIZADA` | Fluxo concluído. |
+
+## <Icon icon="traffic-light" type="solid"/> Situação da etapa (`enum_situacao` / `situacao`)
+
+| Código | Nome | Significado |
+| --- | --- | --- |
+| 1 | `AGUARDANDO_ENVIO` | Aguardando dados ou arquivos do integrador. |
+| 2 | `AGUARDANDO_CLIENTE` | Aguardando uma ação do cliente (biometria, vistoria ou assinatura). |
+| 3 | `EM_PROCESSAMENTO` | A Credicarro está processando a etapa. |
+| 4 | `PENDENTE_CORRECAO` | Há documento recusado aguardando reenvio. |
+| 5 | `BLOQUEADA` | A etapa está bloqueada (por exemplo, biometria reprovada). |
+| 6 | `CONCLUIDA` | A proposta foi finalizada. |
+| 7 | `CANCELADA` | A proposta foi recusada, cancelada ou expirou. |
+
+## <Icon icon="user-gear" type="solid"/> Responsável pela ação (`enum_responsavel_acao` / `responsavel_acao`)
+
+| Código | Nome | Significado |
+| --- | --- | --- |
+| 0 | `NENHUM` | Ninguém precisa agir (proposta encerrada). |
+| 1 | `CLIENTE` | O cliente precisa agir. |
+| 2 | `INTEGRADOR` | Seu sistema precisa enviar algo pela API. |
+| 3 | `CREDICARRO` | A Credicarro está cuidando da etapa. |
+
+<Card title="Como a situação é definida" icon="lightbulb" horizontal>
+  Com a proposta recusada, cancelada ou expirada, a situação é sempre `CANCELADA` e o responsável é `NENHUM`. Com a proposta finalizada, a situação é `CONCLUIDA`. Nos demais casos: `CONTA_RECEBIMENTO`, `ENVIO_DOCUMENTOS` e `DADOS_VEICULO` ficam `AGUARDANDO_ENVIO` com o `INTEGRADOR`; `CORRECAO_DOCUMENTOS` fica `PENDENTE_CORRECAO` com o `INTEGRADOR`; `VISTORIA` e `ASSINATURA` ficam `AGUARDANDO_CLIENTE`; na `ANALISE_BIOMETRIA` a situação acompanha a biometria (sessão criada aguarda o cliente, reprovada fica bloqueada, o restante está em processamento).
+</Card>
+
+## <Icon icon="fingerprint" type="solid"/> Biometria (`enum_biometria` / `biometria`)
+
+| Código | Nome | Significado |
+| --- | --- | --- |
+| 0 | `NAO_INICIADA` | A biometria ainda não foi iniciada. |
+| 1 | `SESSAO_CRIADA` | A sessão foi criada e o cliente precisa acessá-la pelo `link_biometria`. |
+| 2 | `EM_ANALISE` | A biometria está em análise. |
+| 3 | `APROVADA` | A biometria foi aprovada. |
+| 4 | `REPROVADA` | A biometria foi reprovada. |
+
+## <Icon icon="file-lines" type="solid"/> Documentos
+
+Status (`enum_status` / `status` dentro de `documentos`):
+
+| Código | Nome | Significado |
+| --- | --- | --- |
+| 0 | `RECEBIDO` | Documento recebido. |
+| 1 | `VALIDO` | Documento aprovado. |
+| 2 | `INVALIDO` | Documento recusado. O motivo vem em `motivo`; reenvie o mesmo tipo. |
+| 3 | `EM_ANALISE` | Documento em análise. |
+| 4 | `EXCLUIDO` | Documento excluído. |
+
+Tipos aceitos no [envio de documentos](/pages/v2/proposal/document) (`enum_tipo` / `tipo`):
+
+| Código | Nome | Comprador | Loja |
+| --- | --- | :---: | :---: |
+| 1 | `CNH` | ✓ | |
+| 4 | `COMPROVANTE_RENDA` | ✓ | |
+| 5 | `COMPROVANTE_RESIDENCIA` | ✓ | |
+| 6 | `DOCUMENTO_VEICULO` | ✓ | ✓ |
+| 7 | `CNH_DIGITAL` | ✓ | |
+| 8 | `LAUDO_ECV` | | ✓ |
+| 9 | `LAUDO_VISTORIA` | ✓ | |
+| 57 | `ATPV` | ✓ | |
+
+A consulta e o webhook podem listar outros tipos de documento anexados pela Credicarro; eles seguem o mesmo par código e nome.

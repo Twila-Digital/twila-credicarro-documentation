@@ -1,0 +1,120 @@
+---
+title: 'Fluxo de integração'
+icon: 'arrow-right-arrow-left'
+description: 'Ordem de chamadas para levar uma proposta v2 do início ao fim'
+---
+
+A v2 da API leva a proposta até o fim pelo seu sistema. Depois de criada, você acompanha as etapas de cada participante e envia documentos, dados do veículo e conta de recebimento sem precisar de outro canal.
+
+<Card title="A v1 continua disponível" icon="circle-info" horizontal>
+  As rotas `/v1` seguem funcionando. Uma proposta criada pela v1 continua sendo consultada pela v1. Uma proposta criada pela v2 só aceita os endpoints `/v2` de acompanhamento e envio.
+</Card>
+
+## <Icon icon="code-compare" type="solid"/> O que muda em relação à v1
+
+<CardGroup cols={2}>
+  <Card title="Loja informada pelo CNPJ" icon="store">
+    As simulações v2 exigem o campo `cnpjLoja`. A loja precisa estar vinculada ao seu cadastro de parceiro e não pode ter contrato de intermediação.
+  </Card>
+  <Card title="Etapas por participante" icon="list-check">
+    A consulta da proposta traz a etapa ativa, a situação e quem precisa agir para o comprador e para a loja.
+  </Card>
+  <Card title="Envio de dados pela API" icon="upload">
+    Documentos, dados do veículo e conta de recebimento são enviados por endpoints próprios.
+  </Card>
+  <Card title="Webhook detalhado" icon="webhook">
+    Propostas v2 recebem um webhook com o retrato completo da proposta a cada mudança de status, etapa ou documento.
+  </Card>
+</CardGroup>
+
+## <Icon icon="list-ol" type="solid"/> Passo a passo
+
+Os endpoints devem ser chamados na seguinte ordem. Autenticação, cliente, faixas e webhooks continuam em `/v1`.
+
+<Steps>
+  <Step title="Gerar token de acesso" icon="key">
+    Autentique-se com seu `clientId` e `clientSecret` para obter o Bearer token usado em todas as chamadas seguintes.
+
+    <Card title="POST Gerar token de acesso" icon="lock" href="/pages/authentication/accesstoken">
+      Autenticação · v1
+    </Card>
+  </Step>
+
+  <Step title="Cadastrar o webhook de proposta" icon="bell">
+    Cadastre uma URL com `tipo` = 3 (Proposal) e guarde o `segredo_assinatura` retornado. Basta fazer isso uma vez.
+
+    <Card title="POST Cadastrar webhook" icon="plus" href="/pages/webhook/create">
+      Webhooks · v1
+    </Card>
+  </Step>
+
+  <Step title="Cadastrar o cliente" icon="user-check">
+    A proposta só é aceita com o cadastro completo: dados pessoais, endereço, tipo de ocupação e renda. O endpoint unificado envia tudo de uma vez.
+
+    <Card title="POST Criar ou atualizar cliente com dados completos" icon="id-card" href="/pages/customer/unified">
+      Cliente · v1
+    </Card>
+  </Step>
+
+  <Step title="Consultar a faixa (opcional)" icon="sliders">
+    Consulte a entrada mínima por prazo (financiamento) ou o valor mínimo e máximo (refinanciamento) antes de simular.
+
+    <CardGroup cols={2}>
+      <Card title="GET Faixa financiável" icon="car" href="/pages/simulation/range-financing">
+        Simulação · v1
+      </Card>
+      <Card title="GET Faixa refinanciável" icon="car-side" href="/pages/simulation/range-refinancing">
+        Simulação · v1
+      </Card>
+    </CardGroup>
+  </Step>
+
+  <Step title="Simular informando a loja" icon="calculator">
+    Envie `cnpjLoja` na simulação. A resposta traz uma simulação por prazo.
+
+    <CardGroup cols={2}>
+      <Card title="POST Criar simulação de financiamento" icon="calculator" href="/pages/v2/simulation/create-financing">
+        Simulação · v2
+      </Card>
+      <Card title="POST Criar simulação de refinanciamento" icon="calculator" href="/pages/v2/simulation/create-refinancing">
+        Simulação · v2
+      </Card>
+    </CardGroup>
+  </Step>
+
+  <Step title="Criar a proposta" icon="file-signature">
+    Escolha um `id_simulacao` da resposta anterior e crie a proposta.
+
+    <Card title="POST Criar proposta" icon="file-signature" href="/pages/v2/proposal/create">
+      Proposta · v2
+    </Card>
+  </Step>
+
+  <Step title="Acompanhar as etapas" icon="list-check">
+    Consulte a proposta ou use o [webhook v2](/pages/v2/webhooks). Quando `responsavel_acao` for `INTEGRADOR`, a etapa ativa indica o que enviar. Quando for `CLIENTE`, o cliente precisa agir — por exemplo, fazer a biometria pelo `link_biometria`.
+
+    <Card title="GET Buscar proposta" icon="magnifying-glass" href="/pages/v2/proposal/get">
+      Proposta · v2
+    </Card>
+  </Step>
+
+  <Step title="Enviar o que a etapa pedir" icon="upload">
+    Cada etapa com `responsavel_acao` = `INTEGRADOR` tem um endpoint próprio.
+
+    <CardGroup cols={3}>
+      <Card title="POST Enviar documento" icon="file-arrow-up" href="/pages/v2/proposal/document">
+        `ENVIO_DOCUMENTOS` e `CORRECAO_DOCUMENTOS`
+      </Card>
+      <Card title="POST Incluir dados do veículo" icon="car" href="/pages/v2/proposal/vehicle-detail">
+        `DADOS_VEICULO`
+      </Card>
+      <Card title="POST Incluir conta de recebimento" icon="building-columns" href="/pages/v2/proposal/deposit-account">
+        `CONTA_RECEBIMENTO` (só refinanciamento)
+      </Card>
+    </CardGroup>
+  </Step>
+</Steps>
+
+<Info>
+  Os significados de cada etapa, situação e status estão em [Etapas e status](/pages/v2/steps).
+</Info>

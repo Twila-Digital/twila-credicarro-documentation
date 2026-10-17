@@ -1,0 +1,34 @@
+---
+title: 'Cadastrar webhook'
+openapi: "POST /v1/webhook"
+---
+
+Cadastra uma configuração de webhook para o parceiro identificado automaticamente pelo token de acesso.
+
+## Tipos de webhook
+
+| Valor | Tipo | Disponibilidade |
+| --- | --- | --- |
+| `1` | **Cliente** | ⚪ **Sem envio no momento** — pode ser cadastrado, mas não envia notificações. |
+| `2` | **Simulação** | ⚪ **Sem envio no momento** — pode ser cadastrado, mas não envia notificações. |
+| `3` | **Proposta** | 🟢 **Disponível** — envia uma notificação a cada atualização da proposta. |
+
+<Warning>
+  Os tipos Cliente (`1`) e Simulação (`2`) podem ser configurados, mas não enviam notificações. Atualmente, apenas o tipo Proposta (`3`) está disponível.
+</Warning>
+
+## Tipos de autenticação
+
+| Valor | Significado |
+| --- | --- |
+| `1` | **Nenhuma** — a requisição é enviada sem credencial de autenticação. |
+| `2` | **Basic** — envia `Authorization: Basic {credencial}`, com `credencial` em Base64 de `usuario:senha`. |
+| `3` | **JWT** — envia `Authorization: Bearer {credencial}`. |
+
+<Note>
+  A credencial é obrigatória para Basic e JWT. O tipo de autenticação e a credencial não podem ser alterados depois do cadastro. É permitido mais de um webhook por tipo.
+</Note>
+
+## Segredo de assinatura
+
+A resposta traz `segredo_assinatura`, usado para verificar a autenticidade das notificações recebidas. Ele é exibido **apenas nesta resposta** — guarde-o com segurança, pois não é possível consultá-lo novamente. Consulte [Verificação e segurança](/pages/webhooks/security).
