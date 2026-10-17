@@ -94,29 +94,19 @@ O diagrama mostra os caminhos mais comuns. A lista completa de status está em [
 
 ## Como decidir o próximo passo
 
-Para **cada** participante, leia `status_ativo.responsavel_acao`:
+Para **cada** participante (`comprador` e `loja`), leia `status_ativo`:
 
-```javascript
-function proximoPasso(participante) {
-  const { etapa, responsavel_acao } = participante.status_ativo;
-  if (responsavel_acao !== "INTEGRADOR") return null;
-
-  switch (etapa) {
-    case "ENVIO_DOCUMENTOS":
-    case "CORRECAO_DOCUMENTOS":
-      return "enviar-documentos";
-    case "DADOS_VEICULO":
-      return "enviar-dados-veiculo";
-    case "CONTA_RECEBIMENTO":
-      return "enviar-conta-recebimento";
-    default:
-      return null;
-  }
-}
-```
+| `responsavel_acao` | `etapa` | O que fazer |
+| --- | --- | --- |
+| `INTEGRADOR` (2) | `ENVIO_DOCUMENTOS` (6) ou `CORRECAO_DOCUMENTOS` (7) | [Enviar documento](/pages/v2/proposal/document) |
+| `INTEGRADOR` (2) | `DADOS_VEICULO` (8) | [Incluir dados do veículo](/pages/v2/proposal/vehicle-detail) |
+| `INTEGRADOR` (2) | `CONTA_RECEBIMENTO` (5) | [Incluir conta de recebimento](/pages/v2/proposal/deposit-account) |
+| `CLIENTE` (1) | qualquer | Orientar o cliente (biometria, vistoria ou assinatura) |
+| `CREDICARRO` (3) | qualquer | Aguardar |
+| `NENHUM` (0) | qualquer | Nada — a proposta foi encerrada |
 
 <Tip title="Compare pelo número" horizontal>
-  O exemplo usa os nomes para ficar legível. No seu sistema, prefira comparar `enum_etapa` e `enum_responsavel_acao` e usar os nomes em telas e logs.
+  No seu sistema, prefira comparar `enum_etapa` e `enum_responsavel_acao` e usar os nomes em telas e logs.
 </Tip>
 
 <Note>

@@ -30,7 +30,7 @@
 ## Navegação
 
 - Estrutura inspirada na documentação da [AbacatePay](https://github.com/AbacatePay/documentation): seletor de versão em `navigation.versions`
-- **v2** (tag "Atual"): Comece aqui, Para lojistas, Para desenvolvedores, Autenticação, Proposta, Webhooks, Changelog
+- **v2** (tag "Atual"): Comece aqui, Para lojistas, Para desenvolvedores, Autenticação, Proposta, Webhooks
 - **v1** (tag "Legado"): Comece aqui, Para lojistas e Para desenvolvedores (iguais à v2, sem os guias v2), Autenticação, Proposta (com o fluxo v1), Webhooks
 - **Para lojistas** (`pages/concepts/`, `pages/guides/first-proposal`, `pages/faq`, `pages/glossary`) é escrito para quem não programa: sem nomes de campos, códigos ou JSON — links para a parte técnica quando necessário
 - **Para desenvolvedores** reúne integração, fluxo v2 e guias ponta a ponta (`pages/guides/*-integration`, `pages/guides/document-upload`)

@@ -39,67 +39,24 @@ Para validar uma notificação:
     Concatene o valor de `t`, um ponto (`.`) e o corpo da requisição exatamente como recebido, sem reformatar o JSON.
   </Step>
   <Step title="Calcule e compare">
-    Calcule o HMAC-SHA256 desse conteúdo usando o `segredo_assinatura` como chave e compare com `v1` usando uma comparação de tempo constante (`timingSafeEqual`/`CryptographicOperations.FixedTimeEquals` — nunca `==` ou `Equals`).
+    Calcule o HMAC-SHA256 desse conteúdo usando o `segredo_assinatura` como chave e compare com `v1` usando uma comparação de tempo constante (nunca uma comparação comum de strings).
   </Step>
   <Step title="Verifique o timestamp">
     Recuse timestamps (`t`) muito antigos para evitar reenvios maliciosos.
   </Step>
 </Steps>
 
-<CodeGroup>
+### Exemplo para conferir a sua implementação
 
-```javascript Node.js
-import crypto from "node:crypto";
+Com estes valores, a sua implementação precisa chegar à mesma assinatura:
 
-const TOLERANCIA_SEGUNDOS = 300;
-
-function assinaturaValida(rawBody, header, segredo) {
-  const partes = Object.fromEntries(header.split(",").map((p) => p.split("=")));
-  if (Math.abs(Date.now() / 1000 - Number(partes.t)) > TOLERANCIA_SEGUNDOS) return false;
-
-  const esperado = Buffer.from(
-    crypto.createHmac("sha256", segredo).update(`${partes.t}.${rawBody}`).digest("hex")
-  );
-  const recebido = Buffer.from(partes.v1 ?? "");
-  return esperado.length === recebido.length && crypto.timingSafeEqual(esperado, recebido);
-}
-```
-
-```python Python
-import hashlib
-import hmac
-import time
-
-TOLERANCIA_SEGUNDOS = 300
-
-def assinatura_valida(raw_body: bytes, header: str, segredo: str) -> bool:
-    partes = dict(p.split("=", 1) for p in header.split(","))
-    if abs(time.time() - int(partes["t"])) > TOLERANCIA_SEGUNDOS:
-        return False
-
-    conteudo = partes["t"].encode() + b"." + raw_body
-    esperado = hmac.new(segredo.encode(), conteudo, hashlib.sha256).hexdigest()
-    return hmac.compare_digest(esperado, partes.get("v1", ""))
-```
-
-```csharp C#
-using System.Security.Cryptography;
-using System.Text;
-
-static bool AssinaturaValida(string rawBody, string header, string segredo)
-{
-    var partes = header.Split(',').Select(p => p.Split('=', 2)).ToDictionary(p => p[0], p => p[1]);
-    if (Math.Abs(DateTimeOffset.UtcNow.ToUnixTimeSeconds() - long.Parse(partes["t"])) > 300)
-        return false;
-
-    var hash = HMACSHA256.HashData(Encoding.UTF8.GetBytes(segredo), Encoding.UTF8.GetBytes($"{partes["t"]}.{rawBody}"));
-    var esperado = Encoding.ASCII.GetBytes(Convert.ToHexStringLower(hash));
-    var recebido = Encoding.ASCII.GetBytes(partes.GetValueOrDefault("v1", ""));
-    return CryptographicOperations.FixedTimeEquals(esperado, recebido);
-}
-```
-
-</CodeGroup>
+| Item | Valor |
+| --- | --- |
+| `segredo_assinatura` | `segredo-de-exemplo` |
+| `t` | `1715792400` |
+| Corpo bruto | `{"id_proposta":"bea8d060-f93d-48eb-b6c4-45f64483cdd9","enum_status":2,"status":"APROVADA"}` |
+| Conteúdo assinado | `1715792400.{"id_proposta":"bea8d060-f93d-48eb-b6c4-45f64483cdd9","enum_status":2,"status":"APROVADA"}` |
+| `v1` esperado | `695da9818229f76b5a2efc1d5803310ac8f5f247b398d20bcd35e7d52436bab4` |
 
 <Note>
   A tolerância de 5 minutos é uma sugestão. Ajuste conforme a sua necessidade.
@@ -109,25 +66,12 @@ static bool AssinaturaValida(string rawBody, string header, string segredo)
   Sempre valide a assinatura contra o **corpo bruto** da requisição, antes de desserializar. Reformatar o JSON altera o hash calculado e invalida a comparação.
 </Warning>
 
-## Exemplo de endpoint
+## Como montar o endpoint
 
-O endpoint precisa ler o **corpo bruto** antes de desserializar. Em Express:
-
-```javascript
-import express from "express";
-
-const app = express();
-
-app.post("/webhooks/credicarro", express.raw({ type: "application/json" }), (req, res) => {
-  const rawBody = req.body.toString("utf8");
-  if (!assinaturaValida(rawBody, req.get("X-CrediCarro-Signature") ?? "", process.env.CREDICARRO_SEGREDO)) {
-    return res.sendStatus(401);
-  }
-
-  res.sendStatus(200);
-  fila.publicar({ chave: req.get("Idempotency-Key"), evento: JSON.parse(rawBody) });
-});
-```
+1. Leia o **corpo bruto** da requisição, antes de qualquer desserialização
+2. Valide a assinatura `X-CrediCarro-Signature`. Se for inválida, responda `401`
+3. Responda `2xx` e coloque o evento em uma fila, com o header `Idempotency-Key` como chave de deduplicação
+4. Processe o evento de forma assíncrona
 
 <Tip>
   Responda `2xx` assim que validar a assinatura e processe o evento de forma assíncrona (fila, job). O tempo limite de cada entrega é de 15 segundos.
