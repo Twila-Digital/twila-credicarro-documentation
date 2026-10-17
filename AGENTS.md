@@ -30,11 +30,11 @@
 ## Navegação
 
 - Estrutura inspirada na documentação da [AbacatePay](https://github.com/AbacatePay/documentation): seletor de versão em `navigation.versions`
-- **v2** (tag "Atual"): Comece aqui, Para lojistas, Para desenvolvedores, Webhooks, Referência, Changelog
-- **v1** (tag "Legado"): Comece aqui (introdução, fluxo v1 e migração), Webhooks (payload v1), Referência (endpoints v1 e os compartilhados com a v2)
+- **v2** (tag "Atual"): Comece aqui, Para lojistas, Para desenvolvedores, Autenticação, Proposta, Webhooks, Changelog
+- **v1** (tag "Legado"): Comece aqui (introdução, fluxo v1 e migração), Autenticação, Proposta, Webhooks
 - **Para lojistas** (`pages/concepts/`, `pages/guides/first-proposal`, `pages/faq`, `pages/glossary`) é escrito para quem não programa: sem nomes de campos, códigos ou JSON — links para a parte técnica quando necessário
 - **Para desenvolvedores** reúne integração, fluxo v2 e guias ponta a ponta (`pages/guides/*-integration`, `pages/guides/document-upload`)
-- **Referência**: cada grupo começa com uma página `reference.mdx` que explica o recurso e segue com as páginas de endpoint (`openapi:` no front-matter)
+- Endpoints ficam na barra lateral das abas de domínio (Autenticação, Proposta, Webhooks), como na documentação do Parcele+: cada grupo começa com uma visão geral (`reference.mdx`) e segue com as páginas de endpoint (`openapi:` no front-matter)
 - Páginas compartilhadas entre versões (autenticação, cliente, webhooks) aparecem nas duas navegações
 - Não renomeie caminhos de páginas já publicados; se for inevitável, adicione um `redirect` em `docs.json`
 
