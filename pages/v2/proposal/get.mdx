@@ -9,6 +9,10 @@ Retorna o retrato atual da proposta: status, `link_biometria` e, para o comprado
   Leia `status_ativo.responsavel_acao` de cada participante. Quando for `INTEGRADOR`, a `etapa` diz o que enviar. Veja a [referência de proposta](/pages/v2/proposal/reference#como-decidir-o-proximo-passo).
 </Tip>
 
+<Tip title="Documentos pendentes" horizontal>
+  Para o comprador e a loja, `documentos` traz os documentos exigidos na proposta. Os que ainda faltam vêm com `status` = `PENDENTE` (5). Veja [quais documentos são exigidos](/pages/v2/steps#documentos-exigidos-na-consulta).
+</Tip>
+
 <Tip title="Biometria" horizontal>
   A Credicarro envia o link da biometria ao cliente por WhatsApp e e-mail na aprovação. Se a sua integração conduz o contato com o cliente, repasse o `link_biometria`.
 </Tip>
