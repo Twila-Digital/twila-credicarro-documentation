@@ -1591,8 +1591,11 @@ paths:
         - Proposta
       summary: Consultar proposta pelo ID.
       description: |
-        Consulta o retrato atual de uma proposta, com status, link de biometria e as etapas do
-        comprador e da loja.
+        Consulta o retrato atual de uma proposta, com status, link de biometria e as etapas e os
+        documentos do comprador, da loja e, quando houver, do vendedor.
+
+        Em `documentos`, o comprador e a loja listam só os documentos exigidos na proposta: os enviados
+        com o status real e os que faltam com `PENDENTE` (5). O vendedor lista todos os documentos enviados.
       security:
         - bearerAuth: []
       parameters:
@@ -2098,10 +2101,11 @@ components:
         enum_status:
           type: integer
           format: int32
+          description: Código do status do documento. `5` (`PENDENTE`) indica documento exigido ainda não enviado
           example: 2
         status:
           type: string
-          enum: ['RECEBIDO', 'VALIDO', 'INVALIDO', 'EM_ANALISE', 'EXCLUIDO']
+          enum: ['RECEBIDO', 'VALIDO', 'INVALIDO', 'EM_ANALISE', 'EXCLUIDO', 'PENDENTE']
           example: INVALIDO
         motivo:
           type: string

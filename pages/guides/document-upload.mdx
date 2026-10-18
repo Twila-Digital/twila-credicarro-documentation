@@ -10,7 +10,7 @@ Os documentos do comprador, do vendedor e da loja são enviados por `POST /v2/pr
 
 | Etapa ativa do participante | O que enviar |
 | --- | --- |
-| `ENVIO_DOCUMENTOS` (6), com a proposta aprovada | Os documentos pedidos |
+| `ENVIO_DOCUMENTOS` (6), com a proposta aprovada | Os documentos com status `PENDENTE` na [consulta da proposta](/pages/v2/proposal/get) |
 | `CORRECAO_DOCUMENTOS` (7), com a proposta pendente | Só os tipos com status `INVALIDO` |
 
 Fora dessas etapas, a API retorna `422` com `Document.InvalidProposalStage`.

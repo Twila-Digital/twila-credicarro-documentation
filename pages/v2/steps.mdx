@@ -101,6 +101,25 @@ Status (`enum_status` / `status` dentro de `documentos`). O `motivo` só aparece
 | 2 | `INVALIDO` | Documento recusado. O motivo vem em `motivo`; reenvie o mesmo tipo. |
 | 3 | `EM_ANALISE` | Documento em análise. |
 | 4 | `EXCLUIDO` | Documento excluído. |
+| 5 | `PENDENTE` | Documento exigido que ainda não foi enviado. Só aparece na consulta, para o comprador e a loja. |
+
+### Documentos exigidos na consulta
+
+Na consulta `GET /v2/proposal/{propostaId}`, o comprador e a loja listam **só os documentos exigidos** na proposta. Cada documento exigido aparece uma vez:
+
+- Enviado, com o status real (`RECEBIDO`, `VALIDO`, `INVALIDO` ou `EM_ANALISE`) e o `motivo`, quando houver
+- Ainda não enviado (ou excluído), com `PENDENTE` (5)
+
+| Participante | Modalidade | Documentos exigidos, nesta ordem |
+| --- | --- | --- |
+| Comprador | Financiamento | `COMPROVANTE_RESIDENCIA`, `COMPROVANTE_RENDA`, `ATPV` (só veículo registrado no RS), `CNH` |
+| Comprador | Refinanciamento | `COMPROVANTE_RESIDENCIA`, `DOCUMENTO_VEICULO`, `COMPROVANTE_RENDA`, `CNH` |
+| Loja | Financiamento | `LAUDO_ECV`, `DOCUMENTO_VEICULO` |
+| Loja | Refinanciamento | Nenhum (a lista vem vazia) |
+
+A `CNH` aceita `CNH` ou `CNH_DIGITAL`. Se só a digital foi enviada, a lista mostra `CNH_DIGITAL` no lugar da `CNH` pendente. Se as duas foram enviadas, as duas aparecem.
+
+Documentos enviados que não estão na tabela (por exemplo, `LAUDO_VISTORIA`) não aparecem na lista do comprador nem da loja. A lista do vendedor mostra todos os documentos enviados, sem `PENDENTE`.
 
 Tipos aceitos no [envio de documentos](/pages/v2/proposal/document) (`enum_tipo` / `tipo`):
 
@@ -118,4 +137,4 @@ Tipos aceitos no [envio de documentos](/pages/v2/proposal/document) (`enum_tipo`
 | 11 | `CARTAO_CNPJ` | | ✓ | |
 | 57 | `ATPV` | ✓ | | |
 
-A consulta e o webhook podem listar outros tipos de documento anexados pela Credicarro; eles seguem o mesmo par código e nome.
+O webhook e a lista do vendedor na consulta podem trazer outros tipos de documento anexados pela Credicarro; eles seguem o mesmo par código e nome.
