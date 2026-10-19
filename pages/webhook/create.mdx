@@ -6,7 +6,7 @@ openapi: "POST /v1/webhook"
 Cadastra uma configuração de webhook para o parceiro identificado automaticamente pelo token de acesso.
 
 <Warning>
-  A `url` precisa ser **HTTPS** e pública, com até 2048 caracteres: sem `localhost`, IP privado, usuário/senha ou `#fragmento`. Caso contrário, a API retorna `Organization.Webhook.InvalidEndpoint`.
+  A `url` precisa ser **HTTPS** e pública, com até 2048 caracteres: sem `localhost`, IP privado, usuário/senha ou `#fragmento`. Caso contrário, a API retorna `422` com `Organization.Webhook.InvalidEndpoint`. Uma URL malformada (não absoluta) retorna `400` com `Validation.Url.Invalid`.
 </Warning>
 
 ## Tipos de webhook

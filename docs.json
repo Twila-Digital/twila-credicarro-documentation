@@ -302,6 +302,7 @@
               {
                 "group": "Cliente",
                 "pages": [
+                  "pages/customer/reference",
                   "pages/customer/unified",
                   "pages/customer/create",
                   "pages/customer/address",
