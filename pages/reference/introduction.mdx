@@ -24,7 +24,7 @@ Envie `Authorization: Bearer {token_de_acesso}` em todas as requisições, excet
     Os campos são em português. No **corpo das requisições**, os nomes usam `camelCase` (`simulacaoId`, `cnpjLoja`). Nas **respostas**, usam `snake_case` (`id_simulacao`, `valor_parcela`). Exceções: o cadastro de webhook usa `tipo_autenticacao`, e os parâmetros de paginação são `pagina_inicial` e `limite`.
   </Accordion>
   <Accordion title="CPF e CNPJ" icon="id-card">
-    CPF com 11 dígitos, só números. O `cnpjLoja` aceita formatado (`11.222.333/0001-81`) ou só números.
+    CPF com 11 dígitos, formatado (`123.456.789-09`) ou só números; os dígitos verificadores são validados. O `cnpjLoja` aceita formatado (`11.222.333/0001-81`) ou só números.
   </Accordion>
   <Accordion title="Valores monetários" icon="brazilian-real-sign">
     Em reais, como número com ponto decimal (`45000.50`). Não envie em centavos nem como texto.

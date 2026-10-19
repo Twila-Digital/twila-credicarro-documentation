@@ -44,7 +44,7 @@ Um erro de regra de negócio vem sem `campo`:
 | --- | --- | --- |
 | `400` | Dados inválidos (formato, campo obrigatório ausente). | Não — corrija o corpo |
 | `401` | Token ausente, inválido ou expirado. | Gere um novo token e repita |
-| `403` | Integração inativa ou sem acesso. | Não — fale com o time Credicarro |
+| `403` | Integração inativa ou parceiro não encontrado. Pode ocorrer em qualquer rota autenticada. | Não — fale com o time Credicarro |
 | `404` | Recurso não encontrado ou de outro parceiro (proposta, simulação, cliente, loja ou webhook). | Não |
 | `409` | CPF, e-mail ou celular já cadastrado, `Idempotency-Key` reutilizada com outro conteúdo ou edição simultânea de webhook. | Não — trate pelo `tipo` |
 | `422` | Regra de negócio não atendida (por exemplo, loja com intermediação ou cadastro do cliente incompleto). | Não — trate pelo `tipo` |
@@ -69,13 +69,23 @@ Todos retornam `400`, com o campo em `campo`.
 | `Validation.Field.Required` | Campo obrigatório ausente (inclusive headers, como `Idempotency-Key` no envio de documento). |
 | `Validation.Field.TooLong` | Texto maior que o permitido. |
 | `Validation.Field.InvalidOption` | Valor fora das opções aceitas (por exemplo, `tipoOcupacao` ou `participante`). |
+| `Validation.Identifier.Invalid` | Identificador (UUID) inválido ou vazio (por exemplo, `simulacaoId`). |
 | `Validation.Cpf.Invalid` | CPF inválido. |
+| `Validation.Cnpj.Invalid` | `cnpjLoja` inválido. |
+| `Validation.Email.Invalid` | E-mail inválido. |
 | `Validation.Phone.Invalid` | Celular fora do formato `+55 (DD) 99999-9999`. |
 | `Validation.ZipCode.Invalid` | CEP inválido. |
+| `Validation.Uf.Invalid` | UF inválida (`uf` ou `endereco.estado`). |
 | `Validation.BirthDate.Invalid`, `.BelowMinimumAge`, `.AboveMaximumAge` | Data de nascimento futura ou cliente fora da faixa de 18 a 75 anos. |
+| `Validation.Amount.MustBePositive`, `.MustNotBeNegative` | Valor monetário zero ou negativo onde não é permitido (`valorVeiculo`, `valorSolicitado`, `renda`, `valorEntrada`). |
+| `Validation.DownPayment.NotBelowVehicleAmount` | `valorEntrada` igual ou maior que `valorVeiculo`. |
 | `Validation.LicensePlate.Invalid` | Placa inválida. |
 | `Validation.Renavam.Invalid` | Renavam inválido. |
-| `Validation.Bank.InvalidCode`, `.InvalidAgency`, `.InvalidAccountNumber` | Dados bancários inválidos. |
+| `Validation.Chassi.Invalid` | Chassi inválido (17 caracteres, sem I, O e Q). |
+| `Validation.Color.Invalid` | Cor do veículo com números. |
+| `Validation.Bank.InvalidCode`, `.InvalidAgency`, `.InvalidAccountNumber`, `.InvalidCheckDigit` | Dados bancários inválidos. |
+| `Validation.Url.Invalid` | `url` do webhook não é uma URL absoluta http ou https. |
+| `Validation.Paging.InvalidNumber`, `.InvalidSize` | `pagina_inicial` menor que 1 ou `limite` fora de 1 a 100. |
 | `Validation.IdempotencyKey.Invalid` | `Idempotency-Key` vazia ou com mais de 200 caracteres. |
 | `Validation.Document.TypeNotAllowed` | Tipo de documento não aceito para o participante. |
 | `Validation.File.InvalidName`, `.InvalidExtension`, `.InvalidBase64`, `.Empty`, `.TooLarge` | Arquivo do documento inválido. Veja [Enviar documentos](/pages/guides/document-upload). |
@@ -121,6 +131,9 @@ Todos retornam `400`, com o campo em `campo`.
 | `Proposal.Customer.ProfileNotFound` | `404` | O cliente da proposta não foi encontrado. |
 | `Proposal.Customer.ProfileAmbiguous` | `502` | Na listagem, não foi possível identificar o cliente de uma proposta. |
 | `Proposal.IdempotencyKeyReused` | `409` | `Idempotency-Key` reutilizada com outro conteúdo na criação da proposta. |
+| `Proposal.SimulationAlreadyActivated` | `422` | O `simulacaoId` já foi usado em outra proposta. Cada opção de simulação gera uma única proposta. |
+| `Proposal.SimulationAlreadyExpired` | `422` | A simulação expirou. Faça uma nova simulação. |
+| `Proposal.BuyerAgeNotAllowed` | `422` | O cliente não tem entre 18 e 75 anos na criação da proposta. |
 | `Proposal.InvalidStatus` | `422` | Dados do veículo enviados fora da etapa `DADOS_VEICULO`. |
 | `Proposal.ProposalIsNotInDepositAccountStatus` | `422` | Conta de recebimento enviada fora da etapa `CONTA_RECEBIMENTO`. |
 | `Proposal.DepositAccount.OnlyRefinancing` | `422` | Conta de recebimento enviada para uma proposta de financiamento. |

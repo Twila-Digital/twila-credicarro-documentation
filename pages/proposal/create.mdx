@@ -2,3 +2,13 @@
 title: 'Criar proposta'
 openapi: "POST /v1/proposal"
 ---
+
+Cria a proposta a partir da opção de simulação escolhida pelo cliente. O cliente precisa estar com o cadastro completo (endereço, ocupação e renda); senão, a API retorna `422` com `Customer.Account.Incomplete`.
+
+<Note>
+  Cada `id_simulacao` gera uma única proposta. Reutilizar um `simulacaoId` já usado retorna `422` com `Proposal.SimulationAlreadyActivated`; uma simulação expirada retorna `Proposal.SimulationAlreadyExpired`.
+</Note>
+
+<Tip title="Envie Idempotency-Key" horizontal>
+  Assim, um timeout não cria duas propostas. Veja [Erros e idempotência](/pages/errors#reenvio-seguro-com-idempotency-key).
+</Tip>

@@ -58,14 +58,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
           description: Cliente ou simulação não encontrados (`Customer.Account.NotFound`, `Simulation.Access.NotFound`)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo (`Proposal.IdempotencyKeyReused`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra de negócio não atendida (por exemplo, `Customer.Account.Incomplete`)
+          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Proposal.SimulationAlreadyExpired`, `Proposal.SimulationAlreadyActivated` ou `Proposal.BuyerAgeNotAllowed`)
           content:
             application/json:
               schema:
@@ -113,6 +121,20 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: O cliente de uma proposta não foi encontrado (`Proposal.Customer.ProfileNotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '502':
+          description: Não foi possível identificar o cliente de uma proposta (`Proposal.Customer.ProfileAmbiguous`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/proposal/{propostaId}:
     get:
       tags:
@@ -144,8 +166,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`) ou cliente da proposta não encontrado (`Proposal.Customer.ProfileNotFound`)
           content:
             application/json:
               schema:
@@ -194,7 +218,15 @@ paths:
                       additionalProperties: false
                 additionalProperties: false
         '400':
-          description: Bad Request — parâmetros inválidos ou ausentes
+          description: Erro na requisição (parâmetros inválidos ou ausentes)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Nenhuma loja de integração vinculada a este parceiro (`Store.Integration.NotFound`)
           content:
             application/json:
               schema:
@@ -208,7 +240,7 @@ paths:
   /v1/proposal/simulation/range/refinancing:
     get:
       tags:
-        - Proposta
+        - Simulação
       summary: Consultar valor mínimo e máximo refinanciável
       description: Consulta o valor mínimo e máximo refinanciável pela placa informada
       security:
@@ -221,7 +253,7 @@ paths:
           schema:
             type: string
             minLength: 7
-            example: ABC-1234 ou ABC1D23
+            example: ABC1D23
             description: Placa do veículo
       responses:
         '200':
@@ -259,6 +291,14 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Nenhuma loja de integração vinculada a este parceiro (`Store.Integration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
         '422':
           description: Sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
@@ -268,7 +308,7 @@ paths:
   /v1/proposal/simulation:
     get:
       tags:
-        - Proposta
+        - Simulação
       summary: Paginação de simulações
       description: Paginação de simulações
       security:
@@ -309,10 +349,12 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
   /v1/proposal/simulation/{simulacaoId}:
     get:
       tags:
-        - Proposta
+        - Simulação
       summary: Consultar simulação pelo ID.
       description: Consulta os detalhes de uma simulação específica utilizando o seu ID
       security:
@@ -340,6 +382,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
           description: Simulação não encontrada para este parceiro (`Simulation.Access.NotFound`)
           content:
@@ -349,7 +393,7 @@ paths:
   /v1/proposal/simulation/financing:
     post:
       tags:
-        - Proposta
+        - Simulação
       summary: Criar uma nova simulação de financiamento
       description: Cria uma nova simulação de financiamento
       security:
@@ -475,8 +519,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          description: Cliente não encontrado (`Customer.Account.NotFound`) ou nenhuma loja de integração vinculada ao parceiro (`Store.Integration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo (`Proposal.SimulationIdempotencyConflict`)
           content:
             application/json:
               schema:
@@ -490,7 +542,7 @@ paths:
   /v1/proposal/simulation/refinancing:
     post:
       tags:
-        - Proposta
+        - Simulação
       summary: Criar uma nova simulação de refinanciamento
       description: Cria uma nova simulação de refinanciamento
       security:
@@ -604,14 +656,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Cliente não encontrado (`Customer.Account.NotFound`)
+          description: Cliente não encontrado (`Customer.Account.NotFound`) ou nenhuma loja de integração vinculada ao parceiro (`Store.Integration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo (`Proposal.SimulationIdempotencyConflict`)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `Simulation.Refinancing.UfUnavailable`
+          description: Regra de negócio não atendida (por exemplo, `Proposal.RequestAmountInvalid`, `Simulation.Refinancing.AmountOutOfRange`, `Simulation.Terms.Unavailable` ou `Simulation.Refinancing.UfUnavailable`)
           content:
             application/json:
               schema:
@@ -649,7 +709,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/authenticationResponse"
         '400':
-          description: Erro na requisição
+          description: "`clientId` ou `clientSecret` ausente ou longo demais (`Validation.Field.Required`, `Validation.Field.TooLong`)"
           content:
             application/json:
               schema:
@@ -687,8 +747,8 @@ paths:
                   example: "+55 (11) 99876-5432"
                 cpf:
                   type: string
-                  minLength: 1
-                  maxLength: 11
+                  minLength: 11
+                  maxLength: 14
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678909"
                 dataDeNascimento:
@@ -765,7 +825,7 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  maxLength: 11
+                  maxLength: 14
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678909"
                 endereco:
@@ -803,7 +863,13 @@ paths:
                       example: "Bloco B, Apto 1203"
       responses:
         '202':
-          description: Endereço aceito para criação ou atualização
+          description: Endereço aceito para criação ou atualização. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: Accepted
         '400':
           description: Erro na requisição
           content:
@@ -851,7 +917,7 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  maxLength: 11
+                  maxLength: 14
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678909"
                 tipoOcupacao:
@@ -874,7 +940,13 @@ paths:
                   example: 6500.00
       responses:
         '202':
-          description: Dados profissionais aceitos para criação ou atualização
+          description: Dados profissionais aceitos para criação ou atualização. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: Accepted
         '400':
           description: Erro na requisição
           content:
@@ -927,7 +999,7 @@ paths:
                 cpf:
                   type: string
                   minLength: 11
-                  maxLength: 11
+                  maxLength: 14
                   description: CPF do cliente, com ou sem pontuação (11 dígitos). Os dígitos verificadores são validados.
                   example: "12345678909"
                 dataDeNascimento:
@@ -1096,7 +1168,21 @@ paths:
                     description: Segredo usado para validar a assinatura `X-CrediCarro-Signature`. Retornado somente nesta resposta.
                     example: "<segredo-de-assinatura>"
         '400':
-          description: Erro na requisição
+          description: Erro na requisição (por exemplo, `Validation.Url.Invalid` para URL malformada, `Validation.Field.Required` para `credencial` ausente em Basic ou Jwt)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '422':
+          description: "URL não aceita (`Organization.Webhook.InvalidEndpoint`: precisa ser HTTPS pública, sem localhost, IP privado, usuário/senha ou fragmento) ou integração inativa (`Organization.Webhook.ActivationIntegrationInactive`)"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '503':
+          description: Não foi possível proteger a credencial agora (`Organization.Webhook.CredentialProtectionUnavailable`). Tente de novo.
           content:
             application/json:
               schema:
@@ -1143,6 +1229,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
   /v1/webhook/{webhookId}:
     put:
       tags:
@@ -1189,15 +1277,35 @@ paths:
                   example: 1
       responses:
         '204':
-          description: Webhook atualizado com sucesso
+          description: Webhook atualizado com sucesso. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: No Content
         '400':
           description: Erro na requisição
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Webhook não encontrado para este parceiro
+          description: Webhook não encontrado para este parceiro (`Webhook.Registration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: O webhook foi alterado ao mesmo tempo por outra requisição (`Organization.Webhook.ConcurrencyConflict`). Tente de novo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: URL não aceita (`Organization.Webhook.InvalidEndpoint`) ou ativação com a integração inativa (`Organization.Webhook.ActivationIntegrationInactive`)
           content:
             application/json:
               schema:
@@ -1213,15 +1321,29 @@ paths:
         - $ref: "#/components/parameters/WebhookId"
       responses:
         '204':
-          description: Webhook excluído com sucesso
+          description: Webhook excluído com sucesso. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: No Content
         '400':
           description: Erro na requisição
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Webhook não encontrado para este parceiro
+          description: Webhook não encontrado para este parceiro (`Webhook.Registration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: O webhook foi alterado ao mesmo tempo por outra requisição (`Organization.Webhook.ConcurrencyConflict`). Tente de novo.
           content:
             application/json:
               schema:
@@ -1280,11 +1402,13 @@ paths:
                       additionalProperties: false
                 additionalProperties: false
         '400':
-          description: Bad Request — parâmetros inválidos ou ausentes
+          description: Erro na requisição (parâmetros inválidos ou ausentes)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
           description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
           content:
@@ -1292,7 +1416,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Loja de integração com contrato de intermediação não é permitida (`Store.Integration.Intermediation`)
+          description: Loja com contrato de intermediação (`Store.Integration.Intermediation`) ou sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -1316,7 +1440,7 @@ paths:
           schema:
             type: string
             minLength: 7
-            example: ABC-1234 ou ABC1D23
+            example: ABC1D23
             description: Placa do veículo
         - name: cnpjLoja
           in: query
@@ -1361,6 +1485,8 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
           description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
           content:
@@ -1368,7 +1494,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Loja de integração com contrato de intermediação não é permitida (`Store.Integration.Intermediation`)
+          description: Loja com contrato de intermediação (`Store.Integration.Intermediation`) ou sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -1376,7 +1502,7 @@ paths:
   /v2/proposal/simulation/financing:
     post:
       tags:
-        - Proposta
+        - Simulação
       summary: Criar uma nova simulação de financiamento
       description: |
         Cria uma nova simulação de financiamento selecionando a loja de integração pelo CNPJ (`cnpjLoja`).
@@ -1439,8 +1565,16 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
+          description: Cliente não encontrado (`Customer.Account.NotFound`) ou loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo (`Proposal.SimulationIdempotencyConflict`)
           content:
             application/json:
               schema:
@@ -1454,7 +1588,7 @@ paths:
   /v2/proposal/simulation/refinancing:
     post:
       tags:
-        - Proposta
+        - Simulação
       summary: Criar uma nova simulação de refinanciamento
       description: |
         Cria uma nova simulação de refinanciamento selecionando a loja de integração pelo CNPJ (`cnpjLoja`).
@@ -1504,14 +1638,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
+          description: Cliente não encontrado (`Customer.Account.NotFound`) ou loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '409':
+          description: A Idempotency-Key já foi usada com outro conteúdo (`Proposal.SimulationIdempotencyConflict`)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `Simulation.Refinancing.UfUnavailable`
+          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.RequestAmountInvalid`, `Simulation.Refinancing.AmountOutOfRange`, `Simulation.Terms.Unavailable` ou `Simulation.Refinancing.UfUnavailable`)
           content:
             application/json:
               schema:
@@ -1567,20 +1709,22 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Simulação ou loja não encontrada para este parceiro
+          description: Cliente, simulação ou loja não encontrados para este parceiro (`Customer.Account.NotFound`, `Simulation.Access.NotFound`, `Store.Integration.NotFound`)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '409':
-          description: A Idempotency-Key já foi usada com outro conteúdo
+          description: A Idempotency-Key já foi usada com outro conteúdo (`Proposal.IdempotencyKeyReused`)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Simulation.Access.NotFromStore` ou `Store.Integration.Intermediation`)
+          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Simulation.Access.NotFromStore`, `Store.Integration.Intermediation`, `Proposal.SimulationAlreadyExpired`, `Proposal.SimulationAlreadyActivated` ou `Proposal.BuyerAgeNotAllowed`)
           content:
             application/json:
               schema:
@@ -1613,8 +1757,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Proposta não encontrada para este parceiro
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`) ou cliente da proposta não encontrado (`Proposal.Customer.ProfileNotFound`)
           content:
             application/json:
               schema:
@@ -1664,21 +1810,29 @@ paths:
                   example: PRATA
       responses:
         '204':
-          description: Dados do veículo registrados
+          description: Dados do veículo registrados. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: No Content
         '400':
           description: Erro na requisição
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
-          description: Proposta não encontrada
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Etapa não permite o envio (`Proposal.InvalidStatus`) ou proposta não disponível nesta rota
+          description: Etapa não permite o envio (`Proposal.InvalidStatus`) ou proposta não disponível nesta rota (`Proposal.Access.NotIntegrationV2`)
           content:
             application/json:
               schema:
@@ -1736,13 +1890,21 @@ paths:
                   example: CORRENTE
       responses:
         '204':
-          description: Conta de recebimento registrada
+          description: Conta de recebimento registrada. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: No Content
         '400':
           description: Erro na requisição
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
           description: Proposta não encontrada para este parceiro
           content:
@@ -1750,7 +1912,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra não atendida — `Proposal.DepositAccount.OnlyRefinancing`, `Proposal.DepositAccount.HolderNotBuyer` ou `Proposal.ProposalIsNotInDepositAccountStatus`
+          description: Regra não atendida — `Proposal.DepositAccount.OnlyRefinancing`, `Proposal.DepositAccount.HolderNotBuyer`, `Proposal.ProposalIsNotInDepositAccountStatus` ou `Proposal.Access.NotIntegrationV2`
           content:
             application/json:
               schema:
@@ -1813,13 +1975,21 @@ paths:
                   example: JVBERi0xLjcKJcOkw7zDtsOfCjIgMCBvYmoK...
       responses:
         '204':
-          description: Documento recebido
+          description: Documento recebido. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: No Content
         '400':
           description: Erro na requisição
           content:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
         '404':
           description: Proposta não encontrada para este parceiro
           content:
@@ -1827,7 +1997,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra não atendida — `Document.InvalidProposalStage`, `Document.NotPendingCorrection`, `Document.InvalidContent` ou `Document.InvalidProposalModality`
+          description: Regra não atendida — `Document.InvalidProposalStage`, `Document.NotPendingCorrection`, `Document.InvalidContent`, `Document.InvalidProposalModality` ou `Proposal.Access.NotIntegrationV2`
           content:
             application/json:
               schema:
@@ -1845,6 +2015,13 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
 components:
+  responses:
+    IntegrationInactive:
+      description: Integração do parceiro inativa ou não encontrada (`Integration.Access.Inactive`, `Integration.Access.OrganizationNotFound`)
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ProblemDetails"
   parameters:
     IdempotencyKey:
       name: Idempotency-Key
@@ -2379,7 +2556,9 @@ components:
         comprador:
           $ref: "#/components/schemas/Buyer"
         vendedor:
-          $ref: "#/components/schemas/Seller"
+          description: Omitido quando a proposta não tem vendedor
+          allOf:
+            - $ref: "#/components/schemas/Seller"
         data_criacao:
           type: string
           format: date-time
