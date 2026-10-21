@@ -147,6 +147,7 @@
                   "pages/v2/simulation/reference",
                   "pages/v2/simulation/range-financing",
                   "pages/v2/simulation/range-refinancing",
+                  "pages/v2/simulation/get-commission-returns",
                   "pages/v2/simulation/create-financing",
                   "pages/v2/simulation/create-refinancing",
                   "pages/simulation/get",

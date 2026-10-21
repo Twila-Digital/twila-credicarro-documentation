@@ -1548,6 +1548,12 @@ paths:
                   type: boolean
                   description: Indica se o veículo é zero quilômetro. `true` para novo, `false` para usado.
                   example: false
+                retornoComissao:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: Retorno de comissão a ser aplicado, dentro da faixa configurada na loja. Opcional.
+                  example: 2
                 cnpjLoja:
                   type: string
                   description: CNPJ da loja de integração vinculada ao parceiro, formatado ou apenas números.
@@ -1580,7 +1586,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
+          description: Loja com intermediação (`Store.Integration.Intermediation`), regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `retornoComissao` inválido (loja sem retorno de comissão configurado para financiamento, `Store.CommissionReturn.NotConfigured`, ou fora da faixa configurada, `Store.CommissionReturn.OutOfRange`)
           content:
             application/json:
               schema:
@@ -1621,6 +1627,12 @@ paths:
                   format: double
                   description: Valor solicitado para refinanciamento, em reais. Deve estar dentro da faixa refinanciável da placa.
                   example: 25000
+                retornoComissao:
+                  type: integer
+                  format: int32
+                  minimum: 0
+                  description: Retorno de comissão a ser aplicado, dentro da faixa configurada na loja. Opcional.
+                  example: 2
                 cnpjLoja:
                   type: string
                   description: CNPJ da loja de integração vinculada ao parceiro, formatado ou apenas números.
@@ -1653,7 +1665,85 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.RequestAmountInvalid`, `Simulation.Refinancing.AmountOutOfRange`, `Simulation.Terms.Unavailable` ou `Simulation.Refinancing.UfUnavailable`)
+          description: Loja com intermediação (`Store.Integration.Intermediation`), regra de negócio não atendida (por exemplo, `Proposal.RequestAmountInvalid`, `Simulation.Refinancing.AmountOutOfRange`, `Simulation.Terms.Unavailable` ou `Simulation.Refinancing.UfUnavailable`) ou `retornoComissao` inválido (loja sem retorno de comissão configurado para refinanciamento, `Store.CommissionReturn.NotConfigured`, ou fora da faixa configurada, `Store.CommissionReturn.OutOfRange`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/simulation/commission-returns:
+    get:
+      tags:
+        - Simulação
+      summary: Consultar os retornos de comissão disponíveis para a loja
+      description: |
+        Consulta todos os retornos de comissão (financiamento e refinanciamento) configurados para a loja de
+        integração, selecionada pelo CNPJ (`cnpjLoja`). Use um dos valores retornados em `retornoComissao` ao criar
+        a simulação.
+      security:
+        - bearerAuth: []
+      parameters:
+        - name: cnpjLoja
+          in: query
+          description: CNPJ da loja de integração vinculada ao parceiro, formatado ou apenas números
+          required: true
+          schema:
+            type: string
+            example: 11.222.333/0001-81
+      responses:
+        '200':
+          description: Retornos de comissão retornados com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  retornos_comissao:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        tipo:
+                          type: string
+                          enum: [Financing, Refinancing]
+                          description: Tipo de simulação ao qual o retorno se aplica
+                          example: Financing
+                        alvo:
+                          type: string
+                          enum: [Store, Organization]
+                          description: A quem pertence a configuração de comissão
+                          example: Store
+                        retorno_minimo:
+                          type: integer
+                          format: int32
+                          description: Menor retorno de comissão aceito para esse tipo
+                          example: 0
+                        retorno_maximo:
+                          type: integer
+                          format: int32
+                          description: Maior retorno de comissão aceito para esse tipo
+                          example: 6
+                        permite_taxa_padrao:
+                          type: boolean
+                          description: Indica se a loja aceita usar a taxa padrão (sem informar `retornoComissao`)
+                          example: true
+                      additionalProperties: false
+                additionalProperties: false
+        '400':
+          description: Erro na requisição (`cnpjLoja` ausente ou inválido)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Loja não encontrada ou não vinculada a este parceiro (`Store.Integration.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja com contrato de intermediação (`Store.Integration.Intermediation`)
           content:
             application/json:
               schema:
