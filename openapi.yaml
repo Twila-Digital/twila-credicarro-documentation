@@ -539,6 +539,294 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+  /v1/proposal/simulation/financing/without-cpf:
+    post:
+      tags:
+        - Simulação
+      summary: Simular um financiamento sem CPF
+      description: |
+        Calcula as parcelas de um financiamento a partir da placa, do valor do veículo e da UF, **sem CPF e sem cadastro de cliente**.
+        A simulação usa a loja de integração vinculada ao parceiro autenticado e a taxa de juros dessa loja.
+
+        Nada é gravado: a resposta não tem `id_simulacao` e não pode ser usada para criar uma proposta.
+        Para criar uma proposta, faça uma [simulação de financiamento](/pages/simulation/create-financing) com o CPF do cliente.
+
+        Quando `valorEntrada` não é informado, a simulação usa a entrada mínima da taxa da loja para o veículo.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Os dados da simulação
+              required: ['placa', 'valorVeiculo', 'uf']
+              additionalProperties: false
+              properties:
+                placa:
+                  type: string
+                  description: Placa do veículo, no formato ABC-1234 ou ABC1D23.
+                  example: ABC1D23
+                valorVeiculo:
+                  type: number
+                  description: Valor total do veículo, em reais, maior que zero. Utilize ponto como separador decimal.
+                  format: double
+                  example: 45000
+                valorEntrada:
+                  type: number
+                  description: Valor de entrada, em reais, de zero até um valor menor que o do veículo. Opcional. Quando omitido, a simulação usa a entrada mínima da taxa da loja para o veículo. Entradas abaixo desse mínimo são recusadas com `Proposal.DownPaymentInvalid`.
+                  format: double
+                  example: 5000
+                uf:
+                  type: string
+                  description: UF (Unidade Federativa) do registro do veículo, em formato de 2 letras (ex. SP, RJ, MG).
+                  example: "SP"
+      responses:
+        '200':
+          description: Simulação calculada com sucesso. Nada é gravado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cotacoes:
+                    type: array
+                    description: Uma opção para cada prazo elegível.
+                    items:
+                      type: object
+                      properties:
+                        valor_solicitado:
+                          type: number
+                          format: double
+                          description: Valor financiado. É `valorVeiculo` menos a entrada considerada.
+                          example: 31500
+                        prazo:
+                          type: integer
+                          format: int32
+                          description: Quantidade de parcelas mensais.
+                          example: 24
+                        valor_parcela:
+                          type: number
+                          format: double
+                          example: 2033.96
+                        valor_tac:
+                          type: number
+                          format: double
+                          example: 1500
+                        valor_boleto:
+                          type: number
+                          format: double
+                          example: 0
+                        valor_seguro:
+                          type: number
+                          format: double
+                          example: 0
+                        valor_iof:
+                          type: number
+                          format: double
+                          example: 934.29
+                        percentual_iof:
+                          type: number
+                          format: double
+                          example: 3
+                        valor_credito_total:
+                          type: number
+                          format: double
+                          example: 34084.29
+                        valor_divida_total:
+                          type: number
+                          format: double
+                          example: 48815.04
+                        percentual_cet_mensal:
+                          type: number
+                          format: double
+                          example: 3.47968
+                        percentual_cet_anual:
+                          type: number
+                          format: double
+                          example: 50.7513
+                        percentual_juros_mensal:
+                          type: number
+                          format: double
+                          example: 2.8
+                        percentual_juros_anual:
+                          type: number
+                          format: double
+                          example: 39.28918
+                        valor_retencao_diaria_aproximado:
+                          type: number
+                          format: double
+                          description: Valor aproximado de retenção diária. Omitido quando não se aplica.
+                        valor_entrada_minima:
+                          type: number
+                          format: double
+                          description: Entrada mínima da loja para o veículo neste prazo.
+                          example: 13500
+        '400':
+          description: Erro na requisição (por exemplo, `Validation.LicensePlate.Invalid`, `Validation.Uf.Invalid`, `Validation.Amount.MustBePositive`, `Validation.DownPayment.NotBelowVehicleAmount`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Nenhuma loja de integração vinculada ao parceiro (`Store.Integration.NotFound`) ou veículo não encontrado para a placa (`Fipe.VehiclePlateNotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v1/proposal/simulation/refinancing/without-cpf:
+    post:
+      tags:
+        - Simulação
+      summary: Simular um refinanciamento sem CPF
+      description: |
+        Calcula as parcelas de um refinanciamento a partir da placa e do valor solicitado, **sem CPF e sem cadastro de cliente**.
+        A simulação usa a loja de integração vinculada ao parceiro autenticado e a taxa de juros dessa loja.
+
+        Nada é gravado: a resposta não tem `id_simulacao` e não pode ser usada para criar uma proposta.
+        Para criar uma proposta, faça uma [simulação de refinanciamento](/pages/simulation/create-refinancing) com o CPF do cliente.
+
+        Só voltam os prazos em cuja faixa o `valorSolicitado` cabe. Cada prazo informa o valor mínimo e o máximo refinanciável.
+        A `uf` é obrigatória: ela define as taxas e o custo de registro do contrato.
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              description: Os dados da simulação
+              required: ['placa', 'valorSolicitado', 'uf']
+              additionalProperties: false
+              properties:
+                placa:
+                  type: string
+                  description: Placa do veículo, no formato ABC-1234 ou ABC1D23.
+                  example: ABC1D23
+                valorSolicitado:
+                  type: number
+                  description: Valor solicitado para refinanciamento, em reais, maior que zero. Utilize ponto como separador decimal.
+                  format: double
+                  example: 20000
+                uf:
+                  type: string
+                  description: UF (Unidade Federativa) do registro do veículo, em formato de 2 letras (ex. SP, RJ, MG).
+                  example: "SP"
+      responses:
+        '200':
+          description: Simulação calculada com sucesso. Nada é gravado.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  cotacoes:
+                    type: array
+                    description: Uma opção para cada prazo em cuja faixa o valor solicitado cabe.
+                    items:
+                      type: object
+                      properties:
+                        valor_solicitado:
+                          type: number
+                          format: double
+                          description: Valor solicitado para refinanciamento.
+                          example: 20000
+                        prazo:
+                          type: integer
+                          format: int32
+                          example: 24
+                        valor_parcela:
+                          type: number
+                          format: double
+                          example: 1100.5
+                        valor_tac:
+                          type: number
+                          format: double
+                          example: 1500
+                        valor_boleto:
+                          type: number
+                          format: double
+                          example: 0
+                        valor_seguro:
+                          type: number
+                          format: double
+                          example: 0
+                        valor_iof:
+                          type: number
+                          format: double
+                          example: 600.25
+                        percentual_iof:
+                          type: number
+                          format: double
+                          example: 3
+                        valor_credito_total:
+                          type: number
+                          format: double
+                          example: 22100.25
+                        valor_divida_total:
+                          type: number
+                          format: double
+                          example: 26412
+                        percentual_cet_mensal:
+                          type: number
+                          format: double
+                          example: 3.2
+                        percentual_cet_anual:
+                          type: number
+                          format: double
+                          example: 46.1
+                        percentual_juros_mensal:
+                          type: number
+                          format: double
+                          example: 2.8
+                        percentual_juros_anual:
+                          type: number
+                          format: double
+                          example: 39.29
+                        valor_retencao_diaria_aproximado:
+                          type: number
+                          format: double
+                          description: Valor aproximado de retenção diária. Omitido quando não se aplica.
+                        valor_minimo_refinanciavel:
+                          type: number
+                          format: double
+                          description: Menor valor refinanciável neste prazo.
+                          example: 16000
+                        valor_maximo_refinanciavel:
+                          type: number
+                          format: double
+                          description: Maior valor refinanciável neste prazo.
+                          example: 40000
+        '400':
+          description: Erro na requisição (por exemplo, `Validation.LicensePlate.Invalid`, `Validation.Uf.Invalid`, `Validation.Amount.MustBePositive`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Nenhuma loja de integração vinculada ao parceiro (`Store.Integration.NotFound`) ou veículo não encontrado para a placa (`Fipe.VehiclePlateNotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Loja com intermediação (`Store.Integration.Intermediation`) ou regra de negócio não atendida (por exemplo, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/proposal/simulation/refinancing:
     post:
       tags:

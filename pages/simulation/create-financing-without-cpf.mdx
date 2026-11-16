@@ -1,0 +1,24 @@
+---
+title: 'Simular financiamento sem CPF'
+openapi: "POST /v1/proposal/simulation/financing/without-cpf"
+---
+
+Calcula as parcelas de um financiamento **sem CPF e sem cadastro de cliente**. Você informa a placa, o valor do veículo e a UF, e recebe **uma opção para cada prazo elegível**.
+
+**Exemplo:**
+```json
+{
+  "placa": "ABC1D23",
+  "valorVeiculo": 45000,
+  "valorEntrada": 5000,
+  "uf": "SP"
+}
+```
+
+<Tip title="Entrada" horizontal>
+  `valorEntrada` é opcional. Sem ele, a simulação usa a entrada mínima da loja para o veículo. Se você informar um valor abaixo desse mínimo, a API retorna `422` com `Proposal.DownPaymentInvalid`. O mínimo de cada prazo volta em `valor_entrada_minima`.
+</Tip>
+
+<Note title="Só simulação" horizontal>
+  Nada é gravado: a resposta não tem `id_simulacao` e não serve para criar uma proposta. Para isso, faça uma [simulação de financiamento](/pages/simulation/create-financing) com o CPF do cliente.
+</Note>

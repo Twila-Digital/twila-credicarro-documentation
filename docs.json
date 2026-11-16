@@ -153,7 +153,9 @@
                   "pages/v2/simulation/range-refinancing",
                   "pages/v2/simulation/get-commission-returns",
                   "pages/v2/simulation/create-financing",
+                  "pages/simulation/create-financing-without-cpf",
                   "pages/v2/simulation/create-refinancing",
+                  "pages/simulation/create-refinancing-without-cpf",
                   "pages/simulation/get",
                   "pages/simulation/pagination"
                 ]
@@ -322,7 +324,9 @@
                   "pages/simulation/range-financing",
                   "pages/simulation/range-refinancing",
                   "pages/simulation/create-financing",
+                  "pages/simulation/create-financing-without-cpf",
                   "pages/simulation/create-refinancing",
+                  "pages/simulation/create-refinancing-without-cpf",
                   "pages/simulation/get",
                   "pages/simulation/pagination"
                 ]
