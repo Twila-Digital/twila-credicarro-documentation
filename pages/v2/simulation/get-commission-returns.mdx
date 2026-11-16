@@ -1,0 +1,19 @@
+---
+title: 'Retornos de comissão'
+openapi: "GET /v2/proposal/simulation/commission-returns"
+---
+
+Retorna os **retornos de comissão** configurados para a loja, um para financiamento e outro para refinanciamento. Consulte antes de simular para saber a faixa aceita em `retornoComissao`.
+
+```json Resposta
+{
+  "retornos_comissao": [
+    { "tipo": "Financing", "alvo": "Store", "retorno_minimo": 0, "retorno_maximo": 6, "permite_taxa_padrao": true },
+    { "tipo": "Refinancing", "alvo": "Store", "retorno_minimo": 0, "retorno_maximo": 6, "permite_taxa_padrao": true }
+  ]
+}
+```
+
+<Note>
+  Se a loja não tiver retorno de comissão configurado para um tipo, ele não aparece na lista — enviar `retornoComissao` nesse caso resulta em `Store.CommissionReturn.NotConfigured` ao [simular](/pages/v2/simulation/create-financing).
+</Note>

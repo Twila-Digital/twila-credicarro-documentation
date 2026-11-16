@@ -23,6 +23,7 @@ A **simulação** calcula as condições de crédito para um cliente, um veícul
 | --- | --- |
 | [`GET /v2/proposal/simulation/range/financing`](/pages/v2/simulation/range-financing) | Entrada mínima por prazo de financiamento. |
 | [`GET /v2/proposal/simulation/range/refinancing`](/pages/v2/simulation/range-refinancing) | Valor mínimo e máximo por prazo de refinanciamento. |
+| [`GET /v2/proposal/simulation/commission-returns`](/pages/v2/simulation/get-commission-returns) | Retornos de comissão disponíveis para a loja. |
 | [`POST /v2/proposal/simulation/financing`](/pages/v2/simulation/create-financing) | Simular um financiamento. |
 | [`POST /v2/proposal/simulation/refinancing`](/pages/v2/simulation/create-refinancing) | Simular um refinanciamento. |
 | [`GET /v1/proposal/simulation/{simulacaoId}`](/pages/simulation/get) | Consultar uma simulação. |
@@ -40,6 +41,7 @@ A **simulação** calcula as condições de crédito para um cliente, um veícul
 | `uf` | ✓ | |
 | `isVeiculoZeroKm` | ✓ | |
 | `valorSolicitado` | | ✓ (dentro da faixa refinanciável) |
+| `retornoComissao` | ✓ (opcional, dentro da faixa [configurada na loja](/pages/v2/simulation/get-commission-returns)) | ✓ (opcional, dentro da faixa [configurada na loja](/pages/v2/simulation/get-commission-returns)) |
 
 ## Resposta
 

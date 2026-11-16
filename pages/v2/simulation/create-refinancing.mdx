@@ -19,6 +19,10 @@ Calcula as condições de refinanciamento e retorna **uma opção para cada praz
   O cliente precisa estar cadastrado, e o `valorSolicitado` precisa estar dentro da [faixa refinanciável](/pages/v2/simulation/range-refinancing). A UF vem do veículo; se a placa não a informar, é usado o estado do endereço do cliente.
 </Tip>
 
+<Tip title="Retorno de comissão" horizontal>
+  `retornoComissao` é opcional e precisa estar dentro da faixa [configurada na loja](/pages/v2/simulation/get-commission-returns) para refinanciamento. Omita o campo para usar a taxa padrão, quando a loja permitir.
+</Tip>
+
 <Note>
   Veja como ler cada campo da resposta na [referência de simulação](/pages/v2/simulation/reference).
 </Note>
