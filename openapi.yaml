@@ -1287,46 +1287,6 @@ paths:
                 $ref: "#/components/schemas/ProblemDetails"
         '403':
           $ref: "#/components/responses/IntegrationInactive"
-  /v1/webhook/audit/chart:
-    get:
-      tags:
-        - Webhook
-      summary: Consultar o gráfico de sucessos e erros dos envios
-      description: |
-        Conta os envios com sucesso e com erro em intervalos do período, no horário de Brasília. Recebe os mesmos filtros
-        do histórico, mas `data_inicial` e `data_final` são obrigatórios e o período pode ter até 31 dias.
-        O intervalo depende do tamanho do período: até 1 hora, 10 minutos (`"10m"`); até 1 dia, 1 hora (`"14h"`);
-        acima disso, 1 dia (`"05"`). Intervalos sem envios voltam com zero.
-      security:
-        - bearerAuth: []
-      parameters:
-        - $ref: "#/components/parameters/WebhookAuditInitialDate"
-        - $ref: "#/components/parameters/WebhookAuditFinalDate"
-        - $ref: "#/components/parameters/WebhookAuditProposalId"
-        - $ref: "#/components/parameters/WebhookAuditSimulationId"
-        - $ref: "#/components/parameters/WebhookAuditProposalNumber"
-        - $ref: "#/components/parameters/WebhookAuditStatusCode"
-      responses:
-        '200':
-          description: Contagens por intervalo, em ordem cronológica
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/WebhookAuditChartPoint"
-        '400':
-          description: |
-            Período ausente (`Organization.Webhook.Audit.DateRangeRequired`), maior que 31 dias
-            (`Organization.Webhook.Audit.DateRangeTooLarge`) ou com fim antes do início
-            (`Organization.Webhook.Audit.InvalidDateRange`), ou filtro inválido (`Organization.Webhook.Audit.InvalidProposalId`,
-            `.InvalidSimulationId`, `.InvalidProposalNumber`, `.InvalidStatusCode`)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
-        '403':
-          $ref: "#/components/responses/IntegrationInactive"
   /v1/webhook/audit/{auditWebhookId}/resend:
     post:
       tags:
@@ -2636,26 +2596,6 @@ components:
           format: date-time
           description: Data e hora do envio.
           example: "2026-11-05T14:32:10.123+00:00"
-      additionalProperties: false
-    WebhookAuditChartPoint:
-      type: object
-      properties:
-        rotulo:
-          type: string
-          description: |
-            Início do intervalo, no horário de Brasília. Até 1 hora de período, intervalos de 10 minutos (`"10m"`);
-            até 1 dia, por hora (`"14h"`); acima disso, por dia (`"05"`).
-          example: "05"
-        sucessos:
-          type: integer
-          format: int32
-          description: Envios com sucesso no intervalo.
-          example: 42
-        erros:
-          type: integer
-          format: int32
-          description: Envios com erro no intervalo.
-          example: 3
       additionalProperties: false
     SimulationResponse:
       type: object
