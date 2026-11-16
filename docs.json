@@ -27,6 +27,10 @@
     {
       "source": "/pages/idempotency",
       "destination": "/pages/errors"
+    },
+    {
+      "source": "/pages/webhook/audit-chart",
+      "destination": "/pages/webhook/audit"
     }
   ],
   "navigation": {
@@ -198,7 +202,6 @@
                   "pages/webhook/update",
                   "pages/webhook/delete",
                   "pages/webhook/audit",
-                  "pages/webhook/audit-chart",
                   "pages/webhook/resend"
                 ]
               }
@@ -357,7 +360,6 @@
                   "pages/webhook/update",
                   "pages/webhook/delete",
                   "pages/webhook/audit",
-                  "pages/webhook/audit-chart",
                   "pages/webhook/resend"
                 ]
               }

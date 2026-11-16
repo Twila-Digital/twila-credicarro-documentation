@@ -162,8 +162,6 @@ Todos retornam `400`, com o campo em `campo`.
 | `Organization.Webhook.ConcurrencyConflict` | `409` | O webhook foi alterado ao mesmo tempo por outra requisição. Tente de novo. |
 | `Organization.Webhook.CredentialProtectionUnavailable` | `503` | Não foi possível proteger a credencial agora. Tente de novo. |
 | `Webhook.Audit.NotFound` | `404` | No reenvio, o envio não existe, é de outro parceiro ou não pode mais ser reenviado. |
-| `Organization.Webhook.Audit.DateRangeRequired` | `400` | No gráfico de envios, `data_inicial` ou `data_final` ausente. |
-| `Organization.Webhook.Audit.DateRangeTooLarge` | `400` | No gráfico de envios, período maior que 31 dias. |
 | `Organization.Webhook.Audit.InvalidDateRange`, `.InvalidFinalDate` | `400` | Período inválido: `data_final` antes de `data_inicial` ou data fora do intervalo aceito. |
 | `Organization.Webhook.Audit.InvalidProposalId`, `.InvalidSimulationId` | `400` | `id_proposta` ou `id_simulacao` não é um UUID válido. |
 | `Organization.Webhook.Audit.InvalidProposalNumber` | `400` | `numero_proposta` com mais de 50 caracteres. |
