@@ -196,7 +196,10 @@
                   "pages/webhook/create",
                   "pages/webhook/list",
                   "pages/webhook/update",
-                  "pages/webhook/delete"
+                  "pages/webhook/delete",
+                  "pages/webhook/audit",
+                  "pages/webhook/audit-chart",
+                  "pages/webhook/resend"
                 ]
               }
             ]
@@ -352,7 +355,10 @@
                   "pages/webhook/create",
                   "pages/webhook/list",
                   "pages/webhook/update",
-                  "pages/webhook/delete"
+                  "pages/webhook/delete",
+                  "pages/webhook/audit",
+                  "pages/webhook/audit-chart",
+                  "pages/webhook/resend"
                 ]
               }
             ]

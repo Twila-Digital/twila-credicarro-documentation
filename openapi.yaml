@@ -1231,6 +1231,148 @@ paths:
                 $ref: "#/components/schemas/ProblemDetails"
         '403':
           $ref: "#/components/responses/IntegrationInactive"
+  /v1/webhook/audit:
+    get:
+      tags:
+        - Webhook
+      summary: Consultar o histórico de envios de webhook
+      description: |
+        Traz, de forma paginada, os envios de webhook do parceiro autenticado, com o corpo enviado, a resposta da sua URL
+        e o status HTTP. Todos os filtros são opcionais.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WebhookAuditInitialDate"
+        - $ref: "#/components/parameters/WebhookAuditFinalDate"
+        - $ref: "#/components/parameters/WebhookAuditProposalId"
+        - $ref: "#/components/parameters/WebhookAuditSimulationId"
+        - $ref: "#/components/parameters/WebhookAuditProposalNumber"
+        - $ref: "#/components/parameters/WebhookAuditStatusCode"
+        - name: pagina_inicial
+          in: query
+          description: Página inicial (mínimo 1)
+          schema:
+            type: integer
+            format: int32
+            example: 1
+        - name: limite
+          in: query
+          description: Quantidade de itens por página (1 a 100)
+          schema:
+            type: integer
+            format: int32
+            example: 10
+      responses:
+        '200':
+          description: Histórico de envios retornado com sucesso
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  itens:
+                    type: array
+                    items:
+                      $ref: "#/components/schemas/WebhookAuditResponse"
+                  pagina:
+                    $ref: "#/components/schemas/Page"
+        '400':
+          description: |
+            Filtro inválido: paginação (`Validation.Paging.InvalidNumber`, `Validation.Paging.InvalidSize`), período
+            (`Organization.Webhook.Audit.InvalidDateRange`, `Organization.Webhook.Audit.InvalidFinalDate`) ou filtros
+            (`Organization.Webhook.Audit.InvalidProposalId`, `.InvalidSimulationId`, `.InvalidProposalNumber`, `.InvalidStatusCode`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+  /v1/webhook/audit/chart:
+    get:
+      tags:
+        - Webhook
+      summary: Consultar o gráfico de sucessos e erros dos envios
+      description: |
+        Conta os envios com sucesso e com erro em intervalos do período, no horário de Brasília. Recebe os mesmos filtros
+        do histórico, mas `data_inicial` e `data_final` são obrigatórios e o período pode ter até 31 dias.
+        O intervalo depende do tamanho do período: até 1 hora, 10 minutos (`"10m"`); até 1 dia, 1 hora (`"14h"`);
+        acima disso, 1 dia (`"05"`). Intervalos sem envios voltam com zero.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/WebhookAuditInitialDate"
+        - $ref: "#/components/parameters/WebhookAuditFinalDate"
+        - $ref: "#/components/parameters/WebhookAuditProposalId"
+        - $ref: "#/components/parameters/WebhookAuditSimulationId"
+        - $ref: "#/components/parameters/WebhookAuditProposalNumber"
+        - $ref: "#/components/parameters/WebhookAuditStatusCode"
+      responses:
+        '200':
+          description: Contagens por intervalo, em ordem cronológica
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/WebhookAuditChartPoint"
+        '400':
+          description: |
+            Período ausente (`Organization.Webhook.Audit.DateRangeRequired`), maior que 31 dias
+            (`Organization.Webhook.Audit.DateRangeTooLarge`) ou com fim antes do início
+            (`Organization.Webhook.Audit.InvalidDateRange`), ou filtro inválido (`Organization.Webhook.Audit.InvalidProposalId`,
+            `.InvalidSimulationId`, `.InvalidProposalNumber`, `.InvalidStatusCode`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+  /v1/webhook/audit/{auditWebhookId}/resend:
+    post:
+      tags:
+        - Webhook
+      summary: Reenviar um webhook
+      description: |
+        Reenvia para a URL do webhook o mesmo corpo de um envio do histórico, com uma nova assinatura
+        `X-CrediCarro-Signature`. O reenvio cria um novo registro no histórico, sem alterar o original, e a resposta traz
+        o resultado imediato. A requisição não tem corpo.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/AuditWebhookId"
+      responses:
+        '200':
+          description: Reenvio feito. `status_http` vem nulo quando a URL do webhook não respondeu.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status_http:
+                    type: integer
+                    format: int32
+                    nullable: true
+                    description: Status HTTP devolvido pela URL do webhook
+                    example: 200
+                  resposta:
+                    type: string
+                    description: Corpo devolvido pela URL do webhook
+                    example: '{"recebido":true}'
+                additionalProperties: false
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Envio não encontrado para este parceiro ou que não pode mais ser reenviado (`Webhook.Audit.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '503':
+          description: Não foi possível reenviar agora (`Organization.Webhook.Resend.DependencyUnavailable`). Tente de novo.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
   /v1/webhook/{webhookId}:
     put:
       tags:
@@ -1566,7 +1708,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SimplifySimulationListResponse"
         '400':
-          description: Erro na requisição
+          description: Erro na requisição (por exemplo, `Validation.Amount.MustNotBeNegative` para `retornoComissao` negativo)
           content:
             application/json:
               schema:
@@ -1645,7 +1787,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/SimplifySimulationListResponse"
         '400':
-          description: Erro na requisição
+          description: Erro na requisição (por exemplo, `Validation.Amount.MustNotBeNegative` para `retornoComissao` negativo)
           content:
             application/json:
               schema:
@@ -2142,6 +2284,65 @@ components:
         type: string
         format: uuid
         example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+    AuditWebhookId:
+      name: auditWebhookId
+      in: path
+      required: true
+      description: Identificador do envio (`id_auditoria`) retornado no histórico de envios
+      schema:
+        type: string
+        format: uuid
+        example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+    WebhookAuditInitialDate:
+      name: data_inicial
+      in: query
+      description: Início do período de envio. Uma data sem horário (por exemplo, `2026-11-01`) começa no início do dia.
+      schema:
+        type: string
+        format: date-time
+        example: "2026-11-01T00:00:00-03:00"
+    WebhookAuditFinalDate:
+      name: data_final
+      in: query
+      description: Fim do período de envio. Uma data sem horário (por exemplo, `2026-11-05`) inclui o dia inteiro.
+      schema:
+        type: string
+        format: date-time
+        example: "2026-11-05T23:59:59-03:00"
+    WebhookAuditProposalId:
+      name: id_proposta
+      in: query
+      description: Identificador da proposta (UUID)
+      schema:
+        type: string
+        format: uuid
+        example: bea8d060-f93d-48eb-b6c4-45f64483cdd9
+    WebhookAuditSimulationId:
+      name: id_simulacao
+      in: query
+      description: Identificador da simulação (UUID)
+      schema:
+        type: string
+        format: uuid
+        example: 123e4567-e89b-12d3-a456-426614174000
+    WebhookAuditProposalNumber:
+      name: numero_proposta
+      in: query
+      description: Número da proposta, com até 50 caracteres
+      schema:
+        type: string
+        maxLength: 50
+        example: "12345"
+    WebhookAuditStatusCode:
+      name: status_http
+      in: query
+      description: Status HTTP devolvido pela URL do webhook (100 a 599)
+      schema:
+        type: integer
+        format: int32
+        minimum: 100
+        maximum: 599
+        example: 200
   schemas:
     SimplifySimulationListResponse:
       type: object
@@ -2398,6 +2599,64 @@ components:
         status:
           type: string
           example: Active
+    WebhookAuditResponse:
+      type: object
+      properties:
+        id_auditoria:
+          type: string
+          format: uuid
+          description: Identificador do envio. Use em `POST /v1/webhook/audit/{auditWebhookId}/resend` para reenviar.
+          example: 7c9e6679-7425-40de-944b-e07fc1f90ae7
+        id_webhook:
+          type: string
+          format: uuid
+          nullable: true
+          description: Webhook que recebeu o envio. Pode vir nulo quando o webhook não existe mais.
+          example: 3fa85f64-5717-4562-b3fc-2c963f66afa6
+        tipo:
+          type: string
+          description: Tipo do webhook (`Customer`, `Simulation` ou `Proposal`).
+          example: Proposal
+        requisicao:
+          type: string
+          description: Corpo enviado à URL do webhook, como texto JSON.
+          example: '{"id_proposta":"bea8d060-f93d-48eb-b6c4-45f64483cdd9","status":"EM_ANALISE"}'
+        resposta:
+          type: string
+          description: Corpo devolvido pela URL do webhook. Vem vazio quando não houve resposta.
+          example: '{"recebido":true}'
+        status_http:
+          type: integer
+          format: int32
+          nullable: true
+          description: Status HTTP devolvido pela URL do webhook. Vem nulo quando não houve resposta (por exemplo, timeout).
+          example: 200
+        data_criacao:
+          type: string
+          format: date-time
+          description: Data e hora do envio.
+          example: "2026-11-05T14:32:10.123+00:00"
+      additionalProperties: false
+    WebhookAuditChartPoint:
+      type: object
+      properties:
+        rotulo:
+          type: string
+          description: |
+            Início do intervalo, no horário de Brasília. Até 1 hora de período, intervalos de 10 minutos (`"10m"`);
+            até 1 dia, por hora (`"14h"`); acima disso, por dia (`"05"`).
+          example: "05"
+        sucessos:
+          type: integer
+          format: int32
+          description: Envios com sucesso no intervalo.
+          example: 42
+        erros:
+          type: integer
+          format: int32
+          description: Envios com erro no intervalo.
+          example: 3
+      additionalProperties: false
     SimulationResponse:
       type: object
       description: Os dados da sua simulação
