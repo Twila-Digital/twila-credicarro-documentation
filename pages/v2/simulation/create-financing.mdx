@@ -26,6 +26,10 @@ Calcula as condições de financiamento e retorna **uma opção para cada prazo 
   `valorEntrada` pode ser `0` e precisa deixar ao menos 10% de `valorVeiculo` para financiar. Só voltam os prazos cuja entrada mínima foi atingida — consulte a [faixa financiável](/pages/v2/simulation/range-financing). Se nenhum prazo servir, a API retorna `422` com `Proposal.DownPaymentInvalid`.
 </Tip>
 
+<Tip title="Retorno de comissão" horizontal>
+  `retornoComissao` é opcional. Quando enviado, precisa estar na faixa `Financing` da loja — consulte os [retornos de comissão](/pages/v2/simulation/commission-returns). Fora da faixa, a API retorna `422` com `Store.CommissionReturn.OutOfRange`. Sem faixa configurada, retorna `Store.CommissionReturn.NotConfigured`.
+</Tip>
+
 <Note>
   Veja como ler cada campo da resposta na [referência de simulação](/pages/v2/simulation/reference).
 </Note>

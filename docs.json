@@ -147,6 +147,7 @@
                   "pages/v2/simulation/reference",
                   "pages/v2/simulation/range-financing",
                   "pages/v2/simulation/range-refinancing",
+                  "pages/v2/simulation/commission-returns",
                   "pages/v2/simulation/create-financing",
                   "pages/v2/simulation/create-refinancing",
                   "pages/simulation/get",
@@ -195,7 +196,10 @@
                   "pages/webhook/create",
                   "pages/webhook/list",
                   "pages/webhook/update",
-                  "pages/webhook/delete"
+                  "pages/webhook/delete",
+                  "pages/webhook/audit",
+                  "pages/webhook/audit-chart",
+                  "pages/webhook/resend"
                 ]
               }
             ]
@@ -351,7 +355,10 @@
                   "pages/webhook/create",
                   "pages/webhook/list",
                   "pages/webhook/update",
-                  "pages/webhook/delete"
+                  "pages/webhook/delete",
+                  "pages/webhook/audit",
+                  "pages/webhook/audit-chart",
+                  "pages/webhook/resend"
                 ]
               }
             ]

@@ -1,0 +1,41 @@
+---
+title: 'Histórico de envios'
+openapi: "GET /v1/webhook/audit"
+---
+
+Lista os envios de webhook do parceiro, de forma paginada. Cada item traz o corpo enviado, a resposta da sua URL e o status HTTP. Use o histórico para investigar falhas e escolher o que [reenviar](/pages/webhook/resend).
+
+```json Resposta
+{
+  "itens": [
+    {
+      "id_auditoria": "7c9e6679-7425-40de-944b-e07fc1f90ae7",
+      "id_webhook": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "tipo": "Proposal",
+      "requisicao": "{\"id_proposta\":\"bea8d060-f93d-48eb-b6c4-45f64483cdd9\", ...}",
+      "resposta": "",
+      "status_http": null,
+      "data_criacao": "2026-11-05T14:32:10.123+00:00"
+    }
+  ],
+  "pagina": { "numero": 1, "tamanho": 10, "total": 1, "tem_proximo": false, "tem_anterior": false }
+}
+```
+
+| Campo | Descrição |
+| --- | --- |
+| `id_auditoria` | Identificador do envio. Use para [reenviar](/pages/webhook/resend). |
+| `id_webhook` | Webhook que recebeu o envio. |
+| `tipo` | Tipo do webhook (`Proposal`, por exemplo). |
+| `requisicao` | Corpo enviado, como texto JSON. |
+| `resposta` | Corpo devolvido pela sua URL. Vazio quando não houve resposta. |
+| `status_http` | Status HTTP devolvido pela sua URL. `null` quando não houve resposta (por exemplo, tempo esgotado). |
+| `data_criacao` | Data e hora do envio. |
+
+<Tip title="Filtros" horizontal>
+  Todos os filtros são opcionais e podem ser combinados. Filtre por `status_http` para achar as falhas e por `id_proposta` ou `numero_proposta` para ver todos os envios de uma proposta.
+</Tip>
+
+<Note>
+  Uma data sem horário em `data_inicial` começa no início do dia. Em `data_final`, inclui o dia inteiro. Cada retentativa automática e cada reenvio aparecem como um item próprio.
+</Note>

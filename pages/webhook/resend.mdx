@@ -1,0 +1,33 @@
+---
+title: 'Reenviar webhook'
+openapi: "POST /v1/webhook/audit/{auditWebhookId}/resend"
+---
+
+Reenvia para a sua URL **o mesmo corpo** de um envio do [histórico](/pages/webhook/audit). Use depois de corrigir uma falha no seu sistema, quando as retentativas automáticas já acabaram.
+
+```json Resposta
+{
+  "status_http": 200,
+  "resposta": "{\"recebido\":true}"
+}
+```
+
+<Steps>
+  <Step title="Encontre o envio">
+    Consulte o [histórico de envios](/pages/webhook/audit), por exemplo com `status_http` ou `id_proposta`, e pegue o `id_auditoria`.
+  </Step>
+  <Step title="Reenvie">
+    Chame `POST /v1/webhook/audit/{id_auditoria}/resend`, sem corpo.
+  </Step>
+  <Step title="Confira o resultado">
+    A resposta traz o `status_http` e a `resposta` da sua URL. `status_http` vem `null` quando a URL não respondeu.
+  </Step>
+</Steps>
+
+<Warning title="Nova Idempotency-Key">
+  O reenvio chega com uma `Idempotency-Key` nova, no formato `{id_mensagem}:{id_webhook}:{id_tentativa}`. Se você deduplica pela chave inteira, o reenvio será processado mesmo que o envio original já tenha sido. Veja a deduplicação em [Verificação e segurança](/pages/webhooks/security).
+</Warning>
+
+<Note>
+  O reenvio é uma única tentativa, sem retentativas automáticas. Ele é assinado de novo (`X-CrediCarro-Signature`) e entra no histórico como um novo item, sem alterar o envio original.
+</Note>

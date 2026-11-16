@@ -83,12 +83,14 @@ Com estes valores, a sua implementação precisa chegar à mesma assinatura:
   - Qualquer resposta `2xx` com corpo de até 1 MiB confirma o recebimento.
   - Respostas `408`, `425`, `429` e `5xx`, falhas de rede e tempo esgotado (15 segundos) são retentadas automaticamente: até 3 novas tentativas, com espera de cerca de 1 s, 5 s e 30 s.
   - As demais respostas `4xx`, redirecionamentos (`3xx`) e respostas com corpo acima de 1 MiB são tratados como falha e não são retentados.
+  - Depois das retentativas, você pode [reenviar](/pages/webhook/resend) um envio que falhou, a partir do [histórico de envios](/pages/webhook/audit).
 </Card>
 
 ## Deduplicação
 
 <Card title="Trate o webhook como idempotente" icon="clone" horizontal>
   - Use o header `Idempotency-Key` como chave de deduplicação — uma retentativa da mesma notificação repete a chave.
+  - Um [reenvio manual](/pages/webhook/resend) chega com uma chave nova, `{id_mensagem}:{id_webhook}:{id_tentativa}`. Para tratá-lo como a mesma notificação, compare só o prefixo `{id_mensagem}:{id_webhook}`.
   - Notificações de eventos diferentes (por exemplo, mudança de status e mudança de etapas) chegam com chaves diferentes.
   - As notificações podem chegar fora de ordem. Para saber o estado mais recente, consulte a proposta.
 </Card>

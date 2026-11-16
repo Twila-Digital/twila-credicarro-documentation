@@ -113,6 +113,8 @@ Todos retornam `400`, com o campo em `campo`.
 | --- | --- | --- |
 | `Store.Integration.NotFound` | `404` | O `cnpjLoja` não existe ou não está vinculado ao parceiro. |
 | `Store.Integration.Intermediation` | `422` | A loja tem contrato de intermediação e não pode ser usada na integração. |
+| `Store.CommissionReturn.NotConfigured` | `422` | `retornoComissao` foi enviado, mas a loja não tem retorno de comissão configurado para a modalidade. |
+| `Store.CommissionReturn.OutOfRange` | `422` | `retornoComissao` está fora da faixa da loja. O `detalhe` informa o mínimo e o máximo. |
 | `Simulation.Access.NotFound` | `404` | A simulação não existe ou é de outro parceiro. |
 | `Simulation.Access.NotFromStore` | `422` | Na proposta, a simulação não foi feita para uma loja. |
 | `Simulation.Terms.Unavailable` | `422` | Não há prazos disponíveis para o veículo. |
@@ -159,6 +161,14 @@ Todos retornam `400`, com o campo em `campo`.
 | `Organization.Webhook.ActivationIntegrationInactive` | `422` | Não é possível ativar o webhook com a integração inativa. |
 | `Organization.Webhook.ConcurrencyConflict` | `409` | O webhook foi alterado ao mesmo tempo por outra requisição. Tente de novo. |
 | `Organization.Webhook.CredentialProtectionUnavailable` | `503` | Não foi possível proteger a credencial agora. Tente de novo. |
+| `Webhook.Audit.NotFound` | `404` | No reenvio, o envio não existe, é de outro parceiro ou não pode mais ser reenviado. |
+| `Organization.Webhook.Audit.DateRangeRequired` | `400` | No gráfico de envios, `data_inicial` ou `data_final` ausente. |
+| `Organization.Webhook.Audit.DateRangeTooLarge` | `400` | No gráfico de envios, período maior que 31 dias. |
+| `Organization.Webhook.Audit.InvalidDateRange`, `.InvalidFinalDate` | `400` | Período inválido: `data_final` antes de `data_inicial` ou data fora do intervalo aceito. |
+| `Organization.Webhook.Audit.InvalidProposalId`, `.InvalidSimulationId` | `400` | `id_proposta` ou `id_simulacao` não é um UUID válido. |
+| `Organization.Webhook.Audit.InvalidProposalNumber` | `400` | `numero_proposta` com mais de 50 caracteres. |
+| `Organization.Webhook.Audit.InvalidStatusCode` | `400` | `status_http` fora de 100 a 599. |
+| `Organization.Webhook.Resend.DependencyUnavailable` | `503` | Não foi possível reenviar agora. Tente de novo. |
 
 <Tip>
   Trate os códigos que fazem sentido para o seu fluxo e tenha um tratamento genérico por status para os demais. Novos códigos podem ser adicionados.
