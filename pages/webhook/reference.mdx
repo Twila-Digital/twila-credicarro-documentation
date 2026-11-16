@@ -15,7 +15,6 @@ Um **webhook** é uma URL do seu sistema que recebe notificações da Credicarro
 | [`PUT /v1/webhook/{webhookId}`](/pages/webhook/update) | Alterar tipo, URL e status. |
 | [`DELETE /v1/webhook/{webhookId}`](/pages/webhook/delete) | Excluir. O webhook deixa de receber notificações. |
 | [`GET /v1/webhook/audit`](/pages/webhook/audit) | Consultar o histórico de envios, com o corpo enviado e a resposta da sua URL. |
-| [`GET /v1/webhook/audit/chart`](/pages/webhook/audit-chart) | Contar sucessos e erros por intervalo, em até 31 dias. |
 | [`POST /v1/webhook/audit/{auditWebhookId}/resend`](/pages/webhook/resend) | Reenviar um envio do histórico. |
 
 ## Tipo (`tipo`)
@@ -72,12 +71,9 @@ Para pausar um webhook sem perder o cadastro, use `PUT /v1/webhook/{webhookId}` 
 
 Todo envio de webhook, inclusive as retentativas automáticas, fica registrado no histórico com o corpo enviado, a resposta da sua URL e o status HTTP.
 
-<CardGroup cols={3}>
+<CardGroup cols={2}>
   <Card title="Histórico de envios" icon="clock-rotate-left" href="/pages/webhook/audit">
     Investigue falhas filtrando por período, proposta ou status HTTP.
-  </Card>
-  <Card title="Gráfico de envios" icon="chart-column" href="/pages/webhook/audit-chart">
-    Acompanhe sucessos e erros ao longo do tempo.
   </Card>
   <Card title="Reenviar webhook" icon="rotate-right" href="/pages/webhook/resend">
     Reenvie um envio que falhou depois de corrigir o seu sistema.
