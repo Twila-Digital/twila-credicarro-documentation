@@ -1,0 +1,23 @@
+---
+title: 'Simular refinanciamento sem CPF'
+openapi: "POST /v1/proposal/simulation/refinancing/without-cpf"
+---
+
+Calcula as parcelas de um refinanciamento **sem CPF e sem cadastro de cliente**. Você informa a placa, o valor solicitado e a UF, e recebe **uma opção para cada prazo em cuja faixa o valor cabe**.
+
+**Exemplo:**
+```json
+{
+  "placa": "ABC1D23",
+  "valorSolicitado": 20000,
+  "uf": "SP"
+}
+```
+
+<Tip title="Faixa refinanciável" horizontal>
+  Cada prazo informa `valor_minimo_refinanciavel` e `valor_maximo_refinanciavel`. Se o `valorSolicitado` não couber na faixa de nenhum prazo, a API retorna `422` com `Proposal.RequestAmountInvalid`.
+</Tip>
+
+<Note title="Só simulação" horizontal>
+  Nada é gravado: a resposta não tem `id_simulacao` e não serve para criar uma proposta. Para isso, faça uma [simulação de refinanciamento](/pages/simulation/create-refinancing) com o CPF do cliente.
+</Note>
