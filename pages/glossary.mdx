@@ -17,6 +17,7 @@ icon: 'book'
 | **Faixa financiável** | Entrada mínima exigida para cada prazo de financiamento de um veículo. |
 | **Faixa refinanciável** | Valor mínimo e máximo que pode ser pedido em cada prazo de refinanciamento de um veículo. |
 | **Financiamento** | Crédito para o cliente comprar um veículo. |
+| **Intermediação** | Financiamento feito em uma loja com contrato de intermediação, em que quem vende o veículo é um terceiro, o vendedor. O vendedor precisa aceitar a proposta. |
 | **IOF** | Imposto sobre Operações Financeiras, cobrado em operações de crédito. |
 | **Laudo ECV** | Laudo emitido por uma Empresa Credenciada de Vistoria. |
 | **Laudo de vistoria** | Resultado da vistoria do veículo. |
@@ -36,6 +37,8 @@ icon: 'book'
 | **Cliente / comprador** | A pessoa que pede o crédito. Na API, `comprador`. |
 | **Loja** | O estabelecimento que vende o veículo ou atende o cliente, identificado pelo CNPJ (`cnpjLoja`). |
 | **Integrador / parceiro** | Quem consome a API da Credicarro — o sistema da loja ou de um parceiro. |
+| **Vendedor** | Na intermediação, quem vende o veículo ao cliente: uma pessoa física ou um lojista. Na API, `vendedor`. |
+| **Lojista vendedor** | Vendedor que é uma empresa (pessoa jurídica). Envia também os dados da empresa. |
 
 ---
 
@@ -45,8 +48,10 @@ icon: 'book'
 | --- | --- |
 | **Bearer token** | Token de acesso enviado no header `Authorization` de cada requisição. |
 | **Client ID / Client Secret** | Credenciais do integrador, usadas para gerar o token. Cada ambiente tem as suas. |
-| **Etapa ativa** | A etapa em que o comprador ou a loja está agora (`status_ativo`). |
+| **Etapa ativa** | A etapa em que o comprador, a loja ou o vendedor está agora (`status_ativo`). |
 | **Idempotency-Key** | Header que permite repetir uma requisição sem duplicar a operação. |
+| **Notificação pela Credicarro** | Modo de notificação em que a Credicarro convida o vendedor da intermediação e ele aceita ou recusa pelo convite. A Credicarro configura o modo para a sua organização. |
+| **Notificação própria** | Modo de notificação em que o integrador avisa o vendedor da intermediação e registra a decisão dele pela API. A Credicarro configura o modo para a sua organização. |
 | **Proposta** | O pedido de crédito, criado a partir de uma simulação. |
 | **Responsável pela ação** | Quem precisa agir na etapa ativa: cliente, integrador ou Credicarro. |
 | **Segredo de assinatura** | Chave usada para validar a assinatura HMAC dos webhooks. |
