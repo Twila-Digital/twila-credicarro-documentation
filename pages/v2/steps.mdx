@@ -29,23 +29,25 @@ Cada participante (comprador, loja e, quando houver, vendedor) tem a sua etapa a
 | 0 | `INDEFINIDO` | Etapa ainda não definida para o participante. |
 | 1 | `PROPOSTA_CRIADA` | Proposta enviada para análise. |
 | 2 | `PROPOSTA_APROVADA` | Proposta aprovada. |
-| 3 | `NOTIFICACAO_VENDEDOR` | Etapa de notificação interna. Não exige ação do integrador. |
+| 3 | `NOTIFICACAO_VENDEDOR` | Na intermediação, a loja aguarda o integrador [pedir a notificação](/pages/v2/proposal/seller-notification) ou [informar o vendedor](/pages/v2/proposal/seller). |
 | 4 | `ANALISE_BIOMETRIA` | Biometria do participante. |
-| 5 | `CONTA_RECEBIMENTO` | Aguardando a [conta de recebimento](/pages/v2/proposal/deposit-account) (refinanciamento). |
+| 5 | `CONTA_RECEBIMENTO` | Aguardando a [conta de recebimento](/pages/v2/proposal/deposit-account) do comprador (refinanciamento) ou a [do vendedor](/pages/v2/proposal/seller-deposit-account) (intermediação). |
 | 6 | `ENVIO_DOCUMENTOS` | Aguardando o [envio de documentos](/pages/v2/proposal/document). |
 | 7 | `CORRECAO_DOCUMENTOS` | Algum documento foi recusado e precisa ser reenviado. |
 | 8 | `DADOS_VEICULO` | Aguardando os [dados do veículo](/pages/v2/proposal/vehicle-detail). |
-| 9 | `VISTORIA` | Vistoria do veículo pelo cliente. |
+| 9 | `VISTORIA` | Vistoria do veículo pelo cliente ou pelo vendedor pessoa física. |
 | 10 | `ASSINATURA` | Assinatura do contrato pelo cliente. |
 | 11 | `PAGAMENTO` | Pagamento em andamento. |
 | 12 | `PROPOSTA_FINALIZADA` | Fluxo concluído. |
+| 13 | `ACEITE_VENDEDOR` | O vendedor da intermediação foi informado e ainda não aceitou nem recusou a proposta. |
+| 14 | `DADOS_EMPRESA` | Aguardando os [dados da empresa](/pages/v2/proposal/seller-company) do vendedor lojista. |
 
 ## <Icon icon="traffic-light" type="solid"/> Situação da etapa (`enum_situacao` / `situacao`)
 
 | Código | Nome | Significado |
 | --- | --- | --- |
 | 1 | `AGUARDANDO_ENVIO` | Aguardando dados ou arquivos do integrador. |
-| 2 | `AGUARDANDO_CLIENTE` | Aguardando uma ação do cliente (biometria, vistoria ou assinatura). |
+| 2 | `AGUARDANDO_CLIENTE` | Aguardando uma ação do cliente ou do vendedor (aceite, biometria, vistoria ou assinatura). |
 | 3 | `EM_PROCESSAMENTO` | A Credicarro está processando a etapa. |
 | 4 | `PENDENTE_CORRECAO` | Há documento recusado aguardando reenvio. |
 | 5 | `BLOQUEADA` | A etapa está bloqueada (por exemplo, biometria reprovada). |
@@ -57,7 +59,7 @@ Cada participante (comprador, loja e, quando houver, vendedor) tem a sua etapa a
 | Código | Nome | Significado |
 | --- | --- | --- |
 | 0 | `NENHUM` | Ninguém precisa agir (proposta encerrada). |
-| 1 | `CLIENTE` | O cliente precisa agir. |
+| 1 | `CLIENTE` | O cliente ou o vendedor precisa agir. |
 | 2 | `INTEGRADOR` | Seu sistema precisa enviar algo pela API. |
 | 3 | `CREDICARRO` | A Credicarro está cuidando da etapa. |
 
@@ -68,9 +70,9 @@ Cada participante (comprador, loja e, quando houver, vendedor) tem a sua etapa a
 
   | Etapa | Situação | Responsável |
   | --- | --- | --- |
-  | `CONTA_RECEBIMENTO`, `ENVIO_DOCUMENTOS`, `DADOS_VEICULO` | `AGUARDANDO_ENVIO` | `INTEGRADOR` |
+  | `NOTIFICACAO_VENDEDOR`, `CONTA_RECEBIMENTO`, `ENVIO_DOCUMENTOS`, `DADOS_VEICULO`, `DADOS_EMPRESA` | `AGUARDANDO_ENVIO` | `INTEGRADOR` |
   | `CORRECAO_DOCUMENTOS` | `PENDENTE_CORRECAO` | `INTEGRADOR` |
-  | `VISTORIA`, `ASSINATURA` | `AGUARDANDO_CLIENTE` | `CLIENTE` |
+  | `ACEITE_VENDEDOR`, `VISTORIA`, `ASSINATURA` | `AGUARDANDO_CLIENTE` | `CLIENTE` |
   | `ANALISE_BIOMETRIA` com sessão criada | `AGUARDANDO_CLIENTE` | `CLIENTE` |
   | `ANALISE_BIOMETRIA` com biometria reprovada | `BLOQUEADA` | `CREDICARRO` |
   | `ANALISE_BIOMETRIA` nos demais casos | `EM_PROCESSAMENTO` | `CREDICARRO` |
@@ -78,6 +80,8 @@ Cada participante (comprador, loja e, quando houver, vendedor) tem a sua etapa a
   | Demais etapas | `EM_PROCESSAMENTO` | `CREDICARRO` |
 
   Na loja, a situação da `ANALISE_BIOMETRIA` acompanha a biometria do comprador.
+
+  Na `ACEITE_VENDEDOR` com notificação própria, quem registra a decisão é você, em [Registrar a decisão do vendedor](/pages/v2/proposal/seller-decision).
 </Card>
 
 ## <Icon icon="fingerprint" type="solid"/> Biometria (`enum_biometria` / `biometria`)
@@ -101,7 +105,7 @@ Status (`enum_status` / `status` dentro de `documentos`). O `motivo` só aparece
 | 2 | `INVALIDO` | Documento recusado. O motivo vem em `motivo`; reenvie o mesmo tipo. |
 | 3 | `EM_ANALISE` | Documento em análise. |
 | 4 | `EXCLUIDO` | Documento excluído. |
-| 5 | `PENDENTE` | Documento exigido que ainda não foi enviado. Só aparece na consulta, para o comprador e a loja. |
+| 5 | `PENDENTE` | Documento exigido que ainda não foi enviado. Só aparece na consulta. |
 
 ### Documentos exigidos na consulta
 
@@ -116,10 +120,13 @@ Na consulta `GET /v2/proposal/{propostaId}`, o comprador e a loja listam **só o
 | Comprador | Refinanciamento | `COMPROVANTE_RESIDENCIA`, `DOCUMENTO_VEICULO`, `COMPROVANTE_RENDA`, `CNH` |
 | Loja | Financiamento | `LAUDO_ECV`, `DOCUMENTO_VEICULO` |
 | Loja | Refinanciamento | Nenhum (a lista vem vazia) |
+| Loja | Intermediação | Nenhum (a lista vem vazia) |
+| Vendedor pessoa física | Intermediação | `COMPROVANTE_RESIDENCIA`, `DOCUMENTO_VEICULO`, `CNH` |
+| Vendedor lojista | Intermediação | `CARTAO_CNPJ`, `LAUDO_ECV`, `DOCUMENTO_VEICULO` |
 
-A `CNH` aceita `CNH` ou `CNH_DIGITAL`. Se só a digital foi enviada, a lista mostra `CNH_DIGITAL` no lugar da `CNH` pendente. Se as duas foram enviadas, as duas aparecem.
+A `CNH` aceita `CNH` ou `CNH_DIGITAL`. Se só a digital foi enviada, a lista mostra `CNH_DIGITAL` no lugar da `CNH` pendente. Se as duas foram enviadas, as duas aparecem. Para o vendedor pessoa física, `CPF` e `RG` juntos também substituem a `CNH`.
 
-Documentos enviados que não estão na tabela (por exemplo, `LAUDO_VISTORIA`) não aparecem na lista do comprador nem da loja. A lista do vendedor mostra todos os documentos enviados, sem `PENDENTE`.
+Documentos enviados que não estão na tabela (por exemplo, `LAUDO_VISTORIA`) não aparecem na lista do comprador nem da loja. A lista do vendedor mostra todos os documentos enviados e, com `PENDENTE`, os exigidos que ainda faltam.
 
 Tipos aceitos no [envio de documentos](/pages/v2/proposal/document) (`enum_tipo` / `tipo`):
 

@@ -30,6 +30,10 @@ Inclui ou substitui a conta onde o cliente recebe o crédito. Só para propostas
   Enviar de novo substitui a conta anterior, enquanto a etapa estiver ativa.
 </Tip>
 
+<Tip title="Conta do vendedor" horizontal>
+  Na intermediação, a conta de recebimento do vendedor vai em [Incluir conta de recebimento do vendedor](/pages/v2/proposal/seller-deposit-account).
+</Tip>
+
 <Note>
   Retorna `204 No Content`. A etapa `CONTA_RECEBIMENTO` é do comprador. Fora dela, a API retorna `422` com `Proposal.ProposalIsNotInDepositAccountStatus`.
 </Note>

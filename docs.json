@@ -96,6 +96,7 @@
                 "pages": [
                   "pages/guides/financing-integration",
                   "pages/guides/refinancing-integration",
+                  "pages/guides/intermediation-integration",
                   "pages/guides/document-upload"
                 ]
               },
@@ -167,6 +168,11 @@
                   "pages/v2/proposal/document",
                   "pages/v2/proposal/vehicle-detail",
                   "pages/v2/proposal/deposit-account",
+                  "pages/v2/proposal/seller-notification",
+                  "pages/v2/proposal/seller",
+                  "pages/v2/proposal/seller-decision",
+                  "pages/v2/proposal/seller-deposit-account",
+                  "pages/v2/proposal/seller-company",
                   "pages/proposal/pagination"
                 ]
               }

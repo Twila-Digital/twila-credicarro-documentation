@@ -1,0 +1,35 @@
+---
+title: 'Incluir conta de recebimento do vendedor'
+openapi: "POST /v2/proposal/{propostaId}/seller/deposit-account"
+---
+
+Inclui ou substitui a conta onde o vendedor recebe o valor da venda. Só para propostas de **intermediação**, enquanto a etapa ativa do vendedor for `CONTA_RECEBIMENTO`.
+
+**Exemplo:**
+```json
+{
+  "documentoTitular": "98765432100",
+  "codigoBanco": "001",
+  "agencia": "1234",
+  "digitoAgencia": "5",
+  "conta": "123456",
+  "digitoConta": "7",
+  "tipoConta": "CORRENTE"
+}
+```
+
+<Warning>
+  Para o vendedor pessoa física, o `documentoTitular` precisa ser o CPF do vendedor. Senão, a API retorna `Seller.Integration.HolderMustBeCpf`. Para o lojista, precisa ser um CNPJ. Senão, a API retorna `Seller.Integration.HolderMustBeCnpj`.
+</Warning>
+
+<Tip title="Regras" horizontal>
+  Os campos seguem o formato da [conta de recebimento do comprador](/pages/v2/proposal/deposit-account), com `documentoTitular` no lugar de `cpfTitular`. `codigoBanco` com 3 dígitos, `agencia` com até 4 dígitos, `conta` de 4 a 13 dígitos. `digitoAgencia` e `digitoConta` são obrigatórios: um único caractere, de 0 a 9 ou `X`. `tipoConta`: `CORRENTE`, `POUPANCA` ou `PAGAMENTO`.
+</Tip>
+
+<Tip title="Corrigir a conta" horizontal>
+  Enviar de novo substitui a conta anterior, enquanto a etapa estiver ativa. No lojista, use o CNPJ da empresa: ele é conferido depois, nos [dados da empresa](/pages/v2/proposal/seller-company).
+</Tip>
+
+<Note>
+  Retorna `204 No Content`. A etapa `CONTA_RECEBIMENTO` é do vendedor. Fora dela, a API retorna `422` com `Seller.Integration.NotInDepositAccountStep`.
+</Note>

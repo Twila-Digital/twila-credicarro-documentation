@@ -147,9 +147,47 @@ Em paralelo às etapas, a proposta tem um status geral:
 
 ---
 
+## Intermediação
+
+Na loja com contrato de intermediação, quem vende o veículo é um terceiro, o **vendedor**: uma pessoa ou um lojista. A intermediação vale só para o financiamento. Depois da aprovação, o vendedor também tem etapas.
+
+<Steps>
+  <Step title="Aviso ao vendedor" icon="bell">
+    O vendedor é avisado da proposta. Conforme a configuração da sua integração, quem avisa é a Credicarro ou a própria loja.
+
+    **Quem age:** loja (pelo integrador).
+  </Step>
+  <Step title="Aceite do vendedor" icon="handshake">
+    O vendedor aceita ou recusa a proposta. Se recusar, a loja pode indicar outro vendedor.
+
+    **Quem age:** vendedor.
+  </Step>
+  <Step title="Conta de recebimento do vendedor" icon="building-columns">
+    A loja informa a conta bancária onde o vendedor recebe o valor da venda. A conta precisa estar no CPF do vendedor ou, se ele for lojista, no CNPJ da empresa.
+
+    **Quem age:** loja (pelo integrador).
+  </Step>
+  <Step title="Documentos e dados do veículo" icon="file-arrow-up">
+    A loja envia os documentos do vendedor e os dados do veículo. Se o vendedor for lojista, a loja também informa os dados da empresa dele.
+
+    **Quem age:** loja (pelo integrador).
+  </Step>
+  <Step title="Vistoria e biometria" icon="fingerprint">
+    Se o vendedor for pessoa física, o veículo passa pela vistoria e o vendedor confirma a identidade por biometria facial.
+
+    **Quem age:** vendedor.
+  </Step>
+</Steps>
+
+<Note>
+  Na intermediação, a loja não envia documentos nem dados do veículo dela. O cliente segue as etapas do financiamento: envio de documentos e biometria.
+</Note>
+
+---
+
 ## A loja também tem etapas
 
-O cliente e a loja têm **etapas separadas**. No financiamento, por exemplo, o cliente já pode estar com a biometria concluída enquanto a loja ainda está no pagamento. Acompanhe as duas.
+O cliente e a loja têm **etapas separadas**. No financiamento, por exemplo, o cliente já pode estar com a biometria concluída enquanto a loja ainda está no pagamento. Acompanhe as duas. Na intermediação, acompanhe também as etapas do vendedor.
 
 <Card title="Desenvolvedor? Veja os códigos" icon="code" href="/pages/v2/steps" horizontal>
   Os códigos de etapa, situação e status usados pela API estão em **Etapas e status**.

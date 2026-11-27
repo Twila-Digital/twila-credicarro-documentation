@@ -1,0 +1,30 @@
+---
+title: 'Incluir dados da empresa do vendedor'
+openapi: "POST /v2/proposal/{propostaId}/seller/company"
+---
+
+Inclui razão social, nome fantasia, CNPJ, contato e data de abertura da empresa do vendedor **lojista**. Aceito enquanto a etapa ativa do vendedor for `DADOS_EMPRESA`. Fora dela, retorna `422` com `Seller.Integration.NotInStoreDetailsStep`.
+
+**Exemplo:**
+```json
+{
+  "razao_social": "Loja Exemplo LTDA",
+  "nome_fantasia": "Loja Exemplo",
+  "cnpj": "11222333000181",
+  "email": "contato@exemplo.com",
+  "telefone": "+55 (11) 99999-9999",
+  "data_abertura": "2020-01-01"
+}
+```
+
+<Warning>
+  O `cnpj` precisa ser o mesmo do titular da [conta de recebimento do vendedor](/pages/v2/proposal/seller-deposit-account). Senão, a API retorna `Proposal.EstablishmentDocumentDoesNotMatchDepositAccountHolder`.
+</Warning>
+
+<Tip title="Regras" horizontal>
+  Só para o vendedor `JURIDICA`. Para o vendedor pessoa física, a API retorna `Seller.Integration.NotCompany`. `razao_social` e `nome_fantasia` com até 150 caracteres. `telefone` no formato `+55 (DD) 99999-9999`. `data_abertura` no formato `AAAA-MM-DD`, sem data futura.
+</Tip>
+
+<Note>
+  Retorna `204 No Content`, sem corpo.
+</Note>

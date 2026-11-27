@@ -10,10 +10,10 @@ A API leva a proposta até o fim pelo seu sistema. Depois de criada, você acomp
 
 <CardGroup cols={2}>
   <Card title="Loja informada pelo CNPJ" icon="store">
-    As simulações exigem o campo `cnpjLoja`. A loja precisa estar vinculada ao seu cadastro de parceiro e não pode ter contrato de intermediação.
+    As simulações exigem o campo `cnpjLoja`. A loja precisa estar vinculada ao seu cadastro de parceiro. Loja com contrato de intermediação só é aceita no financiamento.
   </Card>
   <Card title="Etapas por participante" icon="list-check">
-    A consulta da proposta traz a etapa ativa, a situação e quem precisa agir para o comprador e para a loja.
+    A consulta da proposta traz a etapa ativa, a situação e quem precisa agir para o comprador, a loja e, na intermediação, o vendedor.
   </Card>
   <Card title="Envio de dados pela API" icon="upload">
     Documentos, dados do veículo e conta de recebimento são enviados por endpoints próprios.
@@ -108,6 +108,8 @@ Os endpoints devem ser chamados na seguinte ordem.
         `CONTA_RECEBIMENTO` (só refinanciamento)
       </Card>
     </CardGroup>
+
+    Na intermediação, o vendedor tem etapas e endpoints próprios. Veja o [guia de intermediação](/pages/guides/intermediation-integration).
   </Step>
 </Steps>
 
@@ -123,6 +125,9 @@ Os endpoints devem ser chamados na seguinte ordem.
   </Card>
   <Card title="Refinanciamento ponta a ponta" icon="money-bill-transfer" href="/pages/guides/refinancing-integration">
     Inclui a conta de recebimento.
+  </Card>
+  <Card title="Intermediação ponta a ponta" icon="handshake" href="/pages/guides/intermediation-integration">
+    Inclui o aceite e as etapas do vendedor.
   </Card>
   <Card title="Envio de documentos" icon="file-arrow-up" href="/pages/guides/document-upload">
     Base64, idempotência e correção.

@@ -30,7 +30,12 @@ O diagrama mostra os caminhos mais comuns. A lista completa de status está em [
 | [`GET /v2/proposal/{propostaId}`](/pages/v2/proposal/get) | Consultar o retrato atual. |
 | [`POST /v2/proposal/{propostaId}/document`](/pages/v2/proposal/document) | Etapa `ENVIO_DOCUMENTOS` ou `CORRECAO_DOCUMENTOS`. |
 | [`POST /v2/proposal/{propostaId}/vehicle-detail`](/pages/v2/proposal/vehicle-detail) | Etapa `DADOS_VEICULO`. |
-| [`POST /v2/proposal/{propostaId}/deposit-account`](/pages/v2/proposal/deposit-account) | Etapa `CONTA_RECEBIMENTO` (só refinanciamento). |
+| [`POST /v2/proposal/{propostaId}/deposit-account`](/pages/v2/proposal/deposit-account) | Etapa `CONTA_RECEBIMENTO` do comprador (só refinanciamento). |
+| [`POST /v2/proposal/{propostaId}/seller/notification`](/pages/v2/proposal/seller-notification) | Etapa `NOTIFICACAO_VENDEDOR` da loja, com notificação pela Credicarro (intermediação). |
+| [`POST /v2/proposal/{propostaId}/seller`](/pages/v2/proposal/seller) | Etapa `NOTIFICACAO_VENDEDOR` da loja (intermediação). |
+| [`POST /v2/proposal/{propostaId}/seller/decision`](/pages/v2/proposal/seller-decision) | Etapa `ACEITE_VENDEDOR`, com notificação própria (intermediação). |
+| [`POST /v2/proposal/{propostaId}/seller/deposit-account`](/pages/v2/proposal/seller-deposit-account) | Etapa `CONTA_RECEBIMENTO` do vendedor (intermediação). |
+| [`POST /v2/proposal/{propostaId}/seller/company`](/pages/v2/proposal/seller-company) | Etapa `DADOS_EMPRESA` do vendedor lojista (intermediação). |
 | [`GET /v1/proposal`](/pages/proposal/pagination) | Listar as propostas do parceiro. |
 
 ## Objeto proposta
@@ -75,7 +80,8 @@ O diagrama mostra os caminhos mais comuns. A lista completa de status está em [
     },
     "etapas_concluidas": [],
     "documentos": []
-  }
+  },
+  "intermediacao": false
 }
 ```
 
@@ -90,8 +96,21 @@ O diagrama mostra os caminhos mais comuns. A lista completa de status está em [
 | `motivo_recusa` | Motivo da recusa. Omitido quando vazio. |
 | `link_biometria` | Link para o cliente fazer a biometria. A Credicarro já envia esse link ao cliente, exceto quando a integração conduz o contato. Omitido quando vazio. |
 | `comprador` | Biometria, etapa ativa, etapas concluídas e documentos do comprador. |
-| `vendedor` | Mesma estrutura de `comprador`. Omitido quando a proposta não tem vendedor. |
+| `vendedor` | Vendedor da [intermediação](/pages/guides/intermediation-integration): a estrutura de `comprador`, mais os campos da tabela abaixo. Omitido quando a proposta não tem vendedor. |
 | `loja` | Etapa ativa, etapas concluídas e documentos da loja. Omitido quando a proposta não foi feita em loja. |
+| `intermediacao` | `true` quando a proposta é de intermediação, com um vendedor terceiro. |
+
+Campos do `vendedor`, além dos de `comprador`. Os campos vazios são omitidos:
+
+| Campo | Descrição |
+| --- | --- |
+| `tipo_pessoa` | `FISICA` (pessoa física) ou `JURIDICA` (lojista). |
+| `cpf` | CPF do vendedor pessoa física. |
+| `cnpj` | CNPJ do lojista. |
+| `decisao` | `INFORMADO` enquanto o vendedor não decide, `ACEITO` ou `RECUSADO`. |
+| `data_decisao` | Data da decisão do vendedor. |
+| `link_biometria` | Link para o vendedor pessoa física fazer a biometria. Na notificação própria, repasse esse link ao vendedor. |
+| `empresa` | `razao_social`, `nome_fantasia`, `cnpj` e `data_abertura` do lojista, depois da etapa `DADOS_EMPRESA`. |
 
 ## Como decidir o próximo passo
 
@@ -100,9 +119,13 @@ Para **cada** participante (`comprador`, `vendedor` e `loja`), leia `status_ativ
 | `responsavel_acao` | `etapa` | O que fazer |
 | --- | --- | --- |
 | `INTEGRADOR` (2) | `ENVIO_DOCUMENTOS` (6) ou `CORRECAO_DOCUMENTOS` (7) | [Enviar documento](/pages/v2/proposal/document) |
-| `INTEGRADOR` (2) | `DADOS_VEICULO` (8) — da loja no financiamento, do comprador no refinanciamento | [Incluir dados do veículo](/pages/v2/proposal/vehicle-detail) |
+| `INTEGRADOR` (2) | `DADOS_VEICULO` (8) — da loja no financiamento, do comprador no refinanciamento, do vendedor na intermediação | [Incluir dados do veículo](/pages/v2/proposal/vehicle-detail) |
 | `INTEGRADOR` (2) | `CONTA_RECEBIMENTO` (5) — do comprador | [Incluir conta de recebimento](/pages/v2/proposal/deposit-account) |
-| `CLIENTE` (1) | qualquer | Orientar o cliente (biometria, vistoria ou assinatura) |
+| `INTEGRADOR` (2) | `CONTA_RECEBIMENTO` (5) — do vendedor | [Incluir conta de recebimento do vendedor](/pages/v2/proposal/seller-deposit-account) |
+| `INTEGRADOR` (2) | `NOTIFICACAO_VENDEDOR` (3) — da loja | [Pedir a notificação do vendedor](/pages/v2/proposal/seller-notification) ou [Informar o vendedor](/pages/v2/proposal/seller) |
+| `INTEGRADOR` (2) | `DADOS_EMPRESA` (14) — do vendedor lojista | [Incluir dados da empresa do vendedor](/pages/v2/proposal/seller-company) |
+| `CLIENTE` (1) | `ACEITE_VENDEDOR` (13) — do vendedor | Na notificação própria, [Registrar a decisão do vendedor](/pages/v2/proposal/seller-decision). Na notificação pela Credicarro, aguardar o vendedor |
+| `CLIENTE` (1) | demais etapas | Orientar o cliente ou o vendedor (biometria, vistoria ou assinatura) |
 | `CREDICARRO` (3) | qualquer | Aguardar |
 | `NENHUM` (0) | qualquer | Nada — a proposta foi encerrada |
 
