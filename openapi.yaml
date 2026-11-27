@@ -73,7 +73,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Proposal.SimulationAlreadyExpired`, `Proposal.SimulationAlreadyActivated` ou `Proposal.BuyerAgeNotAllowed`)
+          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Store.Integration.IntermediationV1`, `Proposal.SimulationAlreadyExpired`, `Proposal.SimulationAlreadyActivated` ou `Proposal.BuyerAgeNotAllowed`)
           content:
             application/json:
               schema:
@@ -232,7 +232,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
+          description: Loja com contrato de intermediação (`Store.Integration.IntermediationV1`) ou sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -300,7 +300,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
+          description: Loja com contrato de intermediação (`Store.Integration.IntermediationV1`) ou sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -534,7 +534,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
+          description: Loja com intermediação (`Store.Integration.IntermediationV1`) ou regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -671,7 +671,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra de negócio não atendida (por exemplo, `Proposal.RequestAmountInvalid`, `Simulation.Refinancing.AmountOutOfRange`, `Simulation.Terms.Unavailable` ou `Simulation.Refinancing.UfUnavailable`)
+          description: Loja com intermediação (`Store.Integration.IntermediationV1`) ou regra de negócio não atendida (por exemplo, `Proposal.RequestAmountInvalid`, `Simulation.Refinancing.AmountOutOfRange`, `Simulation.Terms.Unavailable` ou `Simulation.Refinancing.UfUnavailable`)
           content:
             application/json:
               schema:
@@ -1457,8 +1457,8 @@ paths:
       summary: Consultar valor mínimo de entrada por prazo para financiamento
       description: |
         Consulta o valor mínimo de entrada por prazo pela placa informada, selecionando a loja de integração pelo
-        CNPJ (`cnpjLoja`). A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de
-        intermediação.
+        CNPJ (`cnpjLoja`). A loja precisa estar vinculada ao parceiro autenticado. Lojas com contrato de
+        intermediação são aceitas.
       security:
         - bearerAuth: []
       parameters:
@@ -1518,7 +1518,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Loja com contrato de intermediação (`Store.Integration.Intermediation`) ou sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
+          description: Sem prazos disponíveis para o veículo (`Simulation.Terms.Unavailable`)
           content:
             application/json:
               schema:
@@ -1531,7 +1531,7 @@ paths:
       description: |
         Consulta o valor mínimo e máximo refinanciável pela placa informada, selecionando a loja de integração pelo
         CNPJ (`cnpjLoja`). A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de
-        intermediação.
+        intermediação: o refinanciamento não aceita intermediação.
       security:
         - bearerAuth: []
       parameters:
@@ -1608,7 +1608,8 @@ paths:
       summary: Criar uma nova simulação de financiamento
       description: |
         Cria uma nova simulação de financiamento selecionando a loja de integração pelo CNPJ (`cnpjLoja`).
-        A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de intermediação.
+        A loja precisa estar vinculada ao parceiro autenticado. Lojas com contrato de intermediação são aceitas: a proposta
+        segue o fluxo de intermediação, com o vendedor.
         O cliente precisa estar cadastrado antes da simulação, pelas rotas de Cliente.
       security:
         - bearerAuth: []
@@ -1688,7 +1689,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Loja com intermediação (`Store.Integration.Intermediation`), regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `retornoComissao` inválido (loja sem retorno de comissão configurado para financiamento, `Store.CommissionReturn.NotConfigured`, ou fora da faixa configurada, `Store.CommissionReturn.OutOfRange`)
+          description: Regra de negócio não atendida (por exemplo, `Proposal.DownPaymentInvalid`, `Proposal.RequestAmountInvalid`, `Simulation.Terms.Unavailable`) ou `retornoComissao` inválido (loja sem retorno de comissão configurado para financiamento, `Store.CommissionReturn.NotConfigured`, ou fora da faixa configurada, `Store.CommissionReturn.OutOfRange`)
           content:
             application/json:
               schema:
@@ -1700,7 +1701,8 @@ paths:
       summary: Criar uma nova simulação de refinanciamento
       description: |
         Cria uma nova simulação de refinanciamento selecionando a loja de integração pelo CNPJ (`cnpjLoja`).
-        A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de intermediação.
+        A loja precisa estar vinculada ao parceiro autenticado e não pode ter contrato de intermediação: o refinanciamento
+        não aceita intermediação.
         O cliente precisa estar cadastrado com endereço, e o `valorSolicitado` precisa estar dentro da faixa refinanciável da placa.
       security:
         - bearerAuth: []
@@ -1844,12 +1846,6 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
-        '422':
-          description: Loja com contrato de intermediação (`Store.Integration.Intermediation`)
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProblemDetails"
   /v2/proposal:
     post:
       tags:
@@ -1916,7 +1912,7 @@ paths:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
         '422':
-          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Simulation.Access.NotFromStore`, `Store.Integration.Intermediation`, `Proposal.SimulationAlreadyExpired`, `Proposal.SimulationAlreadyActivated` ou `Proposal.BuyerAgeNotAllowed`)
+          description: Regra de negócio não atendida (`Customer.Account.Incomplete`, `Simulation.Access.NotFromStore`, `Store.Integration.Intermediation` no refinanciamento, `Proposal.SimulationAlreadyExpired`, `Proposal.SimulationAlreadyActivated` ou `Proposal.BuyerAgeNotAllowed`)
           content:
             application/json:
               schema:
@@ -1931,7 +1927,11 @@ paths:
         documentos do comprador, da loja e, quando houver, do vendedor.
 
         Em `documentos`, o comprador e a loja listam só os documentos exigidos na proposta: os enviados
-        com o status real e os que faltam com `PENDENTE` (5). O vendedor lista todos os documentos enviados.
+        com o status real e os que faltam com `PENDENTE` (5). O vendedor lista todos os documentos enviados
+        e, com `PENDENTE` (5), os exigidos que ainda faltam.
+
+        Na proposta de intermediação (`intermediacao` = `true`), `vendedor` traz o tipo de pessoa, a decisão
+        sobre a proposta, o link de biometria e os dados da empresa do vendedor lojista.
       security:
         - bearerAuth: []
       parameters:
@@ -1970,7 +1970,8 @@ paths:
       summary: Incluir os dados do veículo
       description: |
         Inclui ou atualiza placa, Renavam, chassi e cor do veículo de uma proposta. Aceito somente
-        enquanto a etapa `DADOS_VEICULO` (8) estiver ativa: na loja, no financiamento; no comprador, no refinanciamento.
+        enquanto a etapa `DADOS_VEICULO` (8) estiver ativa: na loja, no financiamento; no comprador, no refinanciamento;
+        no vendedor, na intermediação.
       security:
         - bearerAuth: []
       parameters:
@@ -2206,6 +2207,368 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}/seller/notification:
+    post:
+      tags:
+        - Proposta
+      summary: Pedir a notificação do vendedor
+      description: |
+        Pede à Credicarro que convide o vendedor de uma proposta de **intermediação** a aceitar ou recusar a proposta.
+        Disponível para organizações com notificação pela Credicarro, enquanto a etapa ativa da loja for
+        `NOTIFICACAO_VENDEDOR` (3). O vendedor decide pelo convite que recebe. Use esta rota ou
+        `POST /v2/proposal/{propostaId}/seller`, não as duas.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['tipo_pessoa', 'email', 'celular']
+              additionalProperties: false
+              properties:
+                tipo_pessoa:
+                  type: string
+                  description: Tipo de pessoa do vendedor. `FISICA` para pessoa física e `JURIDICA` para lojista.
+                  enum: ['FISICA', 'JURIDICA']
+                  example: FISICA
+                email:
+                  type: string
+                  description: E-mail do vendedor, que recebe o convite.
+                  example: vendedor@exemplo.com
+                celular:
+                  type: string
+                  description: Celular do vendedor no formato `+55 (DD) 99999-9999`.
+                  example: "+55 (11) 99999-9999"
+      responses:
+        '202':
+          description: Pedido de notificação aceito. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: Accepted
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra não atendida — `Seller.Integration.NotIntermediation`, `Seller.Integration.SelfManaged`, `Seller.Integration.NotInNotificationStep`, `Proposal.SellerAlreadyNotified` ou `Proposal.Access.NotIntegrationV2`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}/seller:
+    post:
+      tags:
+        - Proposta
+      summary: Informar o vendedor
+      description: |
+        Pré-cadastra o vendedor de uma proposta de **intermediação** enquanto a etapa ativa da loja for
+        `NOTIFICACAO_VENDEDOR` (3). O vendedor fica na etapa `ACEITE_VENDEDOR` (13), com `decisao` = `INFORMADO`,
+        até aceitar ou recusar. Na notificação pela Credicarro, o vendedor decide pelo convite da Credicarro. Na
+        notificação própria, registre a decisão em `POST /v2/proposal/{propostaId}/seller/decision`.
+
+        O vendedor pessoa física precisa estar cadastrado antes em `POST /v1/customer/unified`.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['tipo_pessoa', 'nome', 'email', 'celular']
+              additionalProperties: false
+              properties:
+                tipo_pessoa:
+                  type: string
+                  description: Tipo de pessoa do vendedor. `FISICA` para pessoa física e `JURIDICA` para lojista.
+                  enum: ['FISICA', 'JURIDICA']
+                  example: FISICA
+                nome:
+                  type: string
+                  maxLength: 150
+                  description: Nome do vendedor ou razão social do lojista.
+                  example: Maria da Silva
+                cpf:
+                  type: string
+                  description: CPF do vendedor pessoa física, formatado ou apenas números. Obrigatório se `tipo_pessoa` for `FISICA`.
+                  example: "12345678909"
+                cnpj:
+                  type: string
+                  description: CNPJ do lojista, formatado ou apenas números. Obrigatório se `tipo_pessoa` for `JURIDICA`.
+                  example: "11222333000181"
+                email:
+                  type: string
+                  description: E-mail do vendedor.
+                  example: vendedor@exemplo.com
+                celular:
+                  type: string
+                  description: Celular do vendedor no formato `+55 (DD) 99999-9999`.
+                  example: "+55 (11) 99999-9999"
+      responses:
+        '201':
+          description: Vendedor informado. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: Created
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra não atendida — `Seller.Integration.NotIntermediation`, `Seller.Integration.NotInNotificationStep`, `Seller.Integration.AlreadyDecided`, `Seller.Integration.AccountRequired`, `Seller.Integration.SameAsBuyer`, `Proposal.ProposalWithWrongStatus` ou `Proposal.Access.NotIntegrationV2`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}/seller/decision:
+    post:
+      tags:
+        - Proposta
+      summary: Registrar a decisão do vendedor
+      description: |
+        Registra o aceite ou a recusa do vendedor informado em uma proposta de **intermediação**. Disponível só para
+        organizações com notificação própria, enquanto o vendedor estiver na etapa `ACEITE_VENDEDOR` (13).
+
+        O aceite libera as etapas do vendedor. A recusa remove o vendedor informado e devolve a loja para
+        `NOTIFICACAO_VENDEDOR` (3).
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['decisao']
+              additionalProperties: false
+              properties:
+                decisao:
+                  type: string
+                  description: Decisão do vendedor.
+                  enum: ['ACEITO', 'RECUSADO']
+                  example: ACEITO
+      responses:
+        '204':
+          description: Decisão registrada. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: No Content
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra não atendida — `Seller.Integration.NotIntermediation`, `Seller.Integration.DecisionOnlySelfManaged`, `Seller.Integration.NotInformed`, `Seller.Integration.AlreadyDecided` ou `Proposal.Access.NotIntegrationV2`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}/seller/deposit-account:
+    post:
+      tags:
+        - Proposta
+      summary: Incluir a conta de recebimento do vendedor
+      description: |
+        Inclui ou substitui a conta de recebimento do vendedor de uma proposta de **intermediação**, enquanto a etapa
+        ativa do vendedor for `CONTA_RECEBIMENTO` (5). O titular deve ser o CPF do vendedor pessoa física ou um CNPJ,
+        no caso do lojista. Enviar novamente substitui a conta anterior.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['documentoTitular', 'codigoBanco', 'agencia', 'digitoAgencia', 'conta', 'digitoConta', 'tipoConta']
+              additionalProperties: false
+              properties:
+                documentoTitular:
+                  type: string
+                  maxLength: 18
+                  description: Documento do titular da conta, formatado ou apenas números. CPF do vendedor pessoa física ou CNPJ do lojista.
+                  example: "12345678909"
+                codigoBanco:
+                  type: string
+                  description: Código do banco (COMPE) com 3 dígitos.
+                  example: "001"
+                agencia:
+                  type: string
+                  description: Número da agência com até 4 dígitos, sem o dígito verificador.
+                  example: "1234"
+                digitoAgencia:
+                  type: string
+                  description: Dígito verificador da agência (número ou X).
+                  example: "5"
+                conta:
+                  type: string
+                  description: Número da conta, de 4 a 13 dígitos, sem o dígito verificador.
+                  example: "123456"
+                digitoConta:
+                  type: string
+                  description: Dígito verificador da conta (número ou X).
+                  example: "7"
+                tipoConta:
+                  type: string
+                  description: Tipo da conta.
+                  enum: ['CORRENTE', 'POUPANCA', 'PAGAMENTO']
+                  example: CORRENTE
+      responses:
+        '204':
+          description: Conta de recebimento do vendedor registrada. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: No Content
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra não atendida — `Seller.Integration.NotIntermediation`, `Seller.Integration.Missing`, `Seller.Integration.NotInDepositAccountStep`, `Seller.Integration.HolderMustBeCpf`, `Seller.Integration.HolderMustBeCnpj` ou `Proposal.Access.NotIntegrationV2`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+  /v2/proposal/{propostaId}/seller/company:
+    post:
+      tags:
+        - Proposta
+      summary: Incluir os dados da empresa do vendedor
+      description: |
+        Inclui os dados da empresa do vendedor **lojista** (`tipo_pessoa` = `JURIDICA`) de uma proposta de
+        intermediação, enquanto a etapa ativa do vendedor for `DADOS_EMPRESA` (14). O CNPJ precisa ser o mesmo do
+        titular da conta de recebimento do vendedor.
+      security:
+        - bearerAuth: []
+      parameters:
+        - $ref: "#/components/parameters/ProposalId"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: ['razao_social', 'nome_fantasia', 'cnpj', 'email', 'telefone', 'data_abertura']
+              additionalProperties: false
+              properties:
+                razao_social:
+                  type: string
+                  maxLength: 150
+                  description: Razão social da empresa.
+                  example: Loja Exemplo LTDA
+                nome_fantasia:
+                  type: string
+                  maxLength: 150
+                  description: Nome fantasia da empresa.
+                  example: Loja Exemplo
+                cnpj:
+                  type: string
+                  description: CNPJ da empresa, formatado ou apenas números. Precisa ser o do titular da conta de recebimento do vendedor.
+                  example: "11222333000181"
+                email:
+                  type: string
+                  description: E-mail da empresa.
+                  example: contato@exemplo.com
+                telefone:
+                  type: string
+                  description: Telefone da empresa no formato `+55 (DD) 99999-9999`.
+                  example: "+55 (11) 99999-9999"
+                data_abertura:
+                  type: string
+                  format: date
+                  description: Data de abertura da empresa (`AAAA-MM-DD`), que não pode ser futura.
+                  example: "2020-01-01"
+      responses:
+        '204':
+          description: Dados da empresa registrados. A resposta não tem corpo.
+          content:
+            text/plain:
+              schema:
+                type: string
+                description: Resposta sem corpo
+              example: No Content
+        '400':
+          description: Erro na requisição
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '403':
+          $ref: "#/components/responses/IntegrationInactive"
+        '404':
+          description: Proposta não encontrada para este parceiro (`Proposal.Access.NotFound`)
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
+        '422':
+          description: Regra não atendida — `Seller.Integration.NotIntermediation`, `Seller.Integration.Missing`, `Seller.Integration.NotCompany`, `Seller.Integration.NotInStoreDetailsStep`, `Proposal.EstablishmentDocumentDoesNotMatchDepositAccountHolder` ou `Proposal.Access.NotIntegrationV2`
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProblemDetails"
 components:
   responses:
     IntegrationInactive:
@@ -2428,9 +2791,15 @@ components:
         comprador:
           $ref: "#/components/schemas/ProposalV2Participant"
         vendedor:
-          $ref: "#/components/schemas/ProposalV2Participant"
+          description: Vendedor da intermediação. Omitido quando a proposta não tem vendedor.
+          allOf:
+            - $ref: "#/components/schemas/ProposalV2Seller"
         loja:
           $ref: "#/components/schemas/ProposalV2Store"
+        intermediacao:
+          type: boolean
+          description: Indica se a proposta é de intermediação, com um vendedor terceiro.
+          example: false
     ProposalV2Participant:
       type: object
       properties:
@@ -2456,6 +2825,75 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProposalV2Document"
+    ProposalV2Seller:
+      type: object
+      description: Vendedor da intermediação. Mesma estrutura do comprador, com o tipo de pessoa, a decisão e os dados da empresa do lojista.
+      properties:
+        cpf:
+          type: string
+          description: CPF do vendedor pessoa física. Omitido para o lojista.
+          example: "98765432100"
+        enum_biometria:
+          type: integer
+          format: int32
+          description: Código da situação da biometria
+          example: 1
+        biometria:
+          type: string
+          enum: ['NAO_INICIADA', 'SESSAO_CRIADA', 'EM_ANALISE', 'APROVADA', 'REPROVADA']
+          example: SESSAO_CRIADA
+        status_ativo:
+          $ref: "#/components/schemas/ProposalV2ActiveStep"
+        etapas_concluidas:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProposalV2CompletedStep"
+        documentos:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProposalV2Document"
+        tipo_pessoa:
+          type: string
+          description: Tipo de pessoa do vendedor. `FISICA` para pessoa física e `JURIDICA` para lojista.
+          enum: ['FISICA', 'JURIDICA']
+          example: FISICA
+        cnpj:
+          type: string
+          description: CNPJ do lojista. Omitido para o vendedor pessoa física.
+          example: "11222333000181"
+        decisao:
+          type: string
+          description: Decisão do vendedor sobre a proposta. `INFORMADO` enquanto o vendedor não decide.
+          enum: ['INFORMADO', 'ACEITO', 'RECUSADO']
+          example: ACEITO
+        data_decisao:
+          type: string
+          format: date-time
+          description: Data da decisão do vendedor. Omitida enquanto o vendedor não decide.
+          example: 2026-10-12T15:10:00-03:00
+        link_biometria:
+          type: string
+          description: Link para o vendedor pessoa física fazer a biometria, quando disponível. Omitido quando vazio e para o lojista.
+          example: https://onboarding.exemplo.com/sessao/def456
+        empresa:
+          description: Dados da empresa do lojista, depois da etapa `DADOS_EMPRESA`. Omitido para o vendedor pessoa física.
+          allOf:
+            - $ref: "#/components/schemas/ProposalV2SellerCompany"
+    ProposalV2SellerCompany:
+      type: object
+      properties:
+        razao_social:
+          type: string
+          example: Loja Exemplo LTDA
+        nome_fantasia:
+          type: string
+          example: Loja Exemplo
+        cnpj:
+          type: string
+          example: "11222333000181"
+        data_abertura:
+          type: string
+          description: Data de abertura da empresa informada em `POST /v2/proposal/{propostaId}/seller/company`
     ProposalV2Store:
       type: object
       description: Etapas da loja de integração. Presente quando a proposta foi feita em loja.
@@ -2483,7 +2921,7 @@ components:
           example: 6
         etapa:
           type: string
-          enum: ['INDEFINIDO', 'PROPOSTA_CRIADA', 'PROPOSTA_APROVADA', 'NOTIFICACAO_VENDEDOR', 'ANALISE_BIOMETRIA', 'CONTA_RECEBIMENTO', 'ENVIO_DOCUMENTOS', 'CORRECAO_DOCUMENTOS', 'DADOS_VEICULO', 'VISTORIA', 'ASSINATURA', 'PAGAMENTO', 'PROPOSTA_FINALIZADA']
+          enum: ['INDEFINIDO', 'PROPOSTA_CRIADA', 'PROPOSTA_APROVADA', 'NOTIFICACAO_VENDEDOR', 'ANALISE_BIOMETRIA', 'CONTA_RECEBIMENTO', 'ENVIO_DOCUMENTOS', 'CORRECAO_DOCUMENTOS', 'DADOS_VEICULO', 'VISTORIA', 'ASSINATURA', 'PAGAMENTO', 'PROPOSTA_FINALIZADA', 'ACEITE_VENDEDOR', 'DADOS_EMPRESA']
           example: ENVIO_DOCUMENTOS
         enum_situacao:
           type: integer

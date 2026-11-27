@@ -1,0 +1,33 @@
+---
+title: 'Informar o vendedor'
+openapi: "POST /v2/proposal/{propostaId}/seller"
+---
+
+Pré-cadastra o vendedor de uma proposta de **intermediação**, enquanto a etapa ativa da loja for `NOTIFICACAO_VENDEDOR`. O vendedor passa para a etapa `ACEITE_VENDEDOR`, com `decisao` = `INFORMADO`, até aceitar ou recusar.
+
+**Exemplo:**
+```json
+{
+  "tipo_pessoa": "FISICA",
+  "nome": "Maria da Silva",
+  "cpf": "98765432100",
+  "email": "vendedor@exemplo.com",
+  "celular": "+55 (11) 99999-9999"
+}
+```
+
+<Warning>
+  O vendedor pessoa física precisa estar cadastrado antes em [`POST /v1/customer/unified`](/pages/customer/unified). Senão, a API retorna `Seller.Integration.AccountRequired`. O vendedor também não pode ser o comprador da proposta (`Seller.Integration.SameAsBuyer`).
+</Warning>
+
+<Tip title="Regras" horizontal>
+  `tipo_pessoa`: `FISICA` (pessoa física) ou `JURIDICA` (lojista). Envie `cpf` para `FISICA` e `cnpj` para `JURIDICA`. `nome` com até 150 caracteres. `celular` no formato `+55 (DD) 99999-9999`.
+</Tip>
+
+<Tip title="Quem registra a decisão" horizontal>
+  Na notificação pela Credicarro, a Credicarro convida o vendedor e ele decide pelo convite. Na notificação própria, você avisa o vendedor e registra a decisão em [Registrar a decisão do vendedor](/pages/v2/proposal/seller-decision).
+</Tip>
+
+<Note>
+  Retorna `201 Created`, sem corpo. Com o vendedor já informado ou já decidido, a API retorna `422` com `Seller.Integration.AlreadyDecided`. Fora da etapa `NOTIFICACAO_VENDEDOR` da loja, retorna `422` com `Seller.Integration.NotInNotificationStep`.
+</Note>

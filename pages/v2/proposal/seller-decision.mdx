@@ -1,0 +1,29 @@
+---
+title: 'Registrar a decisão do vendedor'
+openapi: "POST /v2/proposal/{propostaId}/seller/decision"
+---
+
+Registra o aceite ou a recusa do vendedor informado. Só para propostas de **intermediação** de organizações com notificação própria, enquanto o vendedor estiver na etapa `ACEITE_VENDEDOR`.
+
+**Exemplo:**
+```json
+{
+  "decisao": "ACEITO"
+}
+```
+
+<Warning>
+  Na notificação pela Credicarro, o vendedor decide pelo convite que recebe. Nesse caso, a API retorna `Seller.Integration.DecisionOnlySelfManaged`.
+</Warning>
+
+<Tip title="Regras" horizontal>
+  `decisao`: `ACEITO` ou `RECUSADO`. O vendedor precisa ter sido informado antes em [Informar o vendedor](/pages/v2/proposal/seller). Senão, a API retorna `Seller.Integration.NotInformed`.
+</Tip>
+
+<Tip title="Depois da decisão" horizontal>
+  O aceite libera as etapas do vendedor, a começar pela `CONTA_RECEBIMENTO`. A recusa remove o vendedor informado (`vendedor` volta a vir vazio) e devolve a loja para `NOTIFICACAO_VENDEDOR`, para você informar outro vendedor.
+</Tip>
+
+<Note>
+  Retorna `204 No Content`. Com a decisão já registrada, a API retorna `422` com `Seller.Integration.AlreadyDecided`.
+</Note>

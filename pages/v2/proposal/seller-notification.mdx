@@ -1,0 +1,31 @@
+---
+title: 'Pedir a notificação do vendedor'
+openapi: "POST /v2/proposal/{propostaId}/seller/notification"
+---
+
+Pede à Credicarro que convide o vendedor a aceitar ou recusar a proposta. Só para propostas de **intermediação** de organizações com notificação pela Credicarro, enquanto a etapa ativa da loja for `NOTIFICACAO_VENDEDOR`.
+
+**Exemplo:**
+```json
+{
+  "tipo_pessoa": "FISICA",
+  "email": "vendedor@exemplo.com",
+  "celular": "+55 (11) 99999-9999"
+}
+```
+
+<Warning>
+  Use esta rota **ou** [Informar o vendedor](/pages/v2/proposal/seller), não as duas. Depois de uma, a outra é recusada com `422`.
+</Warning>
+
+<Tip title="Regras" horizontal>
+  `tipo_pessoa`: `FISICA` (pessoa física) ou `JURIDICA` (lojista). `celular` no formato `+55 (DD) 99999-9999`.
+</Tip>
+
+<Tip title="Notificação própria" horizontal>
+  Se a sua organização usa notificação própria, a API retorna `Seller.Integration.SelfManaged`. Informe o vendedor em [Informar o vendedor](/pages/v2/proposal/seller) e registre a decisão em [Registrar a decisão do vendedor](/pages/v2/proposal/seller-decision).
+</Tip>
+
+<Note>
+  Retorna `202 Accepted`. O vendedor aceita ou recusa pelo convite. Fora da etapa `NOTIFICACAO_VENDEDOR` da loja, a API retorna `422` com `Seller.Integration.NotInNotificationStep`. Um segundo pedido para a mesma proposta também é recusado com `422`.
+</Note>
