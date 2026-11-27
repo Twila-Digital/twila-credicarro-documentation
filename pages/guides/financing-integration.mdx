@@ -7,7 +7,7 @@ icon: 'car'
 Este guia leva uma proposta de **financiamento** do começo ao fim no staging. Cada passo traz a requisição e a resposta.
 
 <Info>
-  Antes de começar, tenha as credenciais de staging e um `cnpjLoja` vinculado ao seu cadastro. Veja [Ambiente de testes](/pages/development). Os valores dos exemplos são ilustrativos.
+  Antes de começar, tenha as credenciais de staging e um `cnpjLoja` vinculado ao seu cadastro. Veja [Ambiente de testes](/pages/development). Se a loja tiver contrato de intermediação, siga também o [guia de intermediação](/pages/guides/intermediation-integration). Os valores dos exemplos são ilustrativos.
 </Info>
 
 ## Visão geral
@@ -248,7 +248,6 @@ Nos exemplos, `$BASE` é `https://api.staging.credicarro.com.br/integration` e `
 | --- | --- | --- |
 | `Customer.Account.NotFound` | Simulação | Cadastre o cliente antes de simular. |
 | `Store.Integration.NotFound` | Faixa ou simulação | Confira o `cnpjLoja` e o vínculo da loja com o seu cadastro. |
-| `Store.Integration.Intermediation` | Faixa ou simulação | Use outra loja ou fale com o time Credicarro. |
 | `Customer.Account.Incomplete` | Proposta | Complete endereço, ocupação e renda em `/v1/customer/unified`. |
 | `Proposal.DownPaymentInvalid` | Simulação | Nenhum prazo aceita a entrada informada. Consulte a faixa financiável. |
 | `Proposal.RequestAmountInvalid` | Simulação | A entrada deixa menos de 10% do valor do veículo para financiar. |

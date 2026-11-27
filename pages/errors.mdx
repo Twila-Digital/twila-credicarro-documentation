@@ -47,7 +47,7 @@ Um erro de regra de negócio vem sem `campo`:
 | `403` | Integração inativa ou parceiro não encontrado. Pode ocorrer em qualquer rota autenticada. | Não — fale com o time Credicarro |
 | `404` | Recurso não encontrado ou de outro parceiro (proposta, simulação, cliente, loja ou webhook). | Não |
 | `409` | CPF, e-mail ou celular já cadastrado, `Idempotency-Key` reutilizada com outro conteúdo ou edição simultânea de webhook. | Não — trate pelo `tipo` |
-| `422` | Regra de negócio não atendida (por exemplo, loja com intermediação ou cadastro do cliente incompleto). | Não — trate pelo `tipo` |
+| `422` | Regra de negócio não atendida (por exemplo, refinanciamento em loja com intermediação ou cadastro do cliente incompleto). | Não — trate pelo `tipo` |
 | `500` | Erro inesperado. | Sim, com a mesma `Idempotency-Key` |
 | `502` | Falha ao comunicar com um serviço interno ou externo. | Sim, com espera crescente |
 | `503` | Serviço temporariamente indisponível. | Sim, com espera crescente |
@@ -68,10 +68,10 @@ Todos retornam `400`, com o campo em `campo`.
 | --- | --- |
 | `Validation.Field.Required` | Campo obrigatório ausente (inclusive headers, como `Idempotency-Key` no envio de documento). |
 | `Validation.Field.TooLong` | Texto maior que o permitido. |
-| `Validation.Field.InvalidOption` | Valor fora das opções aceitas (por exemplo, `tipoOcupacao` ou `participante`). |
+| `Validation.Field.InvalidOption` | Valor fora das opções aceitas (por exemplo, `tipoOcupacao`, `participante`, `tipo_pessoa` ou `decisao`). |
 | `Validation.Identifier.Invalid` | Identificador (UUID) inválido ou vazio (por exemplo, `simulacaoId`). |
 | `Validation.Cpf.Invalid` | CPF inválido. |
-| `Validation.Cnpj.Invalid` | `cnpjLoja` inválido. |
+| `Validation.Cnpj.Invalid` | CNPJ inválido (`cnpjLoja` ou `cnpj`). |
 | `Validation.Email.Invalid` | E-mail inválido. |
 | `Validation.Phone.Invalid` | Celular fora do formato `+55 (DD) 99999-9999`. |
 | `Validation.ZipCode.Invalid` | CEP inválido. |
@@ -112,7 +112,8 @@ Todos retornam `400`, com o campo em `campo`.
 | Código | Status | Quando ocorre |
 | --- | --- | --- |
 | `Store.Integration.NotFound` | `404` | O `cnpjLoja` não existe ou não está vinculado ao parceiro. |
-| `Store.Integration.Intermediation` | `422` | A loja tem contrato de intermediação e não pode ser usada na integração. |
+| `Store.Integration.Intermediation` | `422` | No refinanciamento, a loja tem contrato de intermediação. O refinanciamento não aceita intermediação. |
+| `Store.Integration.IntermediationV1` | `422` | A loja tem contrato de intermediação, e a rota usada não aceita intermediação. A intermediação só é aceita no financiamento pelas rotas `/v2/proposal/...`. |
 | `Store.CommissionReturn.NotConfigured` | `422` | `retornoComissao` foi enviado, mas a loja não tem retorno de comissão configurado para a modalidade. |
 | `Store.CommissionReturn.OutOfRange` | `422` | `retornoComissao` está fora da faixa da loja. O `detalhe` informa o mínimo e o máximo. |
 | `Simulation.Access.NotFound` | `404` | A simulação não existe ou é de outro parceiro. |
@@ -140,6 +141,30 @@ Todos retornam `400`, com o campo em `campo`.
 | `Proposal.ProposalIsNotInDepositAccountStatus` | `422` | Conta de recebimento enviada fora da etapa `CONTA_RECEBIMENTO`. |
 | `Proposal.DepositAccount.OnlyRefinancing` | `422` | Conta de recebimento enviada para uma proposta de financiamento. |
 | `Proposal.DepositAccount.HolderNotBuyer` | `422` | O `cpfTitular` da conta não é o CPF do cliente da proposta. |
+
+### Vendedor
+
+Erros das rotas do vendedor da [intermediação](/pages/guides/intermediation-integration) (`/v2/proposal/{propostaId}/seller...`).
+
+| Código | Status | Quando ocorre |
+| --- | --- | --- |
+| `Seller.Integration.NotIntermediation` | `422` | A proposta não é de intermediação. |
+| `Seller.Integration.NotInNotificationStep` | `422` | A etapa ativa da loja não é `NOTIFICACAO_VENDEDOR`. |
+| `Seller.Integration.SelfManaged` | `422` | No pedido de notificação, a organização usa notificação própria. Informe o vendedor em `/seller`. |
+| `Seller.Integration.AccountRequired` | `422` | O vendedor pessoa física não está cadastrado. Cadastre-o em `/v1/customer/unified` antes. |
+| `Seller.Integration.SameAsBuyer` | `422` | O vendedor informado é o comprador da proposta. |
+| `Seller.Integration.AlreadyDecided` | `422` | O vendedor já foi informado ou já decidiu sobre a proposta. |
+| `Seller.Integration.DecisionOnlySelfManaged` | `422` | Na notificação pela Credicarro, o vendedor decide pelo convite. A decisão não é registrada pela API. |
+| `Seller.Integration.NotInformed` | `422` | Na decisão, a proposta não tem vendedor informado aguardando decisão. |
+| `Seller.Integration.Missing` | `422` | A proposta ainda não tem vendedor. |
+| `Seller.Integration.NotInDepositAccountStep` | `422` | A etapa ativa do vendedor não é `CONTA_RECEBIMENTO`. |
+| `Seller.Integration.HolderMustBeCpf` | `422` | O `documentoTitular` da conta do vendedor pessoa física não é o CPF do vendedor. |
+| `Seller.Integration.HolderMustBeCnpj` | `422` | O `documentoTitular` da conta do lojista não é um CNPJ. |
+| `Seller.Integration.NotCompany` | `422` | Dados da empresa enviados para um vendedor pessoa física. |
+| `Seller.Integration.NotInStoreDetailsStep` | `422` | A etapa ativa do vendedor não é `DADOS_EMPRESA`. |
+| `Proposal.SellerAlreadyNotified` | `422` | A notificação do vendedor já foi pedida para a proposta. |
+| `Proposal.ProposalWithWrongStatus` | `422` | A proposta não está mais aguardando o vendedor. Por exemplo, a notificação já foi pedida. |
+| `Proposal.EstablishmentDocumentDoesNotMatchDepositAccountHolder` | `422` | O `cnpj` dos dados da empresa não é o do titular da conta de recebimento do vendedor. |
 
 ### Envio de documento
 
@@ -224,4 +249,4 @@ curl -X POST https://api.staging.credicarro.com.br/integration/v2/proposal \
 | `POST /v1/proposal`, `POST /v2/proposal` | Opcional |
 | `POST /v2/proposal/{propostaId}/document` | **Obrigatório** |
 
-As rotas de webhook, de dados do veículo e de conta de recebimento não usam o header.
+As rotas de webhook, de dados do veículo, de conta de recebimento e do vendedor não usam o header.

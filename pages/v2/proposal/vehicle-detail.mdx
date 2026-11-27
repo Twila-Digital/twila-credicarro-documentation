@@ -3,7 +3,7 @@ title: 'Incluir dados do veículo'
 openapi: "POST /v2/proposal/{propostaId}/vehicle-detail"
 ---
 
-Inclui ou atualiza placa, Renavam, chassi e cor do veículo. Aceito enquanto a etapa `DADOS_VEICULO` estiver ativa — na **loja**, no financiamento, e no **comprador**, no refinanciamento. Fora dela, retorna `422` com `Proposal.InvalidStatus`.
+Inclui ou atualiza placa, Renavam, chassi e cor do veículo. Aceito enquanto a etapa `DADOS_VEICULO` estiver ativa — na **loja**, no financiamento, no **comprador**, no refinanciamento, e no **vendedor**, na intermediação. Fora dela, retorna `422` com `Proposal.InvalidStatus`.
 
 **Exemplo:**
 ```json

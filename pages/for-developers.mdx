@@ -81,7 +81,7 @@ As rotas de cliente, simulação, proposta e documento aceitam o cabeçalho `Ide
     Uma `Idempotency-Key` já usada com um corpo diferente. Gere uma nova chave para uma nova operação — veja [Erros e idempotência](/pages/errors).
   </Accordion>
   <Accordion title="404 ou 422 na simulação" icon="store">
-    `404` (`Store.Integration.NotFound`): o `cnpjLoja` não existe ou não está vinculado ao seu cadastro de parceiro. `422` (`Store.Integration.Intermediation`): a loja tem contrato de intermediação e não pode ser usada na integração.
+    `404` (`Store.Integration.NotFound`): o `cnpjLoja` não existe ou não está vinculado ao seu cadastro de parceiro. `422` (`Store.Integration.Intermediation` ou `Store.Integration.IntermediationV1`): a loja tem contrato de intermediação. A intermediação só é aceita no financiamento, pelas rotas `/v2/proposal/...`. Veja o [guia de intermediação](/pages/guides/intermediation-integration).
   </Accordion>
 </AccordionGroup>
 

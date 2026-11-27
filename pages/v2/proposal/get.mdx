@@ -3,17 +3,20 @@ title: 'Buscar proposta'
 openapi: "GET /v2/proposal/{propostaId}"
 ---
 
-Retorna o retrato atual da proposta: status, `link_biometria` e, para o comprador, a loja e, quando houver, o vendedor, a etapa ativa, a situação, quem precisa agir, as etapas concluídas e os documentos.
+Retorna o retrato atual da proposta: status, `link_biometria`, `intermediacao` e, para o comprador, a loja e, quando houver, o vendedor, a etapa ativa, a situação, quem precisa agir, as etapas concluídas e os documentos.
 
 <Tip title="Quem precisa agir?" horizontal>
   Leia `status_ativo.responsavel_acao` de cada participante. Quando for `INTEGRADOR`, a `etapa` diz o que enviar. Veja a [referência de proposta](/pages/v2/proposal/reference#como-decidir-o-proximo-passo).
 </Tip>
 
 <Tip title="Documentos pendentes" horizontal>
-  Para o comprador e a loja, `documentos` traz os documentos exigidos na proposta. Os que ainda faltam vêm com `status` = `PENDENTE` (5). Veja [quais documentos são exigidos](/pages/v2/steps#documentos-exigidos-na-consulta).
+  Para o comprador, a loja e o vendedor, `documentos` traz os documentos exigidos na proposta. Os que ainda faltam vêm com `status` = `PENDENTE` (5). Veja [quais documentos são exigidos](/pages/v2/steps#documentos-exigidos-na-consulta).
 </Tip>
 
 <Tip title="Biometria" horizontal>
   A Credicarro envia o link da biometria ao cliente por WhatsApp e e-mail na aprovação. Se a sua integração conduz o contato com o cliente, repasse o `link_biometria`.
 </Tip>
 
+<Tip title="Intermediação" horizontal>
+  Com `intermediacao` = `true`, `vendedor` traz o tipo de pessoa, a decisão (`INFORMADO`, `ACEITO` ou `RECUSADO`), o `link_biometria` do vendedor pessoa física e os dados da `empresa` do lojista. Veja o [guia de intermediação](/pages/guides/intermediation-integration).
+</Tip>

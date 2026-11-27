@@ -59,14 +59,14 @@ Cadastre e gerencie seus webhooks pela API em [Cadastrar webhook](/pages/webhook
 | --- | --- |
 | `id_proposta` | Identificador da proposta. |
 | `enum_status` / `status` | Status atual da proposta. Veja [Etapas e status](/pages/v2/steps). |
-| `motivo_evento` | O que disparou a notificação: `STATUS_ALTERADO`, `ETAPAS_ALTERADAS` ou `DOCUMENTOS_ALTERADOS`. |
+| `motivo_evento` | O que disparou a notificação: `STATUS_ALTERADO`, `ETAPAS_ALTERADAS`, `DOCUMENTOS_ALTERADOS`, `VENDEDOR_ACEITOU` ou `VENDEDOR_RECUSOU`. |
 | `motivo_recusa` | Motivo da recusa, ou `null`. |
 | `data_evento` | Momento em que este retrato foi montado (UTC). Muda a cada retentativa. |
 | `comprador` | Biometria, etapa ativa, etapas concluídas e documentos do comprador. |
 | `loja` | Etapa ativa, etapas concluídas e documentos da loja, ou `null`. |
-| `vendedor` | Reservado. Hoje sempre `null`. |
+| `vendedor` | Na [intermediação](/pages/guides/intermediation-integration), biometria, etapa ativa, etapas concluídas, documentos, tipo de pessoa, decisão e dados da empresa do vendedor. `null` quando a proposta não tem vendedor. |
 
-O formato de `status_ativo`, `etapas_concluidas` e `documentos` é o mesmo da [consulta da proposta](/pages/v2/proposal/get).
+O formato de `status_ativo`, `etapas_concluidas`, `documentos` e `vendedor` é o mesmo da [consulta da proposta](/pages/v2/proposal/get). O webhook não traz o campo `intermediacao`: na intermediação, consulte a proposta. Os campos sem valor vêm com `null`.
 
 ## <Icon icon="clone" type="solid"/> Entregas repetidas
 
